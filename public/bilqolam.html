@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="id" class="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilqolam - Rapor Mengaji SD Anak Saleh</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981', // Emerald 500
+                        secondary: '#059669', // Emerald 600
+                        dark: '#1F2937',
+                        light: '#F3F4F6'
+                    },
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Smooth transitions for theme switch */
+        body,
+        div,
+        nav,
+        aside,
+        header {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 font-sans antialiased overflow-x-hidden">
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar Backdrop (Mobile) -->
+        <div id="sidebar-backdrop" class="fixed inset-0 bg-gray-900/50 z-20 hidden lg:hidden glass-effect"
+            onclick="toggleSidebar()"></div>
+
+        <!-- Sidebar -->
+        <aside id="sidebar"
+            class="fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full shadow-lg lg:shadow-none">
+
+            <!-- Sidebar Header -->
+            <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200 dark:border-gray-700">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center">
+                        <i class="ph ph-book-open-text text-xl"></i>
+                    </div>
+                    <span class="text-lg font-bold tracking-tight text-gray-800 dark:text-white">Rapor Mengaji</span>
+                </div>
+                <!-- Close Button (Mobile) -->
+                <button onclick="toggleSidebar()" id="close-sidebar"
+                    class="lg:hidden text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white">
+                    <i class="ph ph-x text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
+                <a href="dashboard.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+                    <i class="ph ph-house text-xl"></i>
+                    <span>Home</span>
+                </a>
+
+                <a href="siswa.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+                    <i class="ph ph-student text-xl"></i>
+                    <span>Data Siswa</span>
+                </a>
+
+                <a href="bilqolam.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary transition-colors">
+                    <i class="ph ph-book-bookmark text-xl"></i>
+                    <span>Bilqolam</span>
+                </a>
+
+                <a href="doa.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+                    <i class="ph ph-hands-praying text-xl"></i>
+                    <span>Doa Sehari-hari</span>
+                </a>
+            </nav>
+
+            <!-- Sidebar Footer -->
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
+
+                <!-- Theme Toggle -->
+                <button onclick="toggleTheme()"
+                    class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+                    <i id="theme-icon" class="ph ph-moon text-xl"></i>
+                    <span id="theme-text">Dark Mode</span>
+                </button>
+
+                <!-- Logout -->
+                <a href="index.html"
+                    class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300 transition-colors">
+                    <i class="ph ph-sign-out text-xl"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Wrapper -->
+        <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+            <!-- Top Header -->
+            <header
+                class="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 lg:px-8 z-10">
+                <div class="flex items-center gap-4">
+                    <!-- Toggle Sidebar Button -->
+                    <button onclick="toggleSidebar()" id="sidebar-toggle"
+                        class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                        <i class="ph ph-list text-2xl"></i>
+                    </button>
+                    <h2 class="text-xl font-semibold text-gray-800 dark:text-white hidden sm:block">Penilaian Bilqolam
+                    </h2>
+                </div>
+
+                <!-- User Profile / Actions -->
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="text-right hidden md:block">
+                            <p class="text-sm font-semibold text-gray-800 dark:text-white">Admin User</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400">Administrator</p>
+                        </div>
+                        <div
+                            class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md">
+                            A
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Scrollable Area -->
+            <main class="flex-1 overflow-y-auto p-4 lg:p-8 bg-gray-50 dark:bg-gray-900">
+
+                <!-- Content Placeholder -->
+                <div id="main-content-placeholder"
+                    class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+
+                    <!-- Header & Actions -->
+                    <div class="flex flex-col gap-4 mb-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Data Penilaian Bilqolam</h3>
+                        </div>
+
+                        <!-- Filters & Sort -->
+                        <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+                            <select id="filterKelas"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                                <option value="">Semua Kelas</option>
+                            </select>
+                            <select id="filterKelompok"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                                <option value="">Semua Kelompok</option>
+                            </select>
+                            <select id="filterShift"
+                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                                <option value="">Semua Shift</option>
+                            </select>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                    <i class="ph ph-magnifying-glass text-gray-500"></i>
+                                </div>
+                                <input type="text" id="searchInput"
+                                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                    placeholder="Cari nama/NIS...">
+                            </div>
+                            <button id="btnSort"
+                                class="flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">
+                                <i class="ph ph-sort-ascending text-lg"></i>
+                                <span id="sortLabel">Nama A-Z</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table -->
+                    <div class="overflow-x-auto min-h-[400px]">
+                        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                            <thead
+                                class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400 sticky top-0">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3">NIS</th>
+                                    <th scope="col" class="px-6 py-3">NISN</th>
+                                    <th scope="col" class="px-6 py-3">Nama Lengkap</th>
+                                    <th scope="col" class="px-6 py-3">Jilid</th>
+                                    <th scope="col" class="px-6 py-3">Tajwid</th>
+                                    <th scope="col" class="px-6 py-3">Fashahah</th>
+                                    <th scope="col" class="px-6 py-3">Lagu</th>
+                                    <th scope="col" class="px-6 py-3">Saran Guru</th>
+                                    <th scope="col" class="px-6 py-3">Guru GPQ</th>
+                                    <th scope="col" class="px-6 py-3">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bilqolamTableBody">
+                                <!-- Data will be populated here -->
+                                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                                    <td colspan="12" class="px-6 py-4 text-center">Memuat data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div
+                        class="flex items-center justify-between border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-4 py-3 sm:px-6 mt-4">
+                        <div class="flex flex-1 justify-between sm:hidden">
+                            <button id="btnPrevMobile"
+                                class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">Previous</button>
+                            <button id="btnNextMobile"
+                                class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600">Next</button>
+                        </div>
+                        <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                            <div>
+                                <p class="text-sm text-gray-700 dark:text-gray-400">
+                                    Menampilkan <span class="font-medium" id="pageStart">0</span> sampai <span
+                                        class="font-medium" id="pageEnd">0</span> dari <span class="font-medium"
+                                        id="totalItems">0</span> data
+                                </p>
+                            </div>
+                            <div>
+                                <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm"
+                                    aria-label="Pagination">
+                                    <button id="btnPrev"
+                                        class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 dark:ring-gray-600 dark:hover:bg-gray-700">
+                                        <span class="sr-only">Previous</span>
+                                        <i class="ph ph-caret-left text-lg"></i>
+                                    </button>
+                                    <span id="pageNumbers" class="flex">
+                                        <!-- Page numbers will be injected here -->
+                                    </span>
+                                    <button id="btnNext"
+                                        class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 dark:ring-gray-600 dark:hover:bg-gray-700">
+                                        <span class="sr-only">Next</span>
+                                        <i class="ph ph-caret-right text-lg"></i>
+                                    </button>
+                                </nav>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- Grade Modal -->
+    <div id="gradeModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-gray-900/75 transition-opacity backdrop-blur-sm"></div>
+
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div
+                class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="ph ph-star text-yellow-600 dark:text-yellow-400 text-xl"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+                                id="modal-title">Penilaian Bilqolam: <span id="modalStudentName"></span></h3>
+                            <input type="hidden" id="modalStudentId">
+                            <div class="mt-4 space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="inputJilid"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jilid</label>
+                                        <select id="inputJilid"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                                            <option value="">Pilih Jilid</option>
+                                            <option value="1">Jilid 1</option>
+                                            <option value="2">Jilid 2</option>
+                                            <option value="3">Jilid 3</option>
+                                            <option value="4">Jilid 4</option>
+                                            <option value="5">Jilid 5</option>
+                                            <option value="6">Jilid 6</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="inputGuru"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
+                                            Guru GPQ</label>
+                                        <input type="text" id="inputGuru"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                            placeholder="Nama Guru">
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div>
+                                        <label for="inputTajwid"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tajwid</label>
+                                        <input type="number" id="inputTajwid" min="0" max="100"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                            placeholder="0-100">
+                                    </div>
+                                    <div>
+                                        <label for="inputFashahah"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fashahah</label>
+                                        <input type="number" id="inputFashahah" min="0" max="100"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                            placeholder="0-100">
+                                    </div>
+                                    <div>
+                                        <label for="inputLagu"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Lagu</label>
+                                        <input type="number" id="inputLagu" min="0" max="100"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                            placeholder="0-100">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="inputSaran"
+                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Saran Guru
+                                        GPQ</label>
+                                    <textarea id="inputSaran" rows="3"
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                        placeholder="Masukkan saran..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="button" id="btnSaveGrade"
+                        class="inline-flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary sm:ml-3 sm:w-auto">Simpan
+                        Nilai</button>
+                    <button type="button" id="btnCancelGrade"
+                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script defer src="/__/firebase/10.7.1/firebase-app-compat.js"></script>
+    <script defer src="/__/firebase/10.7.1/firebase-firestore-compat.js"></script>
+    <script defer src="/__/firebase/init.js?useEmulator=true"></script>
+
+    <!-- Scripts -->
+    <script src="js/dashboard.js"></script>
+    <script src="js/bilqolam.js"></script>
+</body>
+
+</html>
