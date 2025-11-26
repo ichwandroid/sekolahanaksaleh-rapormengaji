@@ -149,81 +149,15 @@ document.addEventListener('DOMContentLoaded', () => {
             const saran = data.bilqolam_saran || '-';
             const guru = data.bilqolam_guru || '-';
 
-            // Tooltip Logic for Tajwid
-            let tajwidTooltip = '';
-            let tajwidClass = '';
-
-            if (tajwid !== '-') {
-                const score = parseInt(tajwid);
-                if (!isNaN(score)) {
-                    // Added 'has-tooltip' class for JS targeting
-                    tajwidClass = 'cursor-help border-b-2 border-dotted border-gray-300 dark:border-gray-600 has-tooltip text-xs';
-                    if (score >= 86) {
-                        tajwidTooltip = "Ananda mampu memahami tajwid dalam bacaan";
-                    } else if (score >= 71) {
-                        tajwidTooltip = "Ananda cukup mampu memahami tajwid dalam bacaan";
-                    } else if (score >= 0) {
-                        tajwidTooltip = "Ananda kurang mampu memahami tajwid dalam bacaan";
-                    }
-                }
-            }
-
-            // Tooltip Logic for Fashahah
-            let fashahahTooltip = '';
-            let fashahahClass = '';
-
-            if (fashahah !== '-') {
-                const score = parseInt(fashahah);
-                if (!isNaN(score)) {
-                    // Added 'has-tooltip' class for JS targeting
-                    fashahahClass = 'cursor-help border-b-2 border-dotted border-gray-300 dark:border-gray-600 has-tooltip text-xs';
-                    if (score >= 86) {
-                        fashahahTooltip = "Ananda mampu melafalkan bacaan dengan jelas";
-                    } else if (score >= 71) {
-                        fashahahTooltip = "Ananda cukup mampu melafalkan bacaan dengan jelas";
-                    } else if (score >= 0) {
-                        fashahahTooltip = "Ananda kurang mampu melafalkan bacaan dengan jelas";
-                    }
-                }
-            }
-
-            // Tooltip Logic for Lagu
-            let laguTooltip = '';
-            let laguClass = '';
-
-            if (lagu !== '-') {
-                const score = parseInt(lagu);
-                if (!isNaN(score)) {
-                    // Added 'has-tooltip' class for JS targeting
-                    laguClass = 'cursor-help border-b-2 border-dotted border-gray-300 dark:border-gray-600 has-tooltip text-xs';
-                    if (score >= 86) {
-                        laguTooltip = "Ananda mampu memahami nada bacaan";
-                    } else if (score >= 71) {
-                        laguTooltip = "Ananda cukup mampu memahami nada bacaan";
-                    } else if (score >= 0) {
-                        laguTooltip = "Ananda kurang mampu memahami nada bacaan";
-                    }
-                }
-            }
-
             html += `
                 <tr class="student-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors opacity-0">
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${data.nis || '-'}</td>
                     <td class="px-6 py-4">${data.nisn || '-'}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.nama_lengkap || '-'}</td>
                     <td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">${jilid}</span></td>
-                    <td class="px-6 py-4">
-                        <!-- Removed title, added data-tooltip -->
-                        <span class="${tajwidClass}" data-tooltip="${tajwidTooltip}">${tajwid}</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <!-- Removed title, added data-tooltip -->
-                        <span class="${fashahahClass}" data-tooltip="${fashahahTooltip}">${fashahah}</span>
-                    </td>
-                    <td class="px-6 py-4">
-                        <!-- Removed title, added data-tooltip -->
-                        <span class="${laguClass}" data-tooltip="${laguTooltip}">${lagu}</span>
-                    </td>
+                    <td class="px-6 py-4">${tajwid}</td>
+                    <td class="px-6 py-4">${fashahah}</td>
+                    <td class="px-6 py-4">${lagu}</td>
                     <td class="px-6 py-4 max-w-xs truncate" title="${saran}">${saran}</td>
                     <td class="px-6 py-4">${guru}</td>
                     <td class="px-6 py-4">
@@ -371,57 +305,4 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- Custom Tooltip Implementation ---
-    const tooltip = document.createElement('div');
-    tooltip.className = 'fixed z-50 hidden bg-gray-900/95 backdrop-blur-sm text-white text-lg font-medium px-4 py-3 rounded-xl shadow-2xl pointer-events-none max-w-sm transition-all duration-200 border border-gray-700';
-    tooltip.style.opacity = '0';
-    document.body.appendChild(tooltip);
-
-    document.addEventListener('mouseover', (e) => {
-        const target = e.target.closest('.has-tooltip');
-        if (target && target.dataset.tooltip) {
-            tooltip.textContent = target.dataset.tooltip;
-            tooltip.classList.remove('hidden');
-            // Small delay to allow display:block to apply before opacity transition
-            requestAnimationFrame(() => {
-                tooltip.style.opacity = '1';
-                tooltip.style.transform = 'translateY(0) scale(1)';
-            });
-        }
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!tooltip.classList.contains('hidden')) {
-            const x = e.clientX + 15;
-            const y = e.clientY + 15;
-
-            // Prevent tooltip from going off screen
-            const rect = tooltip.getBoundingClientRect();
-            let finalX = x;
-            let finalY = y;
-
-            if (x + rect.width > window.innerWidth) {
-                finalX = e.clientX - rect.width - 10;
-            }
-            if (y + rect.height > window.innerHeight) {
-                finalY = e.clientY - rect.height - 10;
-            }
-
-            tooltip.style.left = `${finalX}px`;
-            tooltip.style.top = `${finalY}px`;
-        }
-    });
-
-    document.addEventListener('mouseout', (e) => {
-        const target = e.target.closest('.has-tooltip');
-        if (target) {
-            tooltip.style.opacity = '0';
-            tooltip.style.transform = 'translateY(5px) scale(0.95)';
-            setTimeout(() => {
-                if (tooltip.style.opacity === '0') {
-                    tooltip.classList.add('hidden');
-                }
-            }, 200);
-        }
-    });
 });

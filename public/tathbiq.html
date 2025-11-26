@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Siswa - Rapor Mengaji SD Anak Saleh</title>
+    <title>Tathbiq Ibadah - Rapor Mengaji SD Anak Saleh</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,8 +25,8 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#10B981', // Emerald 500
-                        secondary: '#059669', // Emerald 600
+                        primary: '#10B981',
+                        secondary: '#059669',
                         dark: '#1F2937',
                         light: '#F3F4F6'
                     },
@@ -38,7 +38,6 @@
         }
     </script>
     <style>
-        /* Smooth transitions for theme switch */
         body,
         div,
         nav,
@@ -77,7 +76,7 @@
                     <!-- Header & Actions -->
                     <div class="flex flex-col gap-4 mb-6">
                         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Daftar Siswa</h3>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Penilaian Tathbiq Ibadah</h3>
                             <div class="flex gap-2">
                                 <input type="file" id="csvFileInput" accept=".csv" class="hidden">
                                 <button onclick="document.getElementById('csvFileInput').click()"
@@ -85,11 +84,24 @@
                                     <i class="ph ph-upload-simple text-lg"></i>
                                     <span class="hidden sm:inline">Upload CSV</span>
                                 </button>
-                                <button id="btnAddSiswa"
-                                    class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors text-sm font-medium flex items-center gap-2">
-                                    <i class="ph ph-plus text-lg"></i>
-                                    <span class="hidden sm:inline">Tambah Siswa</span>
+                                <button id="btnDownloadTemplate"
+                                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium flex items-center gap-2">
+                                    <i class="ph ph-download-simple text-lg"></i>
+                                    <span class="hidden sm:inline">Template CSV</span>
                                 </button>
+                            </div>
+                        </div>
+
+                        <!-- Upload Progress -->
+                        <div id="uploadProgress" class="hidden mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-blue-700 dark:text-blue-300">Mengupload
+                                    data...</span>
+                                <span class="text-sm font-medium text-blue-700 dark:text-blue-300"
+                                    id="progressText">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 0%" id="progressBar"></div>
                             </div>
                         </div>
 
@@ -123,18 +135,6 @@
                         </div>
                     </div>
 
-                    <!-- Upload Progress -->
-                    <div id="uploadProgress" class="hidden mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                        <div class="flex justify-between mb-1">
-                            <span class="text-sm font-medium text-blue-700 dark:text-blue-300">Mengupload data...</span>
-                            <span class="text-sm font-medium text-blue-700 dark:text-blue-300"
-                                id="progressText">0%</span>
-                        </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                            <div class="bg-blue-600 h-2.5 rounded-full" style="width: 0%" id="progressBar"></div>
-                        </div>
-                    </div>
-
                     <!-- Table -->
                     <div class="overflow-x-auto min-h-[400px]">
                         <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
@@ -145,15 +145,14 @@
                                     <th scope="col" class="px-6 py-3">NISN</th>
                                     <th scope="col" class="px-6 py-3">Nama Lengkap</th>
                                     <th scope="col" class="px-6 py-3">Kelas</th>
-                                    <th scope="col" class="px-6 py-3">Kelompok</th>
-                                    <th scope="col" class="px-6 py-3">Shift</th>
+                                    <th scope="col" class="px-6 py-3">Tathbiq</th>
                                     <th scope="col" class="px-6 py-3">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="siswaTableBody">
+                            <tbody id="tathbiqTableBody">
                                 <!-- Data will be populated here -->
                                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                    <td colspan="7" class="px-6 py-4 text-center">Memuat data...</td>
+                                    <td colspan="8" class="px-6 py-4 text-center">Memuat data...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -202,80 +201,39 @@
         </div>
     </div>
 
-    <!-- Add Student Modal -->
-    <div id="addStudentModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title"
-        role="dialog" aria-modal="true">
+    <!-- Tathbiq Assessment Modal -->
+    <div id="tathbiqModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
         <!-- Backdrop -->
         <div class="fixed inset-0 bg-gray-900/75 transition-opacity backdrop-blur-sm"></div>
 
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div
-                class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100 dark:border-gray-700">
-                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-gray-100 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 max-h-[80vh] overflow-y-auto">
                     <div class="sm:flex sm:items-start">
                         <div
-                            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 sm:mx-0 sm:h-10 sm:w-10">
-                            <i class="ph ph-student text-green-600 dark:text-green-400 text-xl"></i>
+                            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="ph ph-hands-praying text-purple-600 dark:text-purple-400 text-xl"></i>
                         </div>
                         <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
                             <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-                                id="modal-title">Tambah Siswa Baru</h3>
-                            <div class="mt-4 space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="inputNIS"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIS</label>
-                                        <input type="text" id="inputNIS"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="12345" required>
-                                    </div>
-                                    <div>
-                                        <label for="inputNISN"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NISN</label>
-                                        <input type="text" id="inputNISN"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="0012345678">
-                                    </div>
-                                </div>
-                                <div>
-                                    <label for="inputNama"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
-                                        Lengkap</label>
-                                    <input type="text" id="inputNama"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                        placeholder="Nama Siswa" required>
-                                </div>
-                                <div class="grid grid-cols-3 gap-4">
-                                    <div>
-                                        <label for="inputKelas"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kelas</label>
-                                        <input type="text" id="inputKelas"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="1A">
-                                    </div>
-                                    <div>
-                                        <label for="inputKelompok"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kelompok</label>
-                                        <input type="text" id="inputKelompok"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="A">
-                                    </div>
-                                    <div>
-                                        <label for="inputShift"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Shift</label>
-                                        <input type="text" id="inputShift"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="Pagi">
-                                    </div>
-                                </div>
+                                id="modal-title">
+                                Penilaian Tathbiq: <span id="modalStudentName"></span> (Kelas <span
+                                    id="modalStudentKelas"></span>)
+                            </h3>
+                            <input type="hidden" id="modalStudentId">
+                            <div class="mt-4 space-y-3" id="tathbiqChecklistContainer">
+                                <!-- Tathbiq checklist will be dynamically generated here -->
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="button" id="btnSaveStudent"
-                        class="inline-flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary sm:ml-3 sm:w-auto">Simpan</button>
-                    <button type="button" id="btnCancelModal"
+                    <button type="button" id="btnSaveTathbiq"
+                        class="inline-flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary sm:ml-3 sm:w-auto">Simpan
+                        Penilaian</button>
+                    <button type="button" id="btnCancelTathbiq"
                         class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto">Batal</button>
                 </div>
             </div>
@@ -294,7 +252,7 @@
     <script src="js/sidebar.js"></script>
     <script src="js/header.js"></script>
     <script src="js/dashboard.js"></script>
-    <script src="js/siswa.js"></script>
+    <script src="js/tathbiq.js"></script>
 </body>
 
 </html>

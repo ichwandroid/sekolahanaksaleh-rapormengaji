@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
-    const tableBody = document.getElementById('doaTableBody');
+    const tableBody = document.getElementById('tathbiqTableBody');
 
     // Filters & Sort UI
     const filterKelas = document.getElementById('filterKelas');
@@ -21,13 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalItems = document.getElementById('totalItems');
 
     // Modal UI
-    const doaModal = document.getElementById('doaModal');
-    const btnCancelDoa = document.getElementById('btnCancelDoa');
-    const btnSaveDoa = document.getElementById('btnSaveDoa');
+    const tathbiqModal = document.getElementById('tathbiqModal');
+    const btnCancelTathbiq = document.getElementById('btnCancelTathbiq');
+    const btnSaveTathbiq = document.getElementById('btnSaveTathbiq');
     const modalStudentName = document.getElementById('modalStudentName');
     const modalStudentKelas = document.getElementById('modalStudentKelas');
     const modalStudentId = document.getElementById('modalStudentId');
-    const doaChecklistContainer = document.getElementById('doaChecklistContainer');
+    const tathbiqChecklistContainer = document.getElementById('tathbiqChecklistContainer');
 
     // State
     let studentsData = [];
@@ -36,39 +36,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsPerPage = 10;
     let sortOrder = 'asc';
 
-    // Doa configuration per class
-    const doaConfig = {
+    // Tathbiq Ibadah configuration per class (niat-niat beribadah)
+    const tathbiqConfig = {
         '1': [
-            "Do'a Mau Tidur",
-            "Do'a Bangun Tidur",
-            "Do'a Masuk Kamar Mandi",
-            "Do'a Keluar Kamar Mandi",
-            "Do'a Sebelum Makan",
-            "Do'a Sesudah Makan"
+            "Niat Wudhu	Do’a",
+            "Sesudah Wudhu",
+            "Niat-Niat Shalat Fardhu"
         ],
         '2': [
-            "Do’a Senandung al-Qur’an",
-            "Do'a Kaffārotul Majlis",
-            "Do'a Masuk Masjid",
-            "Do'a Keluar Masjid"
+            "Bacaan dan Jawaban Adzan",
+            "Do’a Ba’da Adzan",
+            "Bacaan Iqamah",
+            "Dzikir Ba’da Shalat"
         ],
         '3': [
-            "Do’a Mohon Kecerdasan Berpikir",
-            "Ayat Kursi"
+            "Niat Shalat Tarawih",
+            "Niat Shalat Witir",
+            "Dzikir Ba’da Shalat Tarawih & Witir"
         ],
         '4': [
-            "Do’a Ketika Sakit",
-            "Do’a Menjenguk Orang Sakit",
-            "Do’a Qunut"
+            "Niat Mandi Wajib"
         ],
         '5': [
-            "Do’a Mohon Keselamatan",
-            "Do’a Mohon Diberi Keteguhan Hati",
-            "Shalawat Thibbil Qulub"
+            "Niat Tayammum",
+            "Praktik Tayammum",
+            "Niat Shalat Jama' Taqdim",
+            "Niat Shalat Jama' Ta'khir"
         ],
         '6': [
-            "Do’a Mohon Diberi Rahmat & Hikmah",
-            "Do'a Mohon Petunjuk Kepada Allah"
+            "Niat Shalat Hajat",
+            "Do'a Shalat Hajat",
+            "Niat Shalat Tasbih"
         ]
     };
 
@@ -171,18 +169,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = '';
         pageData.forEach((data) => {
-            // Get class number for doa count
+            // Get class number for tathbiq count
             const kelasNum = data.kelas ? data.kelas.match(/\d+/)?.[0] : null;
-            const doaList = kelasNum && doaConfig[kelasNum] ? doaConfig[kelasNum] : [];
-            const doaData = data.doa_sehari || {};
+            const tathbiqList = kelasNum && tathbiqConfig[kelasNum] ? tathbiqConfig[kelasNum] : [];
+            const tathbiqData = data.tathbiq_ibadah || {};
 
             // Count completed prayers and calculate average
             let completedCount = 0;
             let totalScore = 0;
             let scoredCount = 0;
 
-            doaList.forEach(doa => {
-                const score = doaData[doa];
+            tathbiqList.forEach(tathbiq => {
+                const score = tathbiqData[tathbiq];
                 if (typeof score === 'number' && score >= 0) {
                     completedCount++;
                     totalScore += score;
@@ -190,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            const totalCount = doaList.length;
+            const totalCount = tathbiqList.length;
             const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
             const avgScore = scoredCount > 0 ? Math.round(totalScore / scoredCount) : 0;
 
@@ -227,7 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </span>
                     </td>
                     <td class="px-6 py-4">
-                        <button class="font-medium text-primary hover:underline" onclick="openDoaModal('${data.id}')">Nilai</button>
+                        <button class="font-medium text-primary hover:underline" onclick="openTathbiqModal('${data.id}')">Nilai</button>
                     </td>
                 </tr>
             `;
@@ -311,23 +309,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Modal Logic ---
     function toggleModal(show) {
         if (show) {
-            doaModal.classList.remove('hidden');
-            gsap.fromTo(doaModal.querySelector('.relative'),
+            tathbiqModal.classList.remove('hidden');
+            gsap.fromTo(tathbiqModal.querySelector('.relative'),
                 { scale: 0.95, opacity: 0 },
                 { scale: 1, opacity: 1, duration: 0.2, ease: "power2.out" }
             );
         } else {
-            gsap.to(doaModal.querySelector('.relative'), {
+            gsap.to(tathbiqModal.querySelector('.relative'), {
                 scale: 0.95,
                 opacity: 0,
                 duration: 0.2,
                 ease: "power2.in",
-                onComplete: () => doaModal.classList.add('hidden')
+                onComplete: () => tathbiqModal.classList.add('hidden')
             });
         }
     }
 
-    window.openDoaModal = (id) => {
+    window.openTathbiqModal = (id) => {
         const student = studentsData.find(s => s.id === id);
         if (!student) return;
 
@@ -335,22 +333,22 @@ document.addEventListener('DOMContentLoaded', () => {
         modalStudentName.textContent = student.nama_lengkap;
         modalStudentKelas.textContent = student.kelas || '-';
 
-        // Get doa list based on class
+        // Get tathbiq list based on class
         const kelasNum = student.kelas ? student.kelas.match(/\d+/)?.[0] : null;
-        const doaList = kelasNum && doaConfig[kelasNum] ? doaConfig[kelasNum] : [];
+        const tathbiqList = kelasNum && tathbiqConfig[kelasNum] ? tathbiqConfig[kelasNum] : [];
 
-        // Get existing doa data
-        const doaData = student.doa_sehari || {};
+        // Get existing tathbiq data
+        const tathbiqData = student.tathbiq_ibadah || {};
 
         // Generate checklist with score inputs
         let checklistHtml = '';
-        if (doaList.length === 0) {
-            checklistHtml = '<p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada daftar doa untuk kelas ini.</p>';
+        if (tathbiqList.length === 0) {
+            checklistHtml = '<p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada daftar tathbiq untuk kelas ini.</p>';
         } else {
-            doaList.forEach((doa, index) => {
-                const doaScore = doaData[doa];
-                const score = typeof doaScore === 'number' ? doaScore : '';
-                const isChecked = doaScore !== undefined && doaScore !== null && doaScore !== '';
+            tathbiqList.forEach((tathbiq, index) => {
+                const tathbiqScore = tathbiqData[tathbiq];
+                const score = typeof tathbiqScore === 'number' ? tathbiqScore : '';
+                const isChecked = tathbiqScore !== undefined && tathbiqScore !== null && tathbiqScore !== '';
 
                 // Tooltip logic
                 let tooltip = '';
@@ -369,12 +367,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 checklistHtml += `
                     <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                        <input type="checkbox" id="doa_check_${index}" data-index="${index}" ${isChecked ? 'checked' : ''} 
-                            class="w-5 h-5 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 doa-checkbox">
-                        <label for="doa_check_${index}" class="text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer flex-1">${doa}</label>
+                        <input type="checkbox" id="tathbiq_check_${index}" data-index="${index}" ${isChecked ? 'checked' : ''} 
+                            class="w-5 h-5 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 tathbiq-checkbox">
+                        <label for="tathbiq_check_${index}" class="text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer flex-1">${tathbiq}</label>
                         <div class="flex items-center gap-2">
-                            <input type="number" id="doa_score_${index}" data-doa="${doa}" value="${score}" min="0" max="100" placeholder="0-100"
-                                class="w-20 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 ${scoreClass} doa-score"
+                            <input type="number" id="tathbiq_score_${index}" data-tathbiq="${tathbiq}" value="${score}" min="0" max="100" placeholder="0-100"
+                                class="w-20 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 ${scoreClass} tathbiq-score"
                                 data-tooltip="${tooltip}">
                             <span class="text-xs text-gray-500 dark:text-gray-400">/ 100</span>
                         </div>
@@ -383,13 +381,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        doaChecklistContainer.innerHTML = checklistHtml;
+        tathbiqChecklistContainer.innerHTML = checklistHtml;
 
         // Add event listeners to auto-check when score is entered
-        const scoreInputs = doaChecklistContainer.querySelectorAll('.doa-score');
+        const scoreInputs = tathbiqChecklistContainer.querySelectorAll('.tathbiq-score');
         scoreInputs.forEach((input, index) => {
             input.addEventListener('input', (e) => {
-                const checkbox = document.getElementById(`doa_check_${index}`);
+                const checkbox = document.getElementById(`tathbiq_check_${index}`);
                 const value = e.target.value;
 
                 // Auto-check if value is entered
@@ -419,11 +417,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Auto-uncheck if checkbox is unchecked manually
-        const checkboxes = doaChecklistContainer.querySelectorAll('.doa-checkbox');
+        const checkboxes = tathbiqChecklistContainer.querySelectorAll('.tathbiq-checkbox');
         checkboxes.forEach((checkbox, index) => {
             checkbox.addEventListener('change', (e) => {
                 if (!e.target.checked) {
-                    const scoreInput = document.getElementById(`doa_score_${index}`);
+                    const scoreInput = document.getElementById(`tathbiq_score_${index}`);
                     scoreInput.value = '';
                     scoreInput.setAttribute('data-tooltip', '');
                     scoreInput.classList.remove('has-tooltip', 'cursor-help', 'border-b-2', 'border-dotted', 'border-gray-300', 'dark:border-gray-600');
@@ -434,37 +432,37 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleModal(true);
     };
 
-    btnCancelDoa.addEventListener('click', () => toggleModal(false));
+    btnCancelTathbiq.addEventListener('click', () => toggleModal(false));
 
-    btnSaveDoa.addEventListener('click', async () => {
+    btnSaveTathbiq.addEventListener('click', async () => {
         const id = modalStudentId.value;
         if (!id) return;
 
-        // Collect doa scores
-        const scoreInputs = doaChecklistContainer.querySelectorAll('.doa-score');
-        const doaData = {};
+        // Collect tathbiq scores
+        const scoreInputs = tathbiqChecklistContainer.querySelectorAll('.tathbiq-score');
+        const tathbiqData = {};
 
         scoreInputs.forEach(input => {
-            const doaName = input.dataset.doa;
+            const tathbiqName = input.dataset.tathbiq;
             const value = input.value;
 
             // Only save if there's a valid score
             if (value !== '' && !isNaN(value)) {
                 const score = parseInt(value);
                 if (score >= 0 && score <= 100) {
-                    doaData[doaName] = score;
+                    tathbiqData[tathbiqName] = score;
                 }
             }
         });
 
         try {
             await db.collection('students').doc(id).update({
-                doa_sehari: doaData,
+                tathbiq_ibadah: tathbiqData,
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             });
             toggleModal(false);
         } catch (error) {
-            console.error("Error updating doa: ", error);
+            console.error("Error updating tathbiq: ", error);
             alert("Gagal menyimpan penilaian: " + error.message);
         }
     });
@@ -478,31 +476,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Download Template CSV
     btnDownloadTemplate.addEventListener('click', () => {
-        // Get all unique doa names from all classes
-        const allDoas = new Set();
-        Object.values(doaConfig).forEach(doaList => {
-            doaList.forEach(doa => allDoas.add(doa));
+        // Get all unique tathbiq names from all classes
+        const allTathbiq = new Set();
+        Object.values(tathbiqConfig).forEach(tathbiqList => {
+            tathbiqList.forEach(tathbiq => allTathbiq.add(tathbiq));
         });
 
         // Create CSV header
-        const headers = ['NIS', 'NISN', 'Nama Lengkap', 'Kelas', ...Array.from(allDoas)];
+        const headers = ['NIS', 'NISN', 'Nama Lengkap', 'Kelas', ...Array.from(allTathbiq)];
 
         // Create sample data
-        const sampleRow = ['12345', '0012345678', 'Nama Siswa', '1', ...Array(allDoas.size).fill('85')];
+        const sampleRow = ['12345', '0012345678', 'Nama Siswa', '1', ...Array(allTathbiq.size).fill('85')];
 
         // Combine into CSV
         const csvContent = [
             headers.join(','),
             sampleRow.join(','),
-            '# Isi nilai 0-100 untuk setiap doa yang sesuai dengan kelas siswa',
-            '# Kolom doa yang tidak relevan untuk kelas tertentu bisa dikosongkan'
+            '# Isi nilai 0-100 untuk setiap tathbiq yang sesuai dengan kelas siswa',
+            '# Kolom tathbiq yang tidak relevan untuk kelas tertentu bisa dikosongkan'
         ].join('\n');
 
         // Download
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'template_doa_sehari_hari.csv';
+        link.download = 'template_tathbiq_ibadah_hari.csv';
         link.click();
     });
 
@@ -548,7 +546,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             continue;
                         }
 
-                        // Get student's class to determine relevant doas
+                        // Get student's class to determine relevant tathbiqs
                         const studentDoc = await db.collection('students').doc(String(nis)).get();
 
                         if (!studentDoc.exists) {
@@ -565,24 +563,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         const studentData = studentDoc.data();
                         const kelasNum = studentData.kelas ? studentData.kelas.match(/\d+/)?.[0] : null;
-                        const relevantDoas = kelasNum && doaConfig[kelasNum] ? doaConfig[kelasNum] : [];
+                        const relevantTathbiqs = kelasNum && tathbiqConfig[kelasNum] ? tathbiqConfig[kelasNum] : [];
 
-                        // Extract doa scores from CSV
-                        const doaScores = {};
-                        relevantDoas.forEach(doaName => {
-                            const score = normalizedRow[doaName];
+                        // Extract tathbiq scores from CSV
+                        const tathbiqScores = {};
+                        relevantTathbiqs.forEach(tathbiqName => {
+                            const score = normalizedRow[tathbiqName];
                             if (score && score !== '' && !isNaN(score)) {
                                 const numScore = parseInt(score);
                                 if (numScore >= 0 && numScore <= 100) {
-                                    doaScores[doaName] = numScore;
+                                    tathbiqScores[tathbiqName] = numScore;
                                 }
                             }
                         });
 
                         // Update student document if there are valid scores
-                        if (Object.keys(doaScores).length > 0) {
+                        if (Object.keys(tathbiqScores).length > 0) {
                             await db.collection('students').doc(String(nis)).update({
-                                doa_sehari: doaScores,
+                                tathbiq_ibadah: tathbiqScores,
                                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
                             });
                             updated++;
