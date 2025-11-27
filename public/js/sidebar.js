@@ -1,7 +1,7 @@
 // Sidebar Component
 const sidebarHTML = `
 <aside id="sidebar"
-    class="fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full shadow-lg lg:shadow-none">
+    class="fixed lg:static inset-y-0 left-0 z-30 w-64 -translate-x-full lg:translate-x-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full shadow-lg lg:shadow-none">
 
     <!-- Sidebar Header -->
     <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200 dark:border-gray-700">
@@ -48,6 +48,18 @@ const sidebarHTML = `
             class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
             <i class="ph ph-mosque text-xl"></i>
             <span>Tathbiq Ibadah</span>
+        </a>
+
+        <a href="tahfizh.html" data-page="tahfizh"
+            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+            <i class="ph ph-book-open-text text-xl"></i>
+            <span>Tahfizh Al-Qur'an</span>
+        </a>
+
+        <a href="laporan.html" data-page="laporan"
+            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+            <i class="ph ph-file-text text-xl"></i>
+            <span>Laporan</span>
         </a>
     </nav>
 
@@ -98,6 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (path.includes('bilqolam')) activePage = 'bilqolam';
     else if (path.includes('doa')) activePage = 'doa';
     else if (path.includes('tathbiq')) activePage = 'tathbiq';
+    else if (path.includes('tahfizh')) activePage = 'tahfizh';
+    else if (path.includes('laporan')) activePage = 'laporan';
 
     loadSidebar(activePage);
 });

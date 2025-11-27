@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const tableBody = document.getElementById('doaTableBody');
+    if (!tableBody) return;
 
     // Filters & Sort UI
     const filterKelas = document.getElementById('filterKelas');
@@ -191,29 +192,24 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const totalCount = doaList.length;
-            const percentage = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-            const avgScore = scoredCount > 0 ? Math.round(totalScore / scoredCount) : 0;
+            const maxPossibleScore = totalCount * 100;
+            const percentage = maxPossibleScore > 0 ? Math.round((totalScore / maxPossibleScore) * 100) : 0;
 
-            // Color coding based on average score
+            // Color coding based on percentage
             let badgeColor = 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
-            let tooltip = '';
-
             if (scoredCount > 0) {
-                if (avgScore >= 86) {
+                if (percentage >= 80) {
                     badgeColor = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
-                    tooltip = 'Ananda lancar dalam menghafalkan';
-                } else if (avgScore >= 71) {
+                } else if (percentage >= 50) {
                     badgeColor = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
-                    tooltip = 'Ananda cukup lancar dalam menghafalkan';
                 } else {
                     badgeColor = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
-                    tooltip = 'Ananda kurang lancar dalam menghafalkan';
                 }
             }
 
-            const displayText = scoredCount > 0
-                ? `${completedCount}/${totalCount} (${avgScore}/100)`
-                : `0/${totalCount}`;
+            const displayText = totalCount > 0
+                ? `${completedCount}/${totalCount} Doa (${percentage}%)`
+                : `0/${totalCount} Doa`;
 
             html += `
                 <tr class="student-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors opacity-0">
@@ -222,7 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.nama_lengkap || '-'}</td>
                     <td class="px-6 py-4">${data.kelas || '-'}</td>
                     <td class="px-6 py-4">
-                        <span class="${badgeColor} text-xs font-medium px-2.5 py-0.5 rounded ${tooltip ? 'has-tooltip cursor-help border-b-2 border-dotted' : ''}" data-tooltip="${tooltip}">
+                        <span class="${badgeColor} text-xs font-medium px-2.5 py-0.5 rounded">
                             ${displayText}
                         </span>
                     </td>
@@ -353,18 +349,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isChecked = doaScore !== undefined && doaScore !== null && doaScore !== '';
 
                 // Tooltip logic
-                let tooltip = '';
-                let scoreClass = '';
                 if (score !== '') {
-                    const numScore = parseInt(score);
-                    scoreClass = 'has-tooltip cursor-help border-b-2 border-dotted border-gray-300 dark:border-gray-600';
-                    if (numScore >= 86) {
-                        tooltip = 'Ananda lancar dalam menghafalkan';
-                    } else if (numScore >= 71) {
-                        tooltip = 'Ananda cukup lancar dalam menghafalkan';
-                    } else if (numScore >= 0) {
-                        tooltip = 'Ananda kurang lancar dalam menghafalkan';
-                    }
+                    // const numScore = parseInt(score);
                 }
 
                 checklistHtml += `
@@ -374,8 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <label for="doa_check_${index}" class="text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer flex-1">${doa}</label>
                         <div class="flex items-center gap-2">
                             <input type="number" id="doa_score_${index}" data-doa="${doa}" value="${score}" min="0" max="100" placeholder="0-100"
-                                class="w-20 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 ${scoreClass} doa-score"
-                                data-tooltip="${tooltip}">
+                                class="w-20 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 doa-score">
                             <span class="text-xs text-gray-500 dark:text-gray-400">/ 100</span>
                         </div>
                     </div>
@@ -396,24 +381,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (value !== '' && value >= 0 && value <= 100) {
                     checkbox.checked = true;
 
-                    // Update tooltip
-                    const numScore = parseInt(value);
-                    let tooltip = '';
-                    if (numScore >= 86) {
-                        tooltip = 'Ananda lancar dalam menghafalkan';
-                    } else if (numScore >= 71) {
-                        tooltip = 'Ananda cukup lancar dalam menghafalkan';
-                    } else if (numScore >= 0) {
-                        tooltip = 'Ananda kurang lancar dalam menghafalkan';
-                    }
-
-                    e.target.setAttribute('data-tooltip', tooltip);
-                    if (!e.target.classList.contains('has-tooltip')) {
-                        e.target.classList.add('has-tooltip', 'cursor-help', 'border-b-2', 'border-dotted', 'border-gray-300', 'dark:border-gray-600');
-                    }
+                    // Update tooltip logic removed
                 } else {
-                    e.target.setAttribute('data-tooltip', '');
-                    e.target.classList.remove('has-tooltip', 'cursor-help', 'border-b-2', 'border-dotted', 'border-gray-300', 'dark:border-gray-600');
+                    // Tooltip removal logic removed
                 }
             });
         });
@@ -425,8 +395,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!e.target.checked) {
                     const scoreInput = document.getElementById(`doa_score_${index}`);
                     scoreInput.value = '';
-                    scoreInput.setAttribute('data-tooltip', '');
-                    scoreInput.classList.remove('has-tooltip', 'cursor-help', 'border-b-2', 'border-dotted', 'border-gray-300', 'dark:border-gray-600');
                 }
             });
         });

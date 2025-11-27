@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const tableBody = document.getElementById('bilqolamTableBody');
+    if (!tableBody) return;
 
     // Filters & Sort UI
     const filterKelas = document.getElementById('filterKelas');
@@ -149,6 +150,24 @@ document.addEventListener('DOMContentLoaded', () => {
             const saran = data.bilqolam_saran || '-';
             const guru = data.bilqolam_guru || '-';
 
+            const tajwidScore = parseInt(tajwid) || 0;
+            const fashahahScore = parseInt(fashahah) || 0;
+            const laguScore = parseInt(lagu) || 0;
+            const totalScore = tajwidScore + fashahahScore + laguScore;
+            const percentage = Math.round((totalScore / 300) * 100);
+
+            // Color coding based on percentage
+            let badgeColor = 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
+            if (totalScore > 0) {
+                if (percentage >= 80) {
+                    badgeColor = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
+                } else if (percentage >= 50) {
+                    badgeColor = 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300';
+                } else {
+                    badgeColor = 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300';
+                }
+            }
+
             html += `
                 <tr class="student-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors opacity-0">
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${data.nis || '-'}</td>
@@ -158,6 +177,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4">${tajwid}</td>
                     <td class="px-6 py-4">${fashahah}</td>
                     <td class="px-6 py-4">${lagu}</td>
+                    <td class="px-6 py-4">
+                        <span class="${badgeColor} text-xs font-medium px-2.5 py-0.5 rounded">
+                            ${percentage}%
+                        </span>
+                    </td>
                     <td class="px-6 py-4 max-w-xs truncate" title="${saran}">${saran}</td>
                     <td class="px-6 py-4">${guru}</td>
                     <td class="px-6 py-4">

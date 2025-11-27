@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
-    const tableBody = document.getElementById('tathbiqTableBody');
+    const tableBody = document.getElementById('tahfizhTableBody');
     if (!tableBody) return;
 
     // Filters & Sort UI
@@ -22,13 +22,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const totalItems = document.getElementById('totalItems');
 
     // Modal UI
-    const tathbiqModal = document.getElementById('tathbiqModal');
-    const btnCancelTathbiq = document.getElementById('btnCancelTathbiq');
-    const btnSaveTathbiq = document.getElementById('btnSaveTathbiq');
+    const tahfizhModal = document.getElementById('tahfizhModal');
+    const btnCancelTahfizh = document.getElementById('btnCancelTahfizh');
+    const btnSaveTahfizh = document.getElementById('btnSaveTahfizh');
     const modalStudentName = document.getElementById('modalStudentName');
     const modalStudentKelas = document.getElementById('modalStudentKelas');
     const modalStudentId = document.getElementById('modalStudentId');
-    const tathbiqChecklistContainer = document.getElementById('tathbiqChecklistContainer');
+    const tahfizhChecklistContainer = document.getElementById('tahfizhChecklistContainer');
 
     // State
     let studentsData = [];
@@ -37,38 +37,45 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsPerPage = 10;
     let sortOrder = 'asc';
 
-    // Tathbiq Ibadah configuration per class (niat-niat beribadah)
-    const tathbiqConfig = {
-        '1': [
-            "Niat Wudhu	Do’a",
-            "Sesudah Wudhu",
-            "Niat-Niat Shalat Fardhu"
-        ],
-        '2': [
-            "Bacaan dan Jawaban Adzan",
-            "Do’a Ba’da Adzan",
-            "Bacaan Iqamah",
-            "Dzikir Ba’da Shalat"
-        ],
-        '3': [
-            "Niat Shalat Tarawih",
-            "Niat Shalat Witir",
-            "Dzikir Ba’da Shalat Tarawih & Witir"
-        ],
-        '4': [
-            "Niat Mandi Wajib"
-        ],
-        '5': [
-            "Niat Tayammum",
-            "Praktik Tayammum",
-            "Niat Shalat Jama' Taqdim",
-            "Niat Shalat Jama' Ta'khir"
-        ],
-        '6': [
-            "Niat Shalat Hajat",
-            "Do'a Shalat Hajat",
-            "Niat Shalat Tasbih"
-        ]
+    // Surah Data (Name -> Total Verses)
+    const surahData = {
+        "Quraisy": 4,
+        "At-Takātsur": 8,
+        "An-Nashr": 3,
+        "An-Nās": 6,
+        "Al-Mā’Ūn": 7,
+        "Al-Lahab": 5,
+        "Al-Kautsar": 3,
+        "Al-Kāfirūn": 6,
+        "Al-Ikhlāsh": 4,
+        "Al-Humazah": 9,
+        "Al-Fīl": 5,
+        "Al-Falaq": 5,
+        "Al-‘Ashr": 3,
+        "At-Tīn": 8,
+        "Asy-Syarh": 8,
+        "Al-Qadr": 5,
+        "Al-Bayyinah": 8,
+        "Al-‘Alaq": 19,
+        "Al-Ghāsyiyah": 26,
+        "Al-Fajr": 30,
+        "Al-A’Lā": 19,
+        "Al-Muthaffifīn": 36,
+        "Al-Infithār": 19,
+        "An-Nāzi’Āt": 46,
+        "An-Naba’": 40,
+        "Yāsīn-ayat41sd83": 83
+    };
+
+    // Tahfizh configuration per class (List of Surahs)
+    // This can be customized. For now, assigning common Juz 30 surahs.
+    const tahfizhConfig = {
+        '1': ["An-Nās", "Al-Falaq", "Al-Ikhlāsh", "Al-Lahab", "An-Nashr", "Al-Kāfirūn", "Al-Kautsar", "Al-Mā’ūn", "Quraisy", "Al-Fīl", "Al-Humazah", "Al-‘Ashr", "At-Takātsur"],
+        '2': ["Al-Bayyinah", "Al-Qadr", "Al-‘Alaq", "At-Tīn", "Asy-Syarh"],
+        '3': ["Al-Fajr", "Al-Ghāsyiyah", "Al-A’lā"],
+        '4': ["Al-Muthaffifīn", "Al-Infithār"],
+        '5': ["An-Nāzi’āt", "An-Naba’"],
+        '6': ["Yāsīn-ayat41sd83"]
     };
 
     // --- Real-time Listener ---
@@ -84,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error("Error fetching students: ", error);
         tableBody.innerHTML = `
             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                <td colspan="8" class="px-6 py-4 text-center text-red-500">
+                <td colspan="6" class="px-6 py-4 text-center text-red-500">
                     Gagal memuat data: ${error.message}
                 </td>
             </tr>`;
@@ -157,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filteredData.length === 0) {
             tableBody.innerHTML = `
                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                    <td colspan="8" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                    <td colspan="6" class="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
                         Tidak ada data siswa yang cocok.
                     </td>
                 </tr>`;
@@ -170,32 +177,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = '';
         pageData.forEach((data) => {
-            // Get class number for tathbiq count
+            // Get class number for tahfizh list
             const kelasNum = data.kelas ? data.kelas.match(/\d+/)?.[0] : null;
-            const tathbiqList = kelasNum && tathbiqConfig[kelasNum] ? tathbiqConfig[kelasNum] : [];
-            const tathbiqData = data.tathbiq_ibadah || {};
+            const surahList = kelasNum && tahfizhConfig[kelasNum] ? tahfizhConfig[kelasNum] : [];
+            const tahfizhData = data.tahfizh || {};
 
-            // Count completed prayers and calculate average
-            let completedCount = 0;
-            let totalScore = 0;
-            let scoredCount = 0;
+            // Calculate progress
+            let totalVersesTarget = 0;
+            let totalVersesMemorized = 0;
+            let completedSurahs = 0;
 
-            tathbiqList.forEach(tathbiq => {
-                const score = tathbiqData[tathbiq];
-                if (typeof score === 'number' && score >= 0) {
-                    completedCount++;
-                    totalScore += score;
-                    scoredCount++;
+            surahList.forEach(surah => {
+                const maxVerses = surahData[surah] || 0;
+                totalVersesTarget += maxVerses;
+
+                const memorized = tahfizhData[surah] || 0;
+                totalVersesMemorized += memorized;
+
+                if (memorized >= maxVerses && maxVerses > 0) {
+                    completedSurahs++;
                 }
             });
 
-            const totalCount = tathbiqList.length;
-            const maxPossibleScore = totalCount * 100;
-            const percentage = maxPossibleScore > 0 ? Math.round((totalScore / maxPossibleScore) * 100) : 0;
+            const percentage = totalVersesTarget > 0 ? Math.round((totalVersesMemorized / totalVersesTarget) * 100) : 0;
 
             // Color coding based on percentage
             let badgeColor = 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
-            if (scoredCount > 0) {
+            if (totalVersesTarget > 0) {
                 if (percentage >= 80) {
                     badgeColor = 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300';
                 } else if (percentage >= 50) {
@@ -205,9 +213,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            const displayText = totalCount > 0
-                ? `${completedCount}/${totalCount} Tathbiq (${percentage}%)`
-                : `0/${totalCount} Tathbiq`;
+            const displayText = totalVersesTarget > 0
+                ? `${completedSurahs}/${surahList.length} Surat (${percentage}%)`
+                : `0/${surahList.length} Surat`;
 
             html += `
                 <tr class="student-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors opacity-0">
@@ -219,9 +227,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         <span class="${badgeColor} text-xs font-medium px-2.5 py-0.5 rounded">
                             ${displayText}
                         </span>
+                        <div class="text-xs text-gray-500 mt-1">${totalVersesMemorized} / ${totalVersesTarget} Ayat</div>
                     </td>
                     <td class="px-6 py-4">
-                        <button class="font-medium text-primary hover:underline" onclick="openTathbiqModal('${data.id}')">Nilai</button>
+                        <button class="font-medium text-primary hover:underline" onclick="openTahfizhModal('${data.id}')">Nilai</button>
                     </td>
                 </tr>
             `;
@@ -305,23 +314,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Modal Logic ---
     function toggleModal(show) {
         if (show) {
-            tathbiqModal.classList.remove('hidden');
-            gsap.fromTo(tathbiqModal.querySelector('.relative'),
+            tahfizhModal.classList.remove('hidden');
+            gsap.fromTo(tahfizhModal.querySelector('.relative'),
                 { scale: 0.95, opacity: 0 },
                 { scale: 1, opacity: 1, duration: 0.2, ease: "power2.out" }
             );
         } else {
-            gsap.to(tathbiqModal.querySelector('.relative'), {
+            gsap.to(tahfizhModal.querySelector('.relative'), {
                 scale: 0.95,
                 opacity: 0,
                 duration: 0.2,
                 ease: "power2.in",
-                onComplete: () => tathbiqModal.classList.add('hidden')
+                onComplete: () => tahfizhModal.classList.add('hidden')
             });
         }
     }
 
-    window.openTathbiqModal = (id) => {
+    window.openTahfizhModal = (id) => {
         const student = studentsData.find(s => s.id === id);
         if (!student) return;
 
@@ -329,70 +338,71 @@ document.addEventListener('DOMContentLoaded', () => {
         modalStudentName.textContent = student.nama_lengkap;
         modalStudentKelas.textContent = student.kelas || '-';
 
-        // Get tathbiq list based on class
+        // Get tahfizh list based on class
         const kelasNum = student.kelas ? student.kelas.match(/\d+/)?.[0] : null;
-        const tathbiqList = kelasNum && tathbiqConfig[kelasNum] ? tathbiqConfig[kelasNum] : [];
+        const surahList = kelasNum && tahfizhConfig[kelasNum] ? tahfizhConfig[kelasNum] : [];
 
-        // Get existing tathbiq data
-        const tathbiqData = student.tathbiq_ibadah || {};
+        // Get existing tahfizh data
+        const tahfizhData = student.tahfizh || {};
 
-        // Generate checklist with score inputs
+        // Generate checklist with verse inputs
         let checklistHtml = '';
-        if (tathbiqList.length === 0) {
-            checklistHtml = '<p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada daftar tathbiq untuk kelas ini.</p>';
+        if (surahList.length === 0) {
+            checklistHtml = '<p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada daftar surat untuk kelas ini.</p>';
         } else {
-            tathbiqList.forEach((tathbiq, index) => {
-                const tathbiqScore = tathbiqData[tathbiq];
-                const score = typeof tathbiqScore === 'number' ? tathbiqScore : '';
-                const isChecked = tathbiqScore !== undefined && tathbiqScore !== null && tathbiqScore !== '';
-
-                // Tooltip logic
-                if (score !== '') {
-                    // const numScore = parseInt(score);
-                }
+            surahList.forEach((surah, index) => {
+                const maxVerses = surahData[surah] || 0;
+                const memorized = tahfizhData[surah];
+                const value = (memorized !== undefined && memorized !== null) ? memorized : '';
+                const isChecked = value !== '' && value > 0;
 
                 checklistHtml += `
                     <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                        <input type="checkbox" id="tathbiq_check_${index}" data-index="${index}" ${isChecked ? 'checked' : ''} 
-                            class="w-5 h-5 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 tathbiq-checkbox">
-                        <label for="tathbiq_check_${index}" class="text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer flex-1">${tathbiq}</label>
+                        <input type="checkbox" id="tahfizh_check_${index}" data-index="${index}" ${isChecked ? 'checked' : ''} 
+                            class="w-5 h-5 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 tahfizh-checkbox">
+                        <div class="flex-1">
+                            <label for="tahfizh_check_${index}" class="text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer block">${surah}</label>
+                            <span class="text-xs text-gray-500 dark:text-gray-400">Total: ${maxVerses} Ayat</span>
+                        </div>
                         <div class="flex items-center gap-2">
-                            <input type="number" id="tathbiq_score_${index}" data-tathbiq="${tathbiq}" value="${score}" min="0" max="100" placeholder="0-100"
-                                class="w-20 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 tathbiq-score">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">/ 100</span>
+                            <input type="number" id="tahfizh_input_${index}" data-surah="${surah}" data-max="${maxVerses}" value="${value}" min="0" max="${maxVerses}"
+                                class="w-20 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 tahfizh-input">
+                            <span class="text-xs text-gray-500 dark:text-gray-400">/ ${maxVerses}</span>
                         </div>
                     </div>
                 `;
             });
         }
 
-        tathbiqChecklistContainer.innerHTML = checklistHtml;
+        tahfizhChecklistContainer.innerHTML = checklistHtml;
 
-        // Add event listeners to auto-check when score is entered
-        const scoreInputs = tathbiqChecklistContainer.querySelectorAll('.tathbiq-score');
-        scoreInputs.forEach((input, index) => {
+        // Add event listeners
+        const inputs = tahfizhChecklistContainer.querySelectorAll('.tahfizh-input');
+        inputs.forEach((input, index) => {
             input.addEventListener('input', (e) => {
-                const checkbox = document.getElementById(`tathbiq_check_${index}`);
-                const value = e.target.value;
+                const checkbox = document.getElementById(`tahfizh_check_${index}`);
+                const value = parseInt(e.target.value);
+                const max = parseInt(e.target.dataset.max);
 
-                // Auto-check if value is entered
-                if (value !== '' && value >= 0 && value <= 100) {
+                if (!isNaN(value) && value > 0) {
                     checkbox.checked = true;
-
-                    // Update tooltip logic removed
-                } else {
-                    // Tooltip removal logic removed
+                    if (value > max) e.target.value = max; // Cap at max
+                } else if (value === 0) {
+                    // checkbox.checked = false; // Optional: uncheck if 0? Maybe keep checked to show they tried but know 0?
                 }
             });
         });
 
-        // Auto-uncheck if checkbox is unchecked manually
-        const checkboxes = tathbiqChecklistContainer.querySelectorAll('.tathbiq-checkbox');
+        const checkboxes = tahfizhChecklistContainer.querySelectorAll('.tahfizh-checkbox');
         checkboxes.forEach((checkbox, index) => {
             checkbox.addEventListener('change', (e) => {
-                if (!e.target.checked) {
-                    const scoreInput = document.getElementById(`tathbiq_score_${index}`);
-                    scoreInput.value = '';
+                const input = document.getElementById(`tahfizh_input_${index}`);
+                if (e.target.checked) {
+                    if (input.value === '' || input.value == 0) {
+                        input.value = input.dataset.max; // Default to max if checked
+                    }
+                } else {
+                    input.value = '';
                 }
             });
         });
@@ -400,37 +410,36 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleModal(true);
     };
 
-    btnCancelTathbiq.addEventListener('click', () => toggleModal(false));
+    btnCancelTahfizh.addEventListener('click', () => toggleModal(false));
 
-    btnSaveTathbiq.addEventListener('click', async () => {
+    btnSaveTahfizh.addEventListener('click', async () => {
         const id = modalStudentId.value;
         if (!id) return;
 
-        // Collect tathbiq scores
-        const scoreInputs = tathbiqChecklistContainer.querySelectorAll('.tathbiq-score');
-        const tathbiqData = {};
+        // Collect scores
+        const inputs = tahfizhChecklistContainer.querySelectorAll('.tahfizh-input');
+        const tahfizhData = {};
 
-        scoreInputs.forEach(input => {
-            const tathbiqName = input.dataset.tathbiq;
+        inputs.forEach(input => {
+            const surah = input.dataset.surah;
             const value = input.value;
 
-            // Only save if there's a valid score
             if (value !== '' && !isNaN(value)) {
-                const score = parseInt(value);
-                if (score >= 0 && score <= 100) {
-                    tathbiqData[tathbiqName] = score;
+                const verses = parseInt(value);
+                if (verses >= 0) {
+                    tahfizhData[surah] = verses;
                 }
             }
         });
 
         try {
             await db.collection('students').doc(id).update({
-                tathbiq_ibadah: tathbiqData,
+                tahfizh: tahfizhData,
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             });
             toggleModal(false);
         } catch (error) {
-            console.error("Error updating tathbiq: ", error);
+            console.error("Error updating tahfizh: ", error);
             alert("Gagal menyimpan penilaian: " + error.message);
         }
     });
@@ -444,31 +453,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Download Template CSV
     btnDownloadTemplate.addEventListener('click', () => {
-        // Get all unique tathbiq names from all classes
-        const allTathbiq = new Set();
-        Object.values(tathbiqConfig).forEach(tathbiqList => {
-            tathbiqList.forEach(tathbiq => allTathbiq.add(tathbiq));
+        // Get all unique surahs
+        const allSurahs = new Set();
+        Object.values(tahfizhConfig).forEach(list => {
+            list.forEach(s => allSurahs.add(s));
         });
 
-        // Create CSV header
-        const headers = ['NIS', 'NISN', 'Nama Lengkap', 'Kelas', ...Array.from(allTathbiq)];
+        const headers = ['NIS', 'NISN', 'Nama Lengkap', 'Kelas', ...Array.from(allSurahs)];
+        const sampleRow = ['12345', '0012345678', 'Nama Siswa', '1', ...Array(allSurahs.size).fill('5')];
 
-        // Create sample data
-        const sampleRow = ['12345', '0012345678', 'Nama Siswa', '1', ...Array(allTathbiq.size).fill('85')];
-
-        // Combine into CSV
         const csvContent = [
             headers.join(','),
             sampleRow.join(','),
-            '# Isi nilai 0-100 untuk setiap tathbiq yang sesuai dengan kelas siswa',
-            '# Kolom tathbiq yang tidak relevan untuk kelas tertentu bisa dikosongkan'
+            '# Isi jumlah ayat yang dihafal untuk setiap surat',
+            '# Pastikan jumlah tidak melebihi total ayat surat tersebut'
         ].join('\n');
 
-        // Download
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = 'template_tathbiq_ibadah_hari.csv';
+        link.download = 'template_tahfizh.csv';
         link.click();
     });
 
@@ -491,17 +495,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 let errors = 0;
                 let updated = 0;
 
-                console.log(`Found ${total} rows in CSV`);
-
                 try {
                     for (const row of data) {
-                        // Skip comment rows
                         if (row.NIS && row.NIS.startsWith('#')) {
                             processed++;
                             continue;
                         }
 
-                        // Normalize keys
                         const normalizedRow = {};
                         Object.keys(row).forEach(key => {
                             normalizedRow[key.trim()] = row[key];
@@ -514,15 +514,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             continue;
                         }
 
-                        // Get student's class to determine relevant tathbiqs
                         const studentDoc = await db.collection('students').doc(String(nis)).get();
-
                         if (!studentDoc.exists) {
-                            console.warn(`Student with NIS ${nis} not found`);
                             errors++;
                             processed++;
-
-                            // Update progress
                             const percent = Math.round((processed / total) * 100);
                             progressBar.style.width = `${percent}%`;
                             progressText.textContent = `${percent}%`;
@@ -531,38 +526,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         const studentData = studentDoc.data();
                         const kelasNum = studentData.kelas ? studentData.kelas.match(/\d+/)?.[0] : null;
-                        const relevantTathbiqs = kelasNum && tathbiqConfig[kelasNum] ? tathbiqConfig[kelasNum] : [];
+                        const relevantSurahs = kelasNum && tahfizhConfig[kelasNum] ? tahfizhConfig[kelasNum] : [];
 
-                        // Extract tathbiq scores from CSV
-                        const tathbiqScores = {};
-                        relevantTathbiqs.forEach(tathbiqName => {
-                            const score = normalizedRow[tathbiqName];
-                            if (score && score !== '' && !isNaN(score)) {
-                                const numScore = parseInt(score);
-                                if (numScore >= 0 && numScore <= 100) {
-                                    tathbiqScores[tathbiqName] = numScore;
+                        const tahfizhScores = {};
+                        relevantSurahs.forEach(surah => {
+                            const val = normalizedRow[surah];
+                            if (val && val !== '' && !isNaN(val)) {
+                                const numVal = parseInt(val);
+                                const max = surahData[surah] || 999;
+                                if (numVal >= 0) {
+                                    tahfizhScores[surah] = Math.min(numVal, max);
                                 }
                             }
                         });
 
-                        // Update student document if there are valid scores
-                        if (Object.keys(tathbiqScores).length > 0) {
+                        if (Object.keys(tahfizhScores).length > 0) {
                             await db.collection('students').doc(String(nis)).update({
-                                tathbiq_ibadah: tathbiqScores,
+                                tahfizh: tahfizhScores,
                                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
                             });
                             updated++;
                         }
 
                         processed++;
-
-                        // Update progress
                         const percent = Math.round((processed / total) * 100);
                         progressBar.style.width = `${percent}%`;
                         progressText.textContent = `${percent}%`;
                     }
 
-                    // Success
                     setTimeout(() => {
                         alert(`Upload selesai!\n${updated} siswa berhasil diperbarui.\n${errors} baris gagal/dilewati.`);
                         uploadProgress.classList.add('hidden');
@@ -582,5 +573,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
 });

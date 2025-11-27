@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bilqolam - Rapor Mengaji SD Anak Saleh</title>
+    <title>Tahfizh Al-Qur'an - Rapor Mengaji SD Anak Saleh</title>
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,8 +25,8 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#10B981', // Emerald 500
-                        secondary: '#059669', // Emerald 600
+                        primary: '#10B981',
+                        secondary: '#059669',
                         dark: '#1F2937',
                         light: '#F3F4F6'
                     },
@@ -76,7 +76,33 @@
                     <!-- Header & Actions -->
                     <div class="flex flex-col gap-4 mb-6">
                         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Data Penilaian Bilqolam</h3>
+                            <h3 class="text-lg font-bold text-gray-800 dark:text-white">Penilaian Tahfizh Al-Qur'an</h3>
+                            <div class="flex gap-2">
+                                <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+                                <button onclick="document.getElementById('csvFileInput').click()"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2">
+                                    <i class="ph ph-upload-simple text-lg"></i>
+                                    <span class="hidden sm:inline">Upload CSV</span>
+                                </button>
+                                <button id="btnDownloadTemplate"
+                                    class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium flex items-center gap-2">
+                                    <i class="ph ph-download-simple text-lg"></i>
+                                    <span class="hidden sm:inline">Template CSV</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Upload Progress -->
+                        <div id="uploadProgress" class="hidden mb-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <div class="flex justify-between mb-1">
+                                <span class="text-sm font-medium text-blue-700 dark:text-blue-300">Mengupload
+                                    data...</span>
+                                <span class="text-sm font-medium text-blue-700 dark:text-blue-300"
+                                    id="progressText">0%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
+                                <div class="bg-blue-600 h-2.5 rounded-full" style="width: 0%" id="progressBar"></div>
+                            </div>
                         </div>
 
                         <!-- Filters & Sort -->
@@ -118,20 +144,15 @@
                                     <th scope="col" class="px-6 py-3">NIS</th>
                                     <th scope="col" class="px-6 py-3">NISN</th>
                                     <th scope="col" class="px-6 py-3">Nama Lengkap</th>
-                                    <th scope="col" class="px-6 py-3">Jilid</th>
-                                    <th scope="col" class="px-6 py-3">Tajwid</th>
-                                    <th scope="col" class="px-6 py-3">Fashahah</th>
-                                    <th scope="col" class="px-6 py-3">Lagu</th>
-                                    <th scope="col" class="px-6 py-3">Total (%)</th>
-                                    <th scope="col" class="px-6 py-3">Saran Guru</th>
-                                    <th scope="col" class="px-6 py-3">Guru GPQ</th>
+                                    <th scope="col" class="px-6 py-3">Kelas</th>
+                                    <th scope="col" class="px-6 py-3">Capaian Tahfizh</th>
                                     <th scope="col" class="px-6 py-3">Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="bilqolamTableBody">
+                            <tbody id="tahfizhTableBody">
                                 <!-- Data will be populated here -->
                                 <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-                                    <td colspan="11" class="px-6 py-4 text-center">Memuat data...</td>
+                                    <td colspan="6" class="px-6 py-4 text-center">Memuat data...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -180,90 +201,39 @@
         </div>
     </div>
 
-    <!-- Grade Modal -->
-    <div id="gradeModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
+    <!-- Tahfizh Assessment Modal -->
+    <div id="tahfizhModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title" role="dialog"
         aria-modal="true">
         <!-- Backdrop -->
         <div class="fixed inset-0 bg-gray-900/75 transition-opacity backdrop-blur-sm"></div>
 
         <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <div
-                class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100 dark:border-gray-700">
-                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-gray-100 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4 max-h-[80vh] overflow-y-auto">
                     <div class="sm:flex sm:items-start">
                         <div
-                            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 sm:mx-0 sm:h-10 sm:w-10">
-                            <i class="ph ph-star text-yellow-600 dark:text-yellow-400 text-xl"></i>
+                            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="ph ph-book-open-text text-blue-600 dark:text-blue-400 text-xl"></i>
                         </div>
                         <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
                             <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-                                id="modal-title">Penilaian Bilqolam: <span id="modalStudentName"></span></h3>
+                                id="modal-title">
+                                Penilaian Tahfizh: <span id="modalStudentName"></span> (Kelas <span
+                                    id="modalStudentKelas"></span>)
+                            </h3>
                             <input type="hidden" id="modalStudentId">
-                            <div class="mt-4 space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="inputJilid"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jilid</label>
-                                        <select id="inputJilid"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-                                            <option value="">Pilih Jilid</option>
-                                            <option value="1">Jilid 1</option>
-                                            <option value="2">Jilid 2</option>
-                                            <option value="3">Jilid 3</option>
-                                            <option value="4">Jilid 4</option>
-                                            <option value="5">Jilid 5</option>
-                                            <option value="6">Jilid 6</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="inputGuru"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
-                                            Guru GPQ</label>
-                                        <input type="text" id="inputGuru"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="Nama Guru">
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-3 gap-4">
-                                    <div>
-                                        <label for="inputTajwid"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tajwid</label>
-                                        <input type="number" id="inputTajwid" min="0" max="100"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="0-100">
-                                    </div>
-                                    <div>
-                                        <label for="inputFashahah"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fashahah</label>
-                                        <input type="number" id="inputFashahah" min="0" max="100"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="0-100">
-                                    </div>
-                                    <div>
-                                        <label for="inputLagu"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Lagu</label>
-                                        <input type="number" id="inputLagu" min="0" max="100"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="0-100">
-                                    </div>
-                                </div>
-                                <div>
-                                    <label for="inputSaran"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Saran Guru
-                                        GPQ</label>
-                                    <textarea id="inputSaran" rows="3"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                        placeholder="Masukkan saran..."></textarea>
-                                </div>
+                            <div class="mt-4 space-y-3" id="tahfizhChecklistContainer">
+                                <!-- Tahfizh checklist will be dynamically generated here -->
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="button" id="btnSaveGrade"
+                    <button type="button" id="btnSaveTahfizh"
                         class="inline-flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary sm:ml-3 sm:w-auto">Simpan
-                        Nilai</button>
-                    <button type="button" id="btnCancelGrade"
+                        Penilaian</button>
+                    <button type="button" id="btnCancelTahfizh"
                         class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto">Batal</button>
                 </div>
             </div>
@@ -275,11 +245,14 @@
     <script defer src="/__/firebase/10.7.1/firebase-firestore-compat.js"></script>
     <script defer src="/__/firebase/init.js?useEmulator=true"></script>
 
+    <!-- PapaParse for CSV -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
     <!-- Scripts -->
     <script src="js/sidebar.js"></script>
     <script src="js/header.js"></script>
     <script src="js/dashboard.js"></script>
-    <script src="js/bilqolam.js"></script>
+    <script src="js/tahfizh.js"></script>
 </body>
 
 </html>

@@ -31,7 +31,9 @@ const pageTitles = {
     'siswa': 'Data Siswa',
     'bilqolam': 'Bilqolam',
     'doa': 'Doa Sehari-hari',
-    'tathbiq': 'Tathbiq Ibadah'
+    'tathbiq': 'Tathbiq Ibadah',
+    'tahfizh': "Tahfizh Al-Qur'an",
+    'laporan': 'Laporan'
 };
 
 // Function to load header
@@ -58,6 +60,8 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (path.includes('bilqolam')) activePage = 'bilqolam';
     else if (path.includes('doa')) activePage = 'doa';
     else if (path.includes('tathbiq')) activePage = 'tathbiq';
+    else if (path.includes('tahfizh')) activePage = 'tahfizh';
+    else if (path.includes('laporan')) activePage = 'laporan';
 
     loadHeader(activePage);
 });
