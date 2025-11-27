@@ -293,122 +293,80 @@ document.addEventListener('DOMContentLoaded', () => {
         const today = new Date();
         const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 
-        // Calculate Bilqolam
+        // --- Helpers for Grading & Description ---
+        function getPredicate(score) {
+            if (score >= 90) return 'A';
+            if (score >= 80) return 'B';
+            if (score >= 70) return 'C';
+            if (score >= 60) return 'D';
+            return 'E';
+        }
+
+        function getDescription(category, name, score) {
+            let quality = '';
+            if (score >= 90) quality = 'sangat baik'; // or 'mampu'
+            else if (score >= 80) quality = 'baik'; // or 'mampu'
+            else if (score >= 70) quality = 'cukup mampu';
+            else if (score >= 60) quality = 'kurang mampu';
+            else quality = 'sangat kurang';
+
+            if (category === 'Tajwid') return `Ananda ${quality} memahami tajwid dalam bacaan`;
+            if (category === 'Fashahah') return `Ananda ${quality} melafalkan bacaan dengan jelas`;
+            if (category === 'Lagu') return `Ananda ${quality} memahami nada bacaan`;
+
+            if (category === 'Doa') {
+                let lancar = '';
+                if (score >= 90) lancar = 'sangat lancar';
+                else if (score >= 80) lancar = 'lancar';
+                else if (score >= 70) lancar = 'cukup lancar';
+                else lancar = 'kurang lancar';
+                return `Ananda ${lancar} dalam menghafalkan ${name}`;
+            }
+
+            if (category === 'Tahfizh') {
+                // Logic for Tahfizh description can be refined. 
+                // For now, using a generic positive message if memorized > 0
+                return `Ananda Baik dan lancar dalam menghafal Surah ${name}`;
+            }
+            return '';
+        }
+
+        // --- Data Preparation ---
+
+        // Bilqolam
         const tajwid = parseInt(student.bilqolam_tajwid) || 0;
         const fashahah = parseInt(student.bilqolam_fashahah) || 0;
         const lagu = parseInt(student.bilqolam_lagu) || 0;
-        const bilqolamTotal = tajwid + fashahah + lagu;
-        const bilqolamPercentage = Math.round((bilqolamTotal / 300) * 100);
 
-        // Calculate Doa
+        // Doa
         const doaList = kelasNum && doaConfig[kelasNum] ? doaConfig[kelasNum] : [];
         const doaData = student.doa_sehari || {};
-        let doaTotalScore = 0;
-        doaList.forEach(doa => {
-            const score = doaData[doa];
-            if (typeof score === 'number' && score >= 0) {
-                doaTotalScore += score;
-            }
-        });
-        const doaMaxScore = doaList.length * 100;
-        const doaPercentage = doaMaxScore > 0 ? Math.round((doaTotalScore / doaMaxScore) * 100) : 0;
 
-        // Calculate Tahfizh
+        // Tahfizh
         const surahList = kelasNum && tahfizhConfig[kelasNum] ? tahfizhConfig[kelasNum] : [];
         const tahfizhData = student.tahfizh || {};
-        let totalVersesTarget = 0;
-        let totalVersesMemorized = 0;
-        let completedSurahs = 0;
-        surahList.forEach(surah => {
-            const maxVerses = surahData[surah] || 0;
-            totalVersesTarget += maxVerses;
-            const memorized = tahfizhData[surah] || 0;
-            totalVersesMemorized += memorized;
-            if (memorized >= maxVerses && maxVerses > 0) {
-                completedSurahs++;
-            }
-        });
-        const tahfizhPercentage = totalVersesTarget > 0 ? Math.round((totalVersesMemorized / totalVersesTarget) * 100) : 0;
-
-        // Calculate Tathbiq
-        const tathbiqList = kelasNum && tathbiqConfig[kelasNum] ? tathbiqConfig[kelasNum] : [];
-        const tathbiqData = student.tathbiq_ibadah || {};
-        let tathbiqTotalScore = 0;
-        tathbiqList.forEach(tathbiq => {
-            const score = tathbiqData[tathbiq];
-            if (typeof score === 'number' && score >= 0) {
-                tathbiqTotalScore += score;
-            }
-        });
-        const tathbiqMaxScore = tathbiqList.length * 100;
-        const tathbiqPercentage = tathbiqMaxScore > 0 ? Math.round((tathbiqTotalScore / tathbiqMaxScore) * 100) : 0;
-
-        // Overall average
-        const overallPercentage = Math.round((bilqolamPercentage + doaPercentage + tahfizhPercentage + tathbiqPercentage) / 4);
-
-        // Determine grade
-        function getGrade(percentage) {
-            if (percentage >= 90) return 'A (Sangat Baik)';
-            if (percentage >= 80) return 'B (Baik)';
-            if (percentage >= 70) return 'C (Cukup)';
-            if (percentage >= 60) return 'D (Kurang)';
-            return 'E (Sangat Kurang)';
-        }
 
         // Determine name class
-        if (student.kelas === '6D') {
-            nameClass = '6D-Mindi';
-        } else if (student.kelas === '6C') {
-            nameClass = '6C-Bintangur';
-        } else if (student.kelas === '6B') {
-            nameClass = '6B-Palapi';
-        } else if (student.kelas === '6A') {
-            nameClass = '6A-Jati';
-        } else if (student.kelas === '5D') {
-            nameClass = '5D-Cemara';
-        } else if (student.kelas === '5C') {
-            nameClass = '5C-Beringin';
-        } else if (student.kelas === '5B') {
-            nameClass = '5B-Pinus';
-        } else if (student.kelas === '5A') {
-            nameClass = '5A-Mersawa';
-        } else if (student.kelas === '4D') {
-            nameClass = '4D-Ulin';
-        } else if (student.kelas === '4C') {
-            nameClass = '4C-Cendana';
-        } else if (student.kelas === '4B') {
-            nameClass = '4B-Damar';
-        } else if (student.kelas === '4A') {
-            nameClass = '4A-Meranti';
-        } else if (student.kelas === '3D') {
-            nameClass = '3D-Cantigi';
-        } else if (student.kelas === '3C') {
-            nameClass = '3C-Eboni';
-        } else if (student.kelas === '3B') {
-            nameClass = '3B-Bungur';
-        } else if (student.kelas === '3A') {
-            nameClass = '3A-Saga';
-        } else if (student.kelas === '2D') {
-            nameClass = '2D-Mahoni';
-        } else if (student.kelas === '2C') {
-            nameClass = '2C-Sengon';
-        } else if (student.kelas === '2B') {
-            nameClass = '2B-Randu';
-        } else if (student.kelas === '2A') {
-            nameClass = '2A-Sungkai';
-        } else if (student.kelas === '1D') {
-            nameClass = '1D-Pingku';
-        } else if (student.kelas === '1C') {
-            nameClass = '1C-Kenanga';
-        } else if (student.kelas === '1B') {
-            nameClass = '1B-Kulim';
-        } else if (student.kelas === '1A') {
-            nameClass = '1A-Trembesi';
-        }
+        let nameClass = student.kelas || '-';
+        const classMap = {
+            '6D': '6D-Mindi', '6C': '6C-Bintangur', '6B': '6B-Palapi', '6A': '6A-Jati',
+            '5D': '5D-Cemara', '5C': '5C-Beringin', '5B': '5B-Pinus', '5A': '5A-Mersawa',
+            '4D': '4D-Ulin', '4C': '4C-Cendana', '4B': '4B-Damar', '4A': '4A-Meranti',
+            '3D': '3D-Cantigi', '3C': '3C-Eboni', '3B': '3B-Bungur', '3A': '3A-Saga',
+            '2D': '2D-Mahoni', '2C': '2C-Sengon', '2B': '2B-Randu', '2A': '2A-Sungkai',
+            '1D': '1D-Pingku', '1C': '1C-Kenanga', '1B': '1B-Kulim', '1A': '1A-Trembesi'
+        };
+        if (classMap[student.kelas]) nameClass = classMap[student.kelas];
 
-        // PDF Header
-        logoPath = '../assets/Logo SD Anak Saleh.png';
-        doc.addImage(logoPath, 'PNG', 23, 2, 25, 25);
+        // --- PDF Generation ---
+
+        // Header
+        const logoPath = '../assets/Logo SD Anak Saleh.png';
+        try {
+            doc.addImage(logoPath, 'PNG', 23, 2, 25, 25);
+        } catch (e) {
+            console.warn("Logo not found or error loading", e);
+        }
 
         doc.setFontSize(8);
         doc.setFont(undefined, 'normal');
@@ -431,8 +389,12 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text('JL. Arumba No.31 Malang 65143 | Telp. (0341) 487088', 105, 22, { align: 'center' });
         doc.text('Email: official@sekolahanaksaleh.sch.id | www.sekolahanaksaleh.sch.id', 105, 26, { align: 'center' });
 
-        logoPath = '../assets/Logo Bilqolam.png';
-        doc.addImage(logoPath, 'PNG', 160, 5, 30, 20);
+        const logoBilqolam = '../assets/Logo Bilqolam.png';
+        try {
+            doc.addImage(logoBilqolam, 'PNG', 160, 5, 30, 20);
+        } catch (e) {
+            console.warn("Logo Bilqolam not found", e);
+        }
 
         // Line separator
         doc.setLineWidth(0.5);
@@ -447,73 +409,116 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
         doc.text(`Nama : ${student.nama_lengkap || '-'}`, 25, yPos);
-        doc.text(`Kelas : ${nameClass || '-'}`, 135, yPos);
+        doc.text(`Kelas : ${nameClass}`, 135, yPos);
 
         yPos += 5;
         doc.setFont(undefined, 'bold');
         doc.text(`Tahun Ajaran : 2025/2026 (Semester 1)`, 25, yPos);
         doc.text(`No. Induk : ${student.nis || '-'}`, 135, yPos);
 
-        // Scores Table
-        yPos += 10;
+        // Table Construction
+        yPos += 5;
+
+        const tableBody = [];
+
+        // A. BILQOLAM
+        tableBody.push([
+            { content: 'A', styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: `BILQOLAM Jilid ${student.bilqolam_jilid || '-'}`, colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
+        ]);
+
+        const bilqolamItems = [
+            { name: 'Tajwid', score: tajwid },
+            { name: 'Fashahah', score: fashahah },
+            { name: 'Lagu', score: lagu }
+        ];
+
+        bilqolamItems.forEach((item, index) => {
+            tableBody.push([
+                (index + 1) + '.',
+                item.name,
+                { content: item.score, styles: { halign: 'center' } },
+                { content: getPredicate(item.score), styles: { halign: 'center' } },
+                getDescription(item.name, null, item.score)
+            ]);
+        });
+
+        // B. DOA
+        tableBody.push([
+            { content: 'B', styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'TAHFIZH DO\'A SEHARI-HARI', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'DESKRIPSI CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
+        ]);
+
+        doaList.forEach((doaName, index) => {
+            const score = doaData[doaName] || 0;
+            tableBody.push([
+                (index + 1) + '.',
+                doaName,
+                { content: score, styles: { halign: 'center' } },
+                { content: getPredicate(score), styles: { halign: 'center' } },
+                getDescription('Doa', doaName, score)
+            ]);
+        });
+
+        // C. TAHFIZH
+        tableBody.push([
+            { content: 'C', styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'TAHFIZH AL-QUR\'AN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } },
+            { content: 'DESKRIPSI CAPAIAN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
+        ]);
+
+        surahList.forEach((surahName, index) => {
+            const memorized = tahfizhData[surahName] || 0;
+            const max = surahData[surahName] || 0;
+            tableBody.push([
+                (index + 1) + '.',
+                `Q.S ${surahName}`,
+                { content: `${memorized} ayat dari ${max}`, colSpan: 2, styles: { halign: 'center' } },
+                getDescription('Tahfizh', surahName, 0)
+            ]);
+        });
+
         doc.autoTable({
             startY: yPos,
-            head: [['Komponen', 'Nilai (%)', 'Predikat']],
-            body: [
-                ['Bilqolam', `${bilqolamPercentage}%`, getGrade(bilqolamPercentage)],
-                ['Doa Sehari-hari', `${doaPercentage}%`, getGrade(doaPercentage)],
-                ['Tahfizh Al-Qur\'an', `${tahfizhPercentage}%`, getGrade(tahfizhPercentage)],
-                ['Tathbiq Ibadah', `${tathbiqPercentage}%`, getGrade(tathbiqPercentage)],
+            head: [
+                [
+                    { content: 'NO', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 8 } },
+                    { content: 'ASPEK PENILAIAN', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 8 } },
+                    { content: 'CAPAIAN', colSpan: 2, styles: { halign: 'center', fontSize: 8 } },
+                    { content: 'DESKRIPSI', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 8 } }
+                ],
+                [
+                    { content: 'NUMERIK', styles: { halign: 'center', fontSize: 8 } },
+                    { content: 'PREDIKAT', styles: { halign: 'center', fontSize: 8 } }
+                ]
             ],
-            foot: [['Rata-rata', `${overallPercentage}%`, getGrade(overallPercentage)]],
+            body: tableBody,
             theme: 'grid',
-            headStyles: { fillColor: [16, 185, 129], textColor: 255, fontStyle: 'bold' },
-            footStyles: { fillColor: [240, 240, 240], textColor: 0, fontStyle: 'bold' },
-            styles: { fontSize: 10, cellPadding: 3 },
+            headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', lineWidth: 0.1, lineColor: [0, 0, 0] },
+            styles: { fontSize: 8, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0 },
             columnStyles: {
-                0: { cellWidth: 70 },
-                1: { cellWidth: 40, halign: 'center' },
-                2: { cellWidth: 70, halign: 'center' }
+                0: { cellWidth: 'auto', halign: 'center' },
+                1: { cellWidth: 'auto' },
+                2: { cellWidth: 'auto' },
+                3: { cellWidth: 'auto' },
+                4: { cellWidth: 'auto' }
             }
         });
 
-        // Detail Bilqolam
-        yPos = doc.lastAutoTable.finalY + 10;
-        doc.setFont(undefined, 'bold');
-        doc.text('Detail Bilqolam:', 20, yPos);
+        // Footer - Signatures
+        yPos = doc.lastAutoTable.finalY + 20;
 
-        yPos += 6;
-        doc.setFont(undefined, 'normal');
-        doc.setFontSize(9);
-        doc.text(`Tajwid: ${tajwid}/100  |  Fashahah: ${fashahah}/100  |  Lagu: ${lagu}/100`, 25, yPos);
-
-        yPos += 5;
-        doc.text(`Jilid: ${student.bilqolam_jilid || '-'}  |  Guru GPQ: ${student.bilqolam_guru || '-'}`, 25, yPos);
-
-        if (student.bilqolam_saran) {
-            yPos += 5;
-            doc.text(`Saran: ${student.bilqolam_saran}`, 25, yPos, { maxWidth: 160 });
+        // Check if we need a new page for signatures
+        if (yPos > 250) {
+            doc.addPage();
+            yPos = 30;
         }
 
-        // Detail Tahfizh
-        yPos += 10;
-        doc.setFont(undefined, 'bold');
-        doc.setFontSize(10);
-        doc.text('Detail Tahfizh Al-Qur\'an:', 20, yPos);
-
-        yPos += 6;
-        doc.setFont(undefined, 'normal');
-        doc.setFontSize(9);
-        doc.text(`Surat yang dihafal: ${completedSurahs}/${surahList.length} Surat`, 25, yPos);
-
-        yPos += 5;
-        doc.text(`Total Ayat: ${totalVersesMemorized}/${totalVersesTarget} Ayat`, 25, yPos);
-
-        // Footer - Signatures
-        yPos = 250; // Fixed position near bottom
         doc.setFontSize(9);
         doc.text('Orang Tua/Wali', 40, yPos, { align: 'center' });
-        doc.text(`Jakarta, ${dateStr}`, 150, yPos, { align: 'center' });
+        doc.text(`Malang, ${dateStr}`, 150, yPos, { align: 'center' });
 
         yPos += 5;
         doc.text('Guru Mengaji', 150, yPos, { align: 'center' });
@@ -524,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         yPos += 5;
         doc.text('(...........................)', 40, yPos, { align: 'center' });
-        doc.text('(...........................)', 150, yPos, { align: 'center' });
+        doc.text(`(${student.bilqolam_guru || '...........................'})`, 150, yPos, { align: 'center' });
 
         // Open PDF in new tab
         const pdfBlob = doc.output('blob');
