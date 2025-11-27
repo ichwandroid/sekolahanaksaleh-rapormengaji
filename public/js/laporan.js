@@ -452,7 +452,7 @@ document.addEventListener('DOMContentLoaded', () => {
         yPos += 5;
         doc.setFont(undefined, 'bold');
         doc.text(`Tahun Ajaran : 2025/2026 (Semester 1)`, 25, yPos);
-        doc.text(`NIS : ${student.nis || '-'}`, 135, yPos);
+        doc.text(`No. Induk : ${student.nis || '-'}`, 135, yPos);
 
         // Scores Table
         yPos += 10;
