@@ -34,27 +34,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Configuration data (same as in other pages)
     const surahData = {
-        "Quraisy": 4, "At-Takātsur": 8, "An-Nashr": 3, "An-Nās": 6,
-        "Al-Mā'Ūn": 7, "Al-Lahab": 5, "Al-Kautsar": 3, "Al-Kāfirūn": 6,
-        "Al-Ikhlāsh": 4, "Al-Humazah": 9, "Al-Fīl": 5, "Al-Falaq": 5,
-        "Al-'Ashr": 3, "At-Tīn": 8, "Asy-Syarh": 8, "Al-Qadr": 5,
-        "Al-Bayyinah": 8, "Al-'Alaq": 19, "Al-Ghāsyiyah": 26, "Al-Fajr": 30,
-        "Al-A'Lā": 19, "Al-Muthaffifīn": 36, "Al-Infithār": 19,
-        "An-Nāzi'Āt": 46, "An-Naba'": 40, "Yāsīn-ayat41sd83": 83
+        "Quraisy": 4, "At-Takatsur": 8, "An-Nashr": 3, "An-Nas": 6,
+        "Al-Ma'Un": 7, "Al-Lahab": 5, "Al-Kautsar": 3, "Al-Kafirun": 6,
+        "Al-Ikhlash": 4, "Al-Humazah": 9, "Al-Fil": 5, "Al-Falaq": 5,
+        "Al-'Ashr": 3, "At-Tin": 8, "Asy-Syarh": 8, "Al-Qadr": 5,
+        "Al-Bayyinah": 8, "Al-'Alaq": 19, "Al-Ghasyiyah": 26, "Al-Fajr": 30,
+        "Al-A'La": 19, "Al-Muthaffifin": 36, "Al-Infithar": 19,
+        "An-Nazi'at": 46, "An-Naba'": 40, "Yasin-ayat41sd83": 83
     };
 
     const tahfizhConfig = {
-        '1': ["An-Nās", "Al-Falaq", "Al-Ikhlāsh", "Al-Lahab", "An-Nashr", "Al-Kāfirūn", "Al-Kautsar", "Al-Mā'ūn", "Quraisy", "Al-Fīl", "Al-Humazah", "Al-'Ashr", "At-Takātsur"],
-        '2': ["Al-Bayyinah", "Al-Qadr", "Al-'Alaq", "At-Tīn", "Asy-Syarh"],
-        '3': ["Al-Fajr", "Al-Ghāsyiyah", "Al-A'lā"],
-        '4': ["Al-Muthaffifīn", "Al-Infithār"],
-        '5': ["An-Nāzi'āt", "An-Naba'"],
-        '6': ["Yāsīn-ayat41sd83"]
+        '1': ["An-Nas", "Al-Falaq", "Al-Ikhlash", "Al-Lahab", "An-Nashr", "Al-Kafirun", "Al-Kautsar", "Al-Ma'Un", "Quraisy", "Al-Fil", "Al-Humazah", "Al-'Ashr", "At-Takatsur"],
+        '2': ["Al-Bayyinah", "Al-Qadr", "Al-'Alaq", "At-Tin", "Asy-Syarh"],
+        '3': ["Al-Fajr", "Al-Ghasyiyah", "Al-A'la"],
+        '4': ["Al-Muthaffifin", "Al-Infithar"],
+        '5': ["An-Nazi'at", "An-Naba'"],
+        '6': ["Yasin-ayat41sd83"]
+    };
+
+    const tahfizhThresholds = {
+        "Yasin-ayat41sd83": { min: 54, mid: 68, max: 83 },
+        "An-Naba'": { min: 13, mid: 30, max: 40 },
+        "An-Nazi'at": { min: 14, mid: 30, max: 46 },
+        "'Abasa": { min: 14, mid: 30, max: 42 },
+        "At-Takwir": { min: 10, mid: 20, max: 29 },
+        "Al-Infithar": { min: 6, mid: 13, max: 19 },
+        "Al-Muthaffifin": { min: 12, mid: 24, max: 36 },
+        "Al-Insyiqaq": { min: 8, mid: 17, max: 25 },
+        "Al-Buruj": { min: 7, mid: 15, max: 22 },
+        "Ath-Thariq": { min: 6, mid: 12, max: 17 },
+        "Al-A'la": { min: 8, mid: 15, max: 19 },
+        "Al-Ghasyiyah": { min: 8, mid: 18, max: 26 },
+        "Al-Fajr": { min: 10, mid: 20, max: 30 },
+        "Al-Balad": { min: 7, mid: 14, max: 20 },
+        "Asy-Syams": { min: 5, mid: 11, max: 15 },
+        "Al-Lail": { min: 7, mid: 15, max: 21 },
+        "Adh-Dhuha": { min: 4, mid: 8, max: 11 },
+        "Asy-Syarh": { min: 3, mid: 6, max: 8 },
+        "At-Tin": { min: 3, mid: 6, max: 8 },
+        "Al-'Alaq": { min: 8, mid: 15, max: 19 },
+        "Al-Qadr": { min: 2, mid: 4, max: 5 },
+        "Al-Bayyinah": { min: 3, mid: 6, max: 8 },
+        "Az-Zalzalah": { min: 3, mid: 6, max: 8 },
+        "Al-'Adiyat": { min: 4, mid: 8, max: 11 },
+        "Al-Qari'ah": { min: 4, mid: 8, max: 11 },
+        "At-Takatsur": { min: 3, mid: 6, max: 8 },
+        "Al-'Ashr": { min: 1, mid: 2, max: 3 },
+        "Al-Humazah": { min: 3, mid: 7, max: 9 },
+        "Al-Fil": { min: 2, mid: 4, max: 5 },
+        "Quraisy": { min: 1, mid: 3, max: 4 },
+        "Al-Ma'Un": { min: 2, mid: 4, max: 7 },
+        "An-Nas": { min: 2, mid: 4, max: 6 },
+        "Al-Falaq": { min: 2, mid: 3, max: 5 },
+        "Al-Ikhlash": { min: 1, mid: 2, max: 4 },
+        "Al-Lahab": { min: 2, mid: 3, max: 5 },
+        "An-Nashr": { min: 1, mid: 2, max: 3 },
+        "Al-Kafirun": { min: 2, mid: 4, max: 6 },
+        "Al-Kautsar": { min: 1, mid: 2, max: 3 }
     };
 
     const doaConfig = {
         '1': ["Do'a Mau Tidur", "Do'a Bangun Tidur", "Do'a Masuk Kamar Mandi", "Do'a Keluar Kamar Mandi", "Do'a Sebelum Makan", "Do'a Sesudah Makan"],
-        '2': ["Do'a Senandung al-Qur'an", "Do'a Kaffārotul Majlis", "Do'a Masuk Masjid", "Do'a Keluar Masjid"],
+        '2': ["Do'a Senandung al-Qur'an", "Do'a Kaffarotul Majlis", "Do'a Masuk Masjid", "Do'a Keluar Masjid"],
         '3': ["Do'a Mohon Kecerdasan Berpikir", "Ayat Kursi"],
         '4': ["Do'a Ketika Sakit", "Do'a Menjenguk Orang Sakit", "Do'a Qunut"],
         '5': ["Do'a Mohon Keselamatan", "Do'a Mohon Diberi Keteguhan Hati", "Shalawat Thibbil Qulub"],
@@ -62,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const tathbiqConfig = {
-        '1': ["Niat Wudhu\tDo'a", "Sesudah Wudhu", "Niat-Niat Shalat Fardhu"],
+        '1': ["Niat Wudhu", "Sesudah Wudhu", "Niat-Niat Shalat Fardhu"],
         '2': ["Bacaan dan Jawaban Adzan", "Do'a Ba'da Adzan", "Bacaan Iqamah", "Dzikir Ba'da Shalat"],
         '3': ["Niat Shalat Tarawih", "Niat Shalat Witir", "Dzikir Ba'da Shalat Tarawih & Witir"],
         '4': ["Niat Mandi Wajib"],
@@ -295,20 +336,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Helpers for Grading & Description ---
         function getPredicate(score) {
-            if (score >= 90) return 'A';
-            if (score >= 80) return 'B';
-            if (score >= 70) return 'C';
-            if (score >= 60) return 'D';
-            return 'E';
+            if (score >= 86) return 'B';
+            if (score >= 71) return 'C';
+            return 'K';
         }
 
         function getDescription(category, name, score) {
             let quality = '';
-            if (score >= 90) quality = 'sangat baik'; // or 'mampu'
-            else if (score >= 80) quality = 'baik'; // or 'mampu'
-            else if (score >= 70) quality = 'cukup mampu';
-            else if (score >= 60) quality = 'kurang mampu';
-            else quality = 'sangat kurang';
+            if (score >= 86) quality = 'mampu'; // or 'mampu'
+            else if (score >= 71) quality = 'cukup mampu'; // or 'mampu'
+            else quality = 'kurang mampu';
 
             if (category === 'Tajwid') return `Ananda ${quality} memahami tajwid dalam bacaan`;
             if (category === 'Fashahah') return `Ananda ${quality} melafalkan bacaan dengan jelas`;
@@ -316,18 +353,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (category === 'Doa') {
                 let lancar = '';
-                if (score >= 90) lancar = 'sangat lancar';
-                else if (score >= 80) lancar = 'lancar';
-                else if (score >= 70) lancar = 'cukup lancar';
+                if (score >= 86) lancar = 'lancar';
+                else if (score >= 71) lancar = 'cukup lancar';
                 else lancar = 'kurang lancar';
                 return `Ananda ${lancar} dalam menghafalkan ${name}`;
             }
 
             if (category === 'Tahfizh') {
-                // Logic for Tahfizh description can be refined. 
-                // For now, using a generic positive message if memorized > 0
-                return `Ananda Baik dan lancar dalam menghafal Surah ${name}`;
+                const threshold = tahfizhThresholds[name];
+                let quality = '';
+
+                if (threshold) {
+                    if (score >= threshold.max) quality = 'Baik dan';
+                    else if (score >= threshold.min) quality = 'Cukup';
+                    else quality = 'Kurang';
+                } else {
+                    // Fallback if no threshold defined
+                    if (score > 0) quality = 'Baik';
+                    else quality = 'Kurang';
+                }
+
+                return `Ananda ${quality} lancar dalam menghafal Surah ${name}`;
             }
+
+            if (category === 'Ibadah') {
+                return `Ananda ${quality} dalam ${name}`;
+            }
+
             return '';
         }
 
@@ -345,6 +397,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // Tahfizh
         const surahList = kelasNum && tahfizhConfig[kelasNum] ? tahfizhConfig[kelasNum] : [];
         const tahfizhData = student.tahfizh || {};
+
+        // Ibadah
+        const ibadahList = kelasNum && tathbiqConfig[kelasNum] ? tathbiqConfig[kelasNum] : [];
+        const ibadahData = student.ibadah || {};
 
         // Determine name class
         let nameClass = student.kelas || '-';
@@ -400,7 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setLineWidth(0.5);
         doc.line(20, 28, 190, 28);
 
-        doc.setFontSize(15);
+        doc.setFontSize(13);
         doc.setFont(undefined, 'bold');
         doc.text('RELIGIOUS REPORT', 105, 33, { align: 'center' });
 
@@ -416,8 +472,14 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text(`Tahun Ajaran : 2025/2026 (Semester 1)`, 25, yPos);
         doc.text(`No. Induk : ${student.nis || '-'}`, 135, yPos);
 
-        // Table Construction
+        // I. PENCAPAIAN KOMPETENSI
         yPos += 5;
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.text('I. PENCAPAIAN KOMPETENSI', 14, yPos);
+
+        // Table Construction
+        yPos += 1;
 
         const tableBody = [];
 
@@ -437,8 +499,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tableBody.push([
                 (index + 1) + '.',
                 item.name,
-                { content: item.score, styles: { halign: 'center' } },
-                { content: getPredicate(item.score), styles: { halign: 'center' } },
+                { content: item.score, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(item.score), styles: { halign: 'center', valign: 'middle' } },
                 getDescription(item.name, null, item.score)
             ]);
         });
@@ -446,8 +508,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // B. DOA
         tableBody.push([
             { content: 'B', styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
-            { content: 'TAHFIZH DO\'A SEHARI-HARI', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
-            { content: 'DESKRIPSI CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
+            { content: 'TAHFIZH DO\'A SEHARI-HARI', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
         ]);
 
         doaList.forEach((doaName, index) => {
@@ -455,8 +516,8 @@ document.addEventListener('DOMContentLoaded', () => {
             tableBody.push([
                 (index + 1) + '.',
                 doaName,
-                { content: score, styles: { halign: 'center' } },
-                { content: getPredicate(score), styles: { halign: 'center' } },
+                { content: score, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(score), styles: { halign: 'center', valign: 'middle' } },
                 getDescription('Doa', doaName, score)
             ]);
         });
@@ -475,8 +536,27 @@ document.addEventListener('DOMContentLoaded', () => {
             tableBody.push([
                 (index + 1) + '.',
                 `Q.S ${surahName}`,
-                { content: `${memorized} ayat dari ${max}`, colSpan: 2, styles: { halign: 'center' } },
-                getDescription('Tahfizh', surahName, 0)
+                { content: `${memorized} ayat dari ${max}`, colSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                getDescription('Tahfizh', surahName, memorized)
+            ]);
+        });
+
+        // D.TATHBIQ IBADAH
+        tableBody.push([
+            { content: 'D', styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'TATHBIQ IBADAH', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } },
+            { content: 'DESKRIPSI CAPAIAN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
+        ]);
+
+        ibadahList.forEach((ibadahName, index) => {
+            const score = ibadahData[ibadahName] || 0;
+            tableBody.push([
+                (index + 1) + '.',
+                ibadahName,
+                { content: score, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(score), styles: { halign: 'center', valign: 'middle' } },
+                getDescription('Ibadah', ibadahName, score)
             ]);
         });
 
@@ -484,20 +564,20 @@ document.addEventListener('DOMContentLoaded', () => {
             startY: yPos,
             head: [
                 [
-                    { content: 'NO', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 8 } },
-                    { content: 'ASPEK PENILAIAN', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 8 } },
-                    { content: 'CAPAIAN', colSpan: 2, styles: { halign: 'center', fontSize: 8 } },
-                    { content: 'DESKRIPSI', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 8 } }
+                    { content: 'NO', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 9 } },
+                    { content: 'ASPEK PENILAIAN', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 9 } },
+                    { content: 'CAPAIAN', colSpan: 2, styles: { halign: 'center', fontSize: 9 } },
+                    { content: 'DESKRIPSI CAPAIAN', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 9 } }
                 ],
                 [
-                    { content: 'NUMERIK', styles: { halign: 'center', fontSize: 8 } },
-                    { content: 'PREDIKAT', styles: { halign: 'center', fontSize: 8 } }
+                    { content: 'NUMERIK', styles: { halign: 'center', fontSize: 9 } },
+                    { content: 'PREDIKAT', styles: { halign: 'center', fontSize: 9 } }
                 ]
             ],
             body: tableBody,
             theme: 'grid',
             headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', lineWidth: 0.1, lineColor: [0, 0, 0] },
-            styles: { fontSize: 8, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0 },
+            styles: { fontSize: 9, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
             columnStyles: {
                 0: { cellWidth: 'auto', halign: 'center' },
                 1: { cellWidth: 'auto' },
@@ -507,29 +587,129 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Footer - Signatures
-        yPos = doc.lastAutoTable.finalY + 20;
-
-        // Check if we need a new page for signatures
-        if (yPos > 250) {
-            doc.addPage();
-            yPos = 30;
-        }
+        // --- II. CATATAN ---
+        yPos = doc.lastAutoTable.finalY + 4;
 
         doc.setFontSize(9);
-        doc.text('Orang Tua/Wali', 40, yPos, { align: 'center' });
-        doc.text(`Malang, ${dateStr}`, 150, yPos, { align: 'center' });
+        doc.setFont(undefined, 'bold');
+        doc.text('II. CATATAN', 14, yPos);
+        yPos += 1;
+
+        const catatanGuruPAI = "Alhamdulillah pada semester satu ini ananda sudah menyelesaikan hafalan ibadah praktis dan doa sehari-hari dengan sangat BAIK. Semoga di semester dua nanti lebih semangat, lebih giat dan istiqomah lagi dalam menghafal serta murojaah, kelak bisa menjadi anak kebanggaan Allah dan RosulNya serta menjadi anak yang berakhlaqul karimah. Aamiin Yaa Rabbal 'alamiin";
+        const catatanGuruQuran = student.catatan_guru || "Ananda cukup dalam bidang tajwid, namun perlu penguatan kembali pada fashohah (ketepatan huruf-harokat dan kelancaran bacaan). Semangat muroja'ah nak, semoga menjadi Ahlul Qur'an.";
+
+        doc.autoTable({
+            startY: yPos,
+            body: [
+                [
+                    { content: 'Guru Pendidikan Agama Islam dan Budi Pekerti', styles: { fontStyle: 'bold', cellWidth: 50 } },
+                    { content: catatanGuruPAI, styles: { cellWidth: 'auto' } }
+                ],
+                [
+                    { content: "Guru Pengajar Al-Qur'an", styles: { fontStyle: 'bold' } },
+                    { content: catatanGuruQuran }
+                ],
+                // [
+                //     { content: 'Orang Tua / Wali Peserta Didik', styles: { fontStyle: 'bold' } },
+                //     { content: ':' },
+                //     { content: '' }
+                // ]
+            ],
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
+            columnStyles: {
+                0: { cellWidth: 'auto' },
+                1: { cellWidth: 'auto' },
+                2: { cellWidth: 'auto' }
+            }
+        });
+
+        // --- III. KONVERSI NILAI BILQOLAM ---
+        yPos = doc.lastAutoTable.finalY + 4;
+
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.text('III. KONVERSI NILAI BILQOLAM', 14, yPos);
+        yPos += 1;
+
+        doc.autoTable({
+            startY: yPos,
+            head: [
+                ['NILAI', 'KONVERSI', 'KETERANGAN']
+            ],
+            body: [
+                ['86 - 100', 'B', 'Apabila anak baca benar dan lancar, tidak ada salah sama sekali'],
+                ['71 - 85', 'C', 'Apabila anak baca dan ada kesalahan 3 kali'],
+                ['< 70', 'K', 'Apabila anak baca dan ada kesalahan lebih dari 3 kali']
+            ],
+            theme: 'grid',
+            headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', lineWidth: 0.1, lineColor: [0, 0, 0], halign: 'center' },
+            styles: { fontSize: 9, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
+            columnStyles: {
+                0: { halign: 'center', cellWidth: 30, fontStyle: 'bold' },
+                1: { halign: 'center', cellWidth: 30, fontStyle: 'bold' },
+                2: { cellWidth: 'auto' }
+            }
+        });
+
+        // --- Signatures ---
+        yPos = doc.lastAutoTable.finalY + 4;
+
+        // // Check page break
+        // if (yPos > 230) {
+        //     doc.addPage();
+        //     yPos = 30;
+        // }
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text('Diberikan di', 14, yPos);
+        doc.text(': Malang', 40, yPos);
+        yPos += 5;
+        doc.text('Tanggal', 14, yPos);
+        doc.text(`: ${dateStr}`, 40, yPos);
 
         yPos += 5;
-        doc.text('Guru Mengaji', 150, yPos, { align: 'center' });
 
-        yPos += 20;
-        doc.line(20, yPos, 60, yPos); // Parent signature line
-        doc.line(130, yPos, 170, yPos); // Teacher signature line
+        // Signature Columns
+        const leftX = 37;
+        const centerX = 100; // Approximate center
+        const rightX = 167;
 
-        yPos += 5;
-        doc.text('(...........................)', 40, yPos, { align: 'center' });
-        doc.text(`(${student.bilqolam_guru || '...........................'})`, 150, yPos, { align: 'center' });
+        doc.text('Mengetahui', centerX, yPos, { align: 'center' });
+
+        yPos += 4;
+        doc.text('Guru PAIBP', leftX, yPos, { align: 'center' });
+        doc.text('Kepala SD Anak Saleh', centerX, yPos, { align: 'center' });
+        doc.text("Guru Al-Qur'an", rightX, yPos, { align: 'center' });
+
+        yPos += 25;
+
+        // Names
+        doc.setFont(undefined, 'bold');
+        doc.text('Selvi Dwi Wahyuni, M.Pd', leftX, yPos, { align: 'center' });
+        doc.text('Andreas Setiyono, S.Pd.Gr., M.Kom', centerX, yPos, { align: 'center' });
+        doc.text('Muhammad Abid Abdillah, S.Si', rightX, yPos, { align: 'center' });
+
+        yPos += 4;
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(9);
+        doc.text('NIY. 07962214190', leftX, yPos, { align: 'center' }); // Small caption
+        doc.text('NIY. 0796071420', centerX, yPos, { align: 'center' });
+        doc.text('NIY. 07962214182', rightX, yPos, { align: 'center' });
+
+        // Headmaster
+        // yPos += 10;
+        // doc.setFontSize(10);
+        // doc.text('Mengetahui:', 105, yPos, { align: 'center' });
+        // yPos += 5;
+        // doc.text('Kepala SD Anak Saleh,', 105, yPos, { align: 'center' });
+
+        // Space for headmaster signature if needed, but image cuts off. 
+        // Assuming standard space.
+        // yPos += 25;
+        // doc.text('Naminah, S.Pd', 105, yPos, { align: 'center' }); // Example name if needed
+
 
         // Open PDF in new tab
         const pdfBlob = doc.output('blob');
