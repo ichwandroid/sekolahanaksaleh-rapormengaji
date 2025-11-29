@@ -506,9 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             tableBody.push([
                 { content: sectionLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
-                { content: 'DAURAH', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
-                { content: 'CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } },
-                { content: 'DESKRIPSI CAPAIAN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
+                { content: 'DAURAH', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
             ]);
 
             tableBody.push([
