@@ -32,6 +32,12 @@ const sidebarHTML = `
             <span>Data Siswa</span>
         </a>
 
+        <a href="guru.html" data-page="guru"
+            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+            <i class="ph ph-chalkboard-teacher text-xl"></i>
+            <span>Data Guru</span>
+        </a>
+
         <a href="bilqolam.html" data-page="bilqolam"
             class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
             <i class="ph ph-book-bookmark text-xl"></i>
@@ -107,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (path.includes('dashboard')) activePage = 'dashboard';
     else if (path.includes('siswa')) activePage = 'siswa';
+    else if (path.includes('guru')) activePage = 'guru';
     else if (path.includes('bilqolam')) activePage = 'bilqolam';
     else if (path.includes('doa')) activePage = 'doa';
     else if (path.includes('tathbiq')) activePage = 'tathbiq';

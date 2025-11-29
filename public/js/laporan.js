@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // State
     let studentsData = [];
+    let teachersData = [];
     let filteredData = [];
     let currentPage = 1;
     const itemsPerPage = 10;
@@ -40,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Al-'Ashr": 3, "At-Tin": 8, "Asy-Syarh": 8, "Al-Qadr": 5,
         "Al-Bayyinah": 8, "Al-'Alaq": 19, "Al-Ghasyiyah": 26, "Al-Fajr": 30,
         "Al-A'La": 19, "Al-Muthaffifin": 36, "Al-Infithar": 19,
-        "An-Nazi'at": 46, "An-Naba'": 40, "Yasin-ayat41sd83": 83
+        "An-Nazi'at": 46, "An-Naba'": 40, "Yasin-ayat 41 s/d 83": 83
     };
 
     const tahfizhConfig = {
@@ -49,11 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
         '3': ["Al-Fajr", "Al-Ghasyiyah", "Al-A'la"],
         '4': ["Al-Muthaffifin", "Al-Infithar"],
         '5': ["An-Nazi'at", "An-Naba'"],
-        '6': ["Yasin-ayat41sd83"]
+        '6': ["Yasin-ayat 41 s/d 83"]
     };
 
     const tahfizhThresholds = {
-        "Yasin-ayat41sd83": { min: 54, mid: 68, max: 83 },
+        "Yasin-ayat 41 s/d 83": { min: 54, mid: 68, max: 83 },
         "An-Naba'": { min: 13, mid: 30, max: 40 },
         "An-Nazi'at": { min: 14, mid: 30, max: 46 },
         "'Abasa": { min: 14, mid: 30, max: 42 },
@@ -128,6 +129,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     Gagal memuat data: ${error.message}
                 </td>
             </tr>`;
+    });
+
+    // --- Fetch Teachers ---
+    db.collection('teachers').onSnapshot((snapshot) => {
+        teachersData = [];
+        snapshot.forEach((doc) => {
+            teachersData.push({ id: doc.id, ...doc.data() });
+        });
+    }, (error) => {
+        console.error("Error fetching teachers: ", error);
     });
 
     // --- Filtering & Sorting ---
@@ -219,8 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4">${data.kelompok || '-'}</td>
                     <td class="px-6 py-4">${data.shift || '-'}</td>
                     <td class="px-6 py-4">
-                        <button class="font-medium text-primary hover:underline" onclick="viewRapor('${data.id}')">
+                        <button class="font-medium text-primary hover:underline mr-3" onclick="viewRapor('${data.id}')">
                             <i class="ph ph-file-text"></i> Lihat Rapor
+                        </button>
+                        <button class="font-medium text-blue-600 hover:underline" onclick="openSaranModal('${data.id}')">
+                            <i class="ph ph-pencil-simple"></i> Edit Saran
                         </button>
                     </td>
                 </tr>
@@ -400,7 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Ibadah
         const ibadahList = kelasNum && tathbiqConfig[kelasNum] ? tathbiqConfig[kelasNum] : [];
-        const ibadahData = student.ibadah || {};
+        const ibadahData = student.tathbiq_ibadah || {};
 
         // Determine name class
         let nameClass = student.kelas || '-';
@@ -595,8 +609,8 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text('II. CATATAN', 14, yPos);
         yPos += 1;
 
-        const catatanGuruPAI = "Alhamdulillah pada semester satu ini ananda sudah menyelesaikan hafalan ibadah praktis dan doa sehari-hari dengan sangat BAIK. Semoga di semester dua nanti lebih semangat, lebih giat dan istiqomah lagi dalam menghafal serta murojaah, kelak bisa menjadi anak kebanggaan Allah dan RosulNya serta menjadi anak yang berakhlaqul karimah. Aamiin Yaa Rabbal 'alamiin";
-        const catatanGuruQuran = student.catatan_guru || "Ananda cukup dalam bidang tajwid, namun perlu penguatan kembali pada fashohah (ketepatan huruf-harokat dan kelancaran bacaan). Semangat muroja'ah nak, semoga menjadi Ahlul Qur'an.";
+        const catatanGuruPAI = student.saran_guru_pai || "-";
+        const catatanGuruQuran = student.saran_guru_gpq || "-";
 
         doc.autoTable({
             startY: yPos,
@@ -676,9 +690,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const centerX = 100; // Approximate center
         const rightX = 167;
 
-        doc.text('Mengetahui', centerX, yPos, { align: 'center' });
-
-        yPos += 4;
         doc.text('Guru PAIBP', leftX, yPos, { align: 'center' });
         doc.text('Kepala SD Anak Saleh', centerX, yPos, { align: 'center' });
         doc.text("Guru Al-Qur'an", rightX, yPos, { align: 'center' });
@@ -686,17 +697,27 @@ document.addEventListener('DOMContentLoaded', () => {
         yPos += 25;
 
         // Names
+        // Names
+        const guruPaiName = student.guru_pai || '...........................';
+        const guruGpqName = student.bilqolam_guru || '...........................';
+
+        const guruPai = teachersData.find(t => t.nama_lengkap === student.guru_pai);
+        const guruGpq = teachersData.find(t => t.nama_lengkap === student.bilqolam_guru);
+
+        const niyPai = guruPai ? guruPai.niy : '...........................';
+        const niyGpq = guruGpq ? guruGpq.niy : '...........................';
+
         doc.setFont(undefined, 'bold');
-        doc.text('Selvi Dwi Wahyuni, M.Pd', leftX, yPos, { align: 'center' });
+        doc.text(guruPaiName, leftX, yPos, { align: 'center' });
         doc.text('Andreas Setiyono, S.Pd.Gr., M.Kom', centerX, yPos, { align: 'center' });
-        doc.text('Muhammad Abid Abdillah, S.Si', rightX, yPos, { align: 'center' });
+        doc.text(guruGpqName, rightX, yPos, { align: 'center' });
 
         yPos += 4;
         doc.setFont(undefined, 'normal');
         doc.setFontSize(9);
-        doc.text('NIY. 07962214190', leftX, yPos, { align: 'center' }); // Small caption
+        doc.text('NIY. ' + niyPai, leftX, yPos, { align: 'center' }); // Small caption
         doc.text('NIY. 0796071420', centerX, yPos, { align: 'center' });
-        doc.text('NIY. 07962214182', rightX, yPos, { align: 'center' });
+        doc.text('NIY. ' + niyGpq, rightX, yPos, { align: 'center' });
 
         // Headmaster
         // yPos += 10;
@@ -716,4 +737,67 @@ document.addEventListener('DOMContentLoaded', () => {
         const pdfUrl = URL.createObjectURL(pdfBlob);
         window.open(pdfUrl, '_blank');
     }
+
+    // --- Modal Logic ---
+    const saranModal = document.getElementById('saranModal');
+    const btnCancelSaran = document.getElementById('btnCancelSaran');
+    const btnSaveSaran = document.getElementById('btnSaveSaran');
+    const modalStudentName = document.getElementById('modalStudentName');
+    const modalStudentId = document.getElementById('modalStudentId');
+    const inputSaranGPQ = document.getElementById('inputSaranGPQ');
+    const inputSaranPAI = document.getElementById('inputSaranPAI');
+
+    function toggleSaranModal(show) {
+        if (show) {
+            saranModal.classList.remove('hidden');
+            gsap.fromTo(saranModal.querySelector('.relative'),
+                { scale: 0.95, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.2, ease: "power2.out" }
+            );
+        } else {
+            gsap.to(saranModal.querySelector('.relative'), {
+                scale: 0.95,
+                opacity: 0,
+                duration: 0.2,
+                ease: "power2.in",
+                onComplete: () => saranModal.classList.add('hidden')
+            });
+        }
+    }
+
+    window.openSaranModal = (id) => {
+        const student = studentsData.find(s => s.id === id);
+        if (!student) return;
+
+        modalStudentId.value = id;
+        modalStudentName.textContent = student.nama_lengkap;
+
+        // Populate existing values
+        inputSaranGPQ.value = student.saran_guru_gpq || '';
+        inputSaranPAI.value = student.saran_guru_pai || '';
+
+        toggleSaranModal(true);
+    };
+
+    btnCancelSaran.addEventListener('click', () => toggleSaranModal(false));
+
+    btnSaveSaran.addEventListener('click', async () => {
+        const id = modalStudentId.value;
+        if (!id) return;
+
+        const updateData = {
+            saran_guru_gpq: inputSaranGPQ.value,
+            saran_guru_pai: inputSaranPAI.value,
+            updated_at: firebase.firestore.FieldValue.serverTimestamp()
+        };
+
+        try {
+            await db.collection('students').doc(id).update(updateData);
+            toggleSaranModal(false);
+        } catch (error) {
+            console.error("Error updating saran: ", error);
+            alert("Gagal menyimpan saran: " + error.message);
+        }
+    });
+
 });

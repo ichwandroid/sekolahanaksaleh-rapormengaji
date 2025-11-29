@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const filterKelas = document.getElementById('filterKelas');
     const filterKelompok = document.getElementById('filterKelompok');
     const filterShift = document.getElementById('filterShift');
+    const filterGuruGPQ = document.getElementById('filterGuruGPQ');
+    const filterGuruPAI = document.getElementById('filterGuruPAI');
     const searchInput = document.getElementById('searchInput');
     const btnSort = document.getElementById('btnSort');
     const sortLabel = document.getElementById('sortLabel');
@@ -59,21 +61,52 @@ document.addEventListener('DOMContentLoaded', () => {
             </tr>`;
     });
 
+    // --- Fetch Teachers ---
+    const inputGuruPAI = document.getElementById('inputGuruPAI');
+    const inputGuruGPQ = document.getElementById('inputGuruGPQ');
+
+    db.collection('teachers').onSnapshot((snapshot) => {
+        const teachers = [];
+        snapshot.forEach((doc) => {
+            teachers.push({ id: doc.id, ...doc.data() });
+        });
+
+        // Populate Dropdowns
+        populateTeacherDropdown(inputGuruPAI, teachers, 'Guru PAIBP');
+        populateTeacherDropdown(inputGuruGPQ, teachers, 'Guru GPQ');
+    });
+
+    function populateTeacherDropdown(selectElement, teachers, jabatan) {
+        selectElement.innerHTML = `<option value="">Pilih ${jabatan}</option>`;
+        teachers.filter(t => t.jabatan === jabatan).forEach(t => {
+            const option = document.createElement('option');
+            option.value = t.nama_lengkap; // Storing name as value for simplicity in display
+            option.textContent = t.nama_lengkap;
+            selectElement.appendChild(option);
+        });
+    }
+
     // --- Filtering & Sorting Logic ---
     function populateFilters() {
         const kelasSet = new Set();
         const kelompokSet = new Set();
         const shiftSet = new Set();
+        const guruGPQSet = new Set();
+        const guruPAISet = new Set();
 
         studentsData.forEach(s => {
             if (s.kelas) kelasSet.add(s.kelas);
             if (s.kelompok) kelompokSet.add(s.kelompok);
             if (s.shift) shiftSet.add(s.shift);
+            if (s.bilqolam_guru) guruGPQSet.add(s.bilqolam_guru);
+            if (s.guru_pai) guruPAISet.add(s.guru_pai);
         });
 
         updateSelectOptions(filterKelas, kelasSet, 'Semua Kelas');
         updateSelectOptions(filterKelompok, kelompokSet, 'Semua Kelompok');
         updateSelectOptions(filterShift, shiftSet, 'Semua Shift');
+        updateSelectOptions(filterGuruGPQ, guruGPQSet, 'Semua Guru GPQ');
+        updateSelectOptions(filterGuruPAI, guruPAISet, 'Semua Guru PAI');
     }
 
     function updateSelectOptions(selectElement, set, defaultText) {
@@ -98,6 +131,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const kelas = filterKelas.value;
         const kelompok = filterKelompok.value;
         const shift = filterShift.value;
+        const guruGPQ = filterGuruGPQ.value;
+        const guruPAI = filterGuruPAI.value;
 
         filteredData = studentsData.filter(s => {
             const matchSearch = (s.nama_lengkap && s.nama_lengkap.toLowerCase().includes(search)) ||
@@ -105,8 +140,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const matchKelas = !kelas || s.kelas === kelas;
             const matchKelompok = !kelompok || s.kelompok === kelompok;
             const matchShift = !shift || s.shift === shift;
+            const matchGuruGPQ = !guruGPQ || s.bilqolam_guru === guruGPQ;
+            const matchGuruPAI = !guruPAI || s.guru_pai === guruPAI;
 
-            return matchSearch && matchKelas && matchKelompok && matchShift;
+            return matchSearch && matchKelas && matchKelompok && matchShift && matchGuruGPQ && matchGuruPAI;
         });
 
         // Sort
@@ -152,9 +189,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4">${data.kelas || '-'}</td>
                     <td class="px-6 py-4">${data.kelompok || '-'}</td>
                     <td class="px-6 py-4">${data.shift || '-'}</td>
+                    <td class="px-6 py-4">${data.bilqolam_guru || '-'}</td>
+                    <td class="px-6 py-4">${data.guru_pai || '-'}</td>
                     <td class="px-6 py-4">
                         <div class="flex gap-2">
-                            <button class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</button>
+                            <button class="font-medium text-blue-600 dark:text-blue-500 hover:underline" onclick="editStudent('${data.id}')">Edit</button>
                             <button class="font-medium text-red-600 dark:text-red-500 hover:underline" onclick="deleteStudent('${data.id}')">Hapus</button>
                         </div>
                     </td>
@@ -214,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Event Listeners ---
-    [filterKelas, filterKelompok, filterShift, searchInput].forEach(el => {
+    [filterKelas, filterKelompok, filterShift, filterGuruGPQ, filterGuruPAI, searchInput].forEach(el => {
         el.addEventListener('input', () => {
             currentPage = 1; // Reset to first page on filter change
             applyFilters();
@@ -262,7 +301,45 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    btnAddSiswa.addEventListener('click', () => toggleModal(true));
+    btnAddSiswa.addEventListener('click', () => {
+        // Reset form
+        document.getElementById('inputNIS').value = '';
+        document.getElementById('inputNISN').value = '';
+        document.getElementById('inputNama').value = '';
+        document.getElementById('inputKelas').value = '';
+        document.getElementById('inputKelompok').value = '';
+        document.getElementById('inputShift').value = '';
+        document.getElementById('inputGuruGPQ').value = '';
+        document.getElementById('inputGuruPAI').value = '';
+
+        document.getElementById('modal-title').textContent = 'Tambah Siswa Baru';
+        // Enable NIS input for new student
+        document.getElementById('inputNIS').disabled = false;
+        document.getElementById('inputNIS').classList.remove('bg-gray-200', 'dark:bg-gray-600');
+
+        toggleModal(true);
+    });
+
+    window.editStudent = (id) => {
+        const student = studentsData.find(s => s.id === id);
+        if (!student) return;
+
+        document.getElementById('inputNIS').value = student.nis || '';
+        document.getElementById('inputNISN').value = student.nisn || '';
+        document.getElementById('inputNama').value = student.nama_lengkap || '';
+        document.getElementById('inputKelas').value = student.kelas || '';
+        document.getElementById('inputKelompok').value = student.kelompok || '';
+        document.getElementById('inputShift').value = student.shift || '';
+        document.getElementById('inputGuruGPQ').value = student.bilqolam_guru || '';
+        document.getElementById('inputGuruPAI').value = student.guru_pai || '';
+
+        document.getElementById('modal-title').textContent = 'Edit Data Siswa';
+        // Disable NIS input for editing to prevent ID change issues
+        document.getElementById('inputNIS').disabled = true;
+        document.getElementById('inputNIS').classList.add('bg-gray-200', 'dark:bg-gray-600');
+
+        toggleModal(true);
+    };
     btnCancelModal.addEventListener('click', () => toggleModal(false));
 
     btnSaveStudent.addEventListener('click', async () => {
@@ -281,6 +358,8 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await db.collection('students').doc(nis).set({
                 nis, nisn, nama_lengkap: nama, kelas, kelompok, shift,
+                bilqolam_guru: document.getElementById('inputGuruGPQ').value,
+                guru_pai: document.getElementById('inputGuruPAI').value,
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
 
@@ -292,6 +371,8 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('inputKelas').value = '';
             document.getElementById('inputKelompok').value = '';
             document.getElementById('inputShift').value = '';
+            document.getElementById('inputGuruGPQ').value = '';
+            document.getElementById('inputGuruPAI').value = '';
 
             alert('Data siswa berhasil disimpan!');
         } catch (error) {

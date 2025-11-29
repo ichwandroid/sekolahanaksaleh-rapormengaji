@@ -54,21 +54,21 @@ document.addEventListener('DOMContentLoaded', () => {
             "Do'a Keluar Masjid"
         ],
         '3': [
-            "Do’a Mohon Kecerdasan Berpikir",
+            "Do'a Mohon Kecerdasan Berpikir",
             "Ayat Kursi"
         ],
         '4': [
-            "Do’a Ketika Sakit",
-            "Do’a Menjenguk Orang Sakit",
+            "Do'a Ketika Sakit",
+            "Do'a Menjenguk Orang Sakit",
             "Do’a Qunut"
         ],
         '5': [
-            "Do’a Mohon Keselamatan",
-            "Do’a Mohon Diberi Keteguhan Hati",
+            "Do'a Mohon Keselamatan",
+            "Do'a Mohon Diberi Keteguhan Hati",
             "Shalawat Thibbil Qulub"
         ],
         '6': [
-            "Do’a Mohon Diberi Rahmat & Hikmah",
+            "Do'a Mohon Diberi Rahmat & Hikmah",
             "Do'a Mohon Petunjuk Kepada Allah"
         ]
     };

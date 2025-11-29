@@ -30,11 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inputs
     const inputJilid = document.getElementById('inputJilid');
-    const inputGuru = document.getElementById('inputGuru');
+
     const inputTajwid = document.getElementById('inputTajwid');
     const inputFashahah = document.getElementById('inputFashahah');
     const inputLagu = document.getElementById('inputLagu');
-    const inputSaran = document.getElementById('inputSaran');
+
 
     // State
     let studentsData = [];
@@ -143,12 +143,11 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = '';
         pageData.forEach((data) => {
             // Bilqolam specific fields
+            // Bilqolam specific fields
             const jilid = data.bilqolam_jilid || '-';
             const tajwid = data.bilqolam_tajwid || '-';
             const fashahah = data.bilqolam_fashahah || '-';
             const lagu = data.bilqolam_lagu || '-';
-            const saran = data.bilqolam_saran || '-';
-            const guru = data.bilqolam_guru || '-';
 
             const tajwidScore = parseInt(tajwid) || 0;
             const fashahahScore = parseInt(fashahah) || 0;
@@ -182,8 +181,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${percentage}%
                         </span>
                     </td>
-                    <td class="px-6 py-4 max-w-xs truncate" title="${saran}">${saran}</td>
-                    <td class="px-6 py-4">${guru}</td>
                     <td class="px-6 py-4">
                         <button class="font-medium text-primary hover:underline" onclick="openGradeModal('${data.id}')">Nilai</button>
                     </td>
@@ -294,11 +291,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Populate existing values
         inputJilid.value = student.bilqolam_jilid || '';
-        inputGuru.value = student.bilqolam_guru || '';
+
         inputTajwid.value = student.bilqolam_tajwid || '';
         inputFashahah.value = student.bilqolam_fashahah || '';
         inputLagu.value = student.bilqolam_lagu || '';
-        inputSaran.value = student.bilqolam_saran || '';
+
 
         toggleModal(true);
     };
@@ -311,11 +308,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const updateData = {
             bilqolam_jilid: inputJilid.value,
-            bilqolam_guru: inputGuru.value,
+
             bilqolam_tajwid: inputTajwid.value,
             bilqolam_fashahah: inputFashahah.value,
             bilqolam_lagu: inputLagu.value,
-            bilqolam_saran: inputSaran.value,
+
             updated_at: firebase.firestore.FieldValue.serverTimestamp()
         };
 

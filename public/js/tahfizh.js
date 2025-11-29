@@ -40,42 +40,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // Surah Data (Name -> Total Verses)
     const surahData = {
         "Quraisy": 4,
-        "At-Takātsur": 8,
+        "At-Takatsur": 8,
         "An-Nashr": 3,
-        "An-Nās": 6,
-        "Al-Mā’Ūn": 7,
+        "An-Nas": 6,
+        "Al-Maun": 7,
         "Al-Lahab": 5,
         "Al-Kautsar": 3,
-        "Al-Kāfirūn": 6,
-        "Al-Ikhlāsh": 4,
+        "Al-Kafirun": 6,
+        "Al-Ikhlash": 4,
         "Al-Humazah": 9,
-        "Al-Fīl": 5,
+        "Al-Fil": 5,
         "Al-Falaq": 5,
-        "Al-‘Ashr": 3,
-        "At-Tīn": 8,
+        "Al-Ashr": 3,
+        "At-Tin": 8,
         "Asy-Syarh": 8,
         "Al-Qadr": 5,
         "Al-Bayyinah": 8,
-        "Al-‘Alaq": 19,
-        "Al-Ghāsyiyah": 26,
+        "Al-Alaq": 19,
+        "Al-Ghasyiyah": 26,
         "Al-Fajr": 30,
-        "Al-A’Lā": 19,
-        "Al-Muthaffifīn": 36,
-        "Al-Infithār": 19,
-        "An-Nāzi’Āt": 46,
+        "Al-A’La": 19,
+        "Al-Muthaffifin": 36,
+        "Al-Infithar": 19,
+        "An-Nazi’at": 46,
         "An-Naba’": 40,
-        "Yāsīn-ayat41sd83": 83
+        "Yasin-ayat 41 s/d 83": 83
     };
 
     // Tahfizh configuration per class (List of Surahs)
     // This can be customized. For now, assigning common Juz 30 surahs.
     const tahfizhConfig = {
-        '1': ["An-Nās", "Al-Falaq", "Al-Ikhlāsh", "Al-Lahab", "An-Nashr", "Al-Kāfirūn", "Al-Kautsar", "Al-Mā’ūn", "Quraisy", "Al-Fīl", "Al-Humazah", "Al-‘Ashr", "At-Takātsur"],
-        '2': ["Al-Bayyinah", "Al-Qadr", "Al-‘Alaq", "At-Tīn", "Asy-Syarh"],
-        '3': ["Al-Fajr", "Al-Ghāsyiyah", "Al-A’lā"],
-        '4': ["Al-Muthaffifīn", "Al-Infithār"],
-        '5': ["An-Nāzi’āt", "An-Naba’"],
-        '6': ["Yāsīn-ayat41sd83"]
+        '1': ["An-Nas", "Al-Falaq", "Al-Ikhlash", "Al-Lahab", "An-Nashr", "Al-Kafirun", "Al-Kautsar", "Al-Maun", "Quraisy", "Al-Fil", "Al-Humazah", "Al-Ashr", "At-Takatsur"],
+        '2': ["Al-Bayyinah", "Al-Qadr", "Al-Alaq", "At-Tin", "Asy-Syarh"],
+        '3': ["Al-Fajr", "Al-Ghasyiyah", "Al-Ala"],
+        '4': ["Al-Muthaffifin", "Al-Infithar"],
+        '5': ["An-Naziat", "An-Naba"],
+        '6': ["Yasin-ayat 41 s/d 83"]
     };
 
     // --- Real-time Listener ---
