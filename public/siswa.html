@@ -152,6 +152,7 @@
                                     <th scope="col" class="px-6 py-3">NIS</th>
                                     <th scope="col" class="px-6 py-3">NISN</th>
                                     <th scope="col" class="px-6 py-3">Nama Lengkap</th>
+                                    <th scope="col" class="px-6 py-3">Status</th>
                                     <th scope="col" class="px-6 py-3">Kelas</th>
                                     <th scope="col" class="px-6 py-3">Kelompok</th>
                                     <th scope="col" class="px-6 py-3">Shift</th>
@@ -247,13 +248,24 @@
                                             placeholder="0012345678">
                                     </div>
                                 </div>
-                                <div>
-                                    <label for="inputNama"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
-                                        Lengkap</label>
-                                    <input type="text" id="inputNama"
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                        placeholder="Nama Siswa" required>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="inputNama"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
+                                            Lengkap</label>
+                                        <input type="text" id="inputNama"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                            placeholder="Nama Siswa" required>
+                                    </div>
+                                    <div>
+                                        <label for="inputStatus"
+                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
+                                        <select id="inputStatus"
+                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                                            <option value="Reguler">Reguler</option>
+                                            <option value="Pasca">Pasca</option>
+                                        </select>
+                                    </div>
                                 </div>
                                 <div class="grid grid-cols-3 gap-4">
                                     <div>

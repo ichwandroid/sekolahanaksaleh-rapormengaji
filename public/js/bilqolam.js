@@ -35,6 +35,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputFashahah = document.getElementById('inputFashahah');
     const inputLagu = document.getElementById('inputLagu');
 
+    // Daurah Inputs
+    const daurahFields = document.getElementById('daurahFields');
+    const inputTadarus = document.getElementById('inputTadarus');
+    const inputBahasaArab = document.getElementById('inputBahasaArab');
+
 
     // State
     let studentsData = [];
@@ -142,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = '';
         pageData.forEach((data) => {
-            // Bilqolam specific fields
             // Bilqolam specific fields
             const jilid = data.bilqolam_jilid || '-';
             const tajwid = data.bilqolam_tajwid || '-';
@@ -296,6 +300,16 @@ document.addEventListener('DOMContentLoaded', () => {
         inputFashahah.value = student.bilqolam_fashahah || '';
         inputLagu.value = student.bilqolam_lagu || '';
 
+        // Handle Daurah Fields
+        if (student.status === 'Pasca') {
+            daurahFields.classList.remove('hidden');
+            inputTadarus.value = student.daurah_tadarus || '';
+            inputBahasaArab.value = student.daurah_bahasa_arab || '';
+        } else {
+            daurahFields.classList.add('hidden');
+            inputTadarus.value = '';
+            inputBahasaArab.value = '';
+        }
 
         toggleModal(true);
     };
@@ -312,6 +326,10 @@ document.addEventListener('DOMContentLoaded', () => {
             bilqolam_tajwid: inputTajwid.value,
             bilqolam_fashahah: inputFashahah.value,
             bilqolam_lagu: inputLagu.value,
+
+            // Daurah fields (will be saved even if empty/hidden, but that's okay)
+            daurah_tadarus: inputTadarus.value,
+            daurah_bahasa_arab: inputBahasaArab.value,
 
             updated_at: firebase.firestore.FieldValue.serverTimestamp()
         };

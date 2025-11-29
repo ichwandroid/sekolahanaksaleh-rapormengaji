@@ -496,10 +496,42 @@ document.addEventListener('DOMContentLoaded', () => {
         yPos += 1;
 
         const tableBody = [];
+        let sectionCode = 65; // ASCII for 'A'
 
-        // A. BILQOLAM
+        // 1. DAURAH (Only for Pasca)
+        if (student.status === 'Pasca') {
+            const tadarusScore = parseInt(student.daurah_tadarus) || 0;
+            const bahasaArabScore = parseInt(student.daurah_bahasa_arab) || 0;
+            const sectionLetter = String.fromCharCode(sectionCode++);
+
+            tableBody.push([
+                { content: sectionLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+                { content: 'DAURAH', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+                { content: 'CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } },
+                { content: 'DESKRIPSI CAPAIAN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
+            ]);
+
+            tableBody.push([
+                '1.',
+                "Tadarus Al-Qur'an",
+                { content: tadarusScore, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(tadarusScore), styles: { halign: 'center', valign: 'middle' } },
+                getDescription('Ibadah', "Tadarus Al-Qur'an", tadarusScore)
+            ]);
+
+            tableBody.push([
+                '2.',
+                "Bahasa Arab",
+                { content: bahasaArabScore, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(bahasaArabScore), styles: { halign: 'center', valign: 'middle' } },
+                getDescription('Ibadah', "Bahasa Arab", bahasaArabScore)
+            ]);
+        }
+
+        // 2. BILQOLAM
+        const bilqolamLetter = String.fromCharCode(sectionCode++);
         tableBody.push([
-            { content: 'A', styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: bilqolamLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: `BILQOLAM Jilid ${student.bilqolam_jilid || '-'}`, colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
         ]);
 
@@ -519,9 +551,10 @@ document.addEventListener('DOMContentLoaded', () => {
             ]);
         });
 
-        // B. DOA
+        // 3. DOA
+        const doaLetter = String.fromCharCode(sectionCode++);
         tableBody.push([
-            { content: 'B', styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: doaLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: 'TAHFIZH DO\'A SEHARI-HARI', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
         ]);
 
@@ -536,9 +569,10 @@ document.addEventListener('DOMContentLoaded', () => {
             ]);
         });
 
-        // C. TAHFIZH
+        // 4. TAHFIZH
+        const tahfizhLetter = String.fromCharCode(sectionCode++);
         tableBody.push([
-            { content: 'C', styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: tahfizhLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: 'TAHFIZH AL-QUR\'AN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: 'CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } },
             { content: 'DESKRIPSI CAPAIAN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
@@ -555,9 +589,10 @@ document.addEventListener('DOMContentLoaded', () => {
             ]);
         });
 
-        // D.TATHBIQ IBADAH
+        // 5. TATHBIQ IBADAH
+        const ibadahLetter = String.fromCharCode(sectionCode++);
         tableBody.push([
-            { content: 'D', styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: ibadahLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: 'TATHBIQ IBADAH', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: 'CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } },
             { content: 'DESKRIPSI CAPAIAN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }

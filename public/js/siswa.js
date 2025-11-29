@@ -186,6 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${data.nis || '-'}</td>
                     <td class="px-6 py-4">${data.nisn || '-'}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.nama_lengkap || '-'}</td>
+                    <td class="px-6 py-4"><span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-purple-900 dark:text-purple-300">${data.status || 'Reguler'}</span></td>
                     <td class="px-6 py-4">${data.kelas || '-'}</td>
                     <td class="px-6 py-4">${data.kelompok || '-'}</td>
                     <td class="px-6 py-4">${data.shift || '-'}</td>
@@ -306,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('inputNIS').value = '';
         document.getElementById('inputNISN').value = '';
         document.getElementById('inputNama').value = '';
+        document.getElementById('inputStatus').value = 'Reguler';
         document.getElementById('inputKelas').value = '';
         document.getElementById('inputKelompok').value = '';
         document.getElementById('inputShift').value = '';
@@ -327,6 +329,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('inputNIS').value = student.nis || '';
         document.getElementById('inputNISN').value = student.nisn || '';
         document.getElementById('inputNama').value = student.nama_lengkap || '';
+        document.getElementById('inputStatus').value = student.status || 'Reguler';
         document.getElementById('inputKelas').value = student.kelas || '';
         document.getElementById('inputKelompok').value = student.kelompok || '';
         document.getElementById('inputShift').value = student.shift || '';
@@ -346,6 +349,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nis = document.getElementById('inputNIS').value;
         const nisn = document.getElementById('inputNISN').value;
         const nama = document.getElementById('inputNama').value;
+        const status = document.getElementById('inputStatus').value;
         const kelas = document.getElementById('inputKelas').value;
         const kelompok = document.getElementById('inputKelompok').value;
         const shift = document.getElementById('inputShift').value;
@@ -357,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             await db.collection('students').doc(nis).set({
-                nis, nisn, nama_lengkap: nama, kelas, kelompok, shift,
+                nis, nisn, nama_lengkap: nama, status, kelas, kelompok, shift,
                 bilqolam_guru: document.getElementById('inputGuruGPQ').value,
                 guru_pai: document.getElementById('inputGuruPAI').value,
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
@@ -368,6 +372,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('inputNIS').value = '';
             document.getElementById('inputNISN').value = '';
             document.getElementById('inputNama').value = '';
+            document.getElementById('inputStatus').value = 'Reguler';
             document.getElementById('inputKelas').value = '';
             document.getElementById('inputKelompok').value = '';
             document.getElementById('inputShift').value = '';
