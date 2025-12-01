@@ -1,29 +1,46 @@
 // Header Component
-const headerHTML = `
-<header class="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 lg:px-8 z-10">
-    <div class="flex items-center gap-4">
-        <!-- Toggle Sidebar Button -->
-        <button onclick="toggleSidebar()" id="sidebar-toggle"
-            class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary">
-            <i class="ph ph-list text-2xl"></i>
-        </button>
-        <h2 class="text-xl font-semibold text-gray-800 dark:text-white hidden sm:block" id="page-title">Dashboard</h2>
-    </div>
+function getHeaderHTML() {
+    const teacher = getCurrentTeacher();
+    const teacherName = teacher ? teacher.nama_lengkap : 'Operator SD Anak Saleh';
+    const teacherNIY = teacher ? teacher.niy : '-';
+    const teacherInitial = teacherName ? teacherName.charAt(0).toUpperCase() : 'OP';
 
-    <!-- User Profile / Actions -->
-    <div class="flex items-center gap-4">
-        <div class="flex items-center gap-3">
-            <div class="text-right hidden md:block">
-                <p class="text-sm font-semibold text-gray-800 dark:text-white">Operator SD Anak Saleh</p>
-                <p class="text-xs text-gray-500 dark:text-gray-400">Operator</p>
-            </div>
-            <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md">
-                OP
-            </div>
+    return `
+    <header class="h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-4 lg:px-8 z-10">
+        <div class="flex items-center gap-4">
+            <!-- Toggle Sidebar Button -->
+            <button onclick="toggleSidebar()" id="sidebar-toggle"
+                class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                <i class="ph ph-list text-2xl"></i>
+            </button>
+            <h2 class="text-xl font-semibold text-gray-800 dark:text-white hidden sm:block" id="page-title">Dashboard</h2>
         </div>
-    </div>
-</header>
-`;
+
+        <!-- User Profile / Actions -->
+        <div class="flex items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="text-right hidden md:block">
+                    <p class="text-sm font-semibold text-gray-800 dark:text-white">${teacherName}</p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">NIY: ${teacherNIY}</p>
+                </div>
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-secondary flex items-center justify-center text-white font-bold shadow-md">
+                    ${teacherInitial}
+                </div>
+            </div>
+            ${teacher ? `
+            <button 
+                onclick="logout()" 
+                class="p-2 rounded-lg text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
+                title="Keluar"
+            >
+                <i class="ph ph-sign-out text-xl"></i>
+            </button>
+            ` : ''}
+        </div>
+    </header>
+    `;
+}
+
 
 // Page titles mapping
 const pageTitles = {
@@ -40,7 +57,7 @@ const pageTitles = {
 function loadHeader(activePage) {
     const headerContainer = document.getElementById('header-container');
     if (headerContainer) {
-        headerContainer.innerHTML = headerHTML;
+        headerContainer.innerHTML = getHeaderHTML();
 
         // Set page title
         const pageTitle = document.getElementById('page-title');

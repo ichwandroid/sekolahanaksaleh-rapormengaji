@@ -79,6 +79,9 @@
                             <h3 class="text-lg font-bold text-gray-800 dark:text-white">Data Penilaian Bilqolam</h3>
                         </div>
 
+                        <!-- Teacher Info Card -->
+                        <div id="teacherInfoCard"></div>
+
                         <!-- Filters & Sort -->
                         <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
                             <select id="filterKelas"
@@ -206,58 +209,58 @@
                                             <label for="inputJilid"
                                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Jilid</label>
                                             <select id="inputJilid"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-                                            <option value="">Pilih Jilid</option>
-                                            <option value="Al Qur'an">Al Qur'an</option>
-                                            <option value="Al Qur'an Awal">Al Qur'an Awal</option>
-                                            <option value="Drill Jilid 2">Drill Jilid 2</option>
-                                            <option value="Inklusi">Inklusi</option>
-                                            <option value="Jilid 1">Jilid 1</option>
-                                            <option value="Jilid 1 Akhir">Jilid 1 Akhir</option>
-                                            <option value="Jilid 1 Awal">Jilid 1 Awal</option>
-                                            <option value="Jilid 1 Tengah">Jilid 1 Tengah</option>
-                                            <option value="Jilid 2">Jilid 2</option>
-                                            <option value="Jilid 2 Akhir">Jilid 2 Akhir</option>
-                                            <option value="Jilid 2 Awal">Jilid 2 Awal</option>
-                                            <option value="Jilid 2 Lambat">Jilid 2 Lambat</option>
-                                            <option value="Jilid 2 Tengah">Jilid 2 Tengah</option>
-                                            <option value="Jilid 3">Jilid 3</option>
-                                            <option value="Jilid 3 Awal">Jilid 3 Awal</option>
-                                            <option value="Jilid 3 Drill">Jilid 3 Drill</option>
-                                            <option value="Jilid 3 Tengah">Jilid 3 Tengah</option>
-                                            <option value="Jilid 4">Jilid 4</option>
-                                            <option value="Jilid 4 Akhir">Jilid 4 Akhir</option>
-                                            <option value="Jilid 4 Awal">Jilid 4 Awal</option>
-                                            <option value="Jilid 4 Tengah">Jilid 4 Tengah</option>
-                                            <option value="Juz Amma">Juz Amma</option>
-                                            <option value="Pra Bilqolam">Pra Bilqolam</option>
-                                        </select>
-                                    </div>
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
+                                                <option value="">Pilih Jilid</option>
+                                                <option value="Al Qur'an">Al Qur'an</option>
+                                                <option value="Al Qur'an Awal">Al Qur'an Awal</option>
+                                                <option value="Drill Jilid 2">Drill Jilid 2</option>
+                                                <option value="Inklusi">Inklusi</option>
+                                                <option value="Jilid 1">Jilid 1</option>
+                                                <option value="Jilid 1 Akhir">Jilid 1 Akhir</option>
+                                                <option value="Jilid 1 Awal">Jilid 1 Awal</option>
+                                                <option value="Jilid 1 Tengah">Jilid 1 Tengah</option>
+                                                <option value="Jilid 2">Jilid 2</option>
+                                                <option value="Jilid 2 Akhir">Jilid 2 Akhir</option>
+                                                <option value="Jilid 2 Awal">Jilid 2 Awal</option>
+                                                <option value="Jilid 2 Lambat">Jilid 2 Lambat</option>
+                                                <option value="Jilid 2 Tengah">Jilid 2 Tengah</option>
+                                                <option value="Jilid 3">Jilid 3</option>
+                                                <option value="Jilid 3 Awal">Jilid 3 Awal</option>
+                                                <option value="Jilid 3 Drill">Jilid 3 Drill</option>
+                                                <option value="Jilid 3 Tengah">Jilid 3 Tengah</option>
+                                                <option value="Jilid 4">Jilid 4</option>
+                                                <option value="Jilid 4 Akhir">Jilid 4 Akhir</option>
+                                                <option value="Jilid 4 Awal">Jilid 4 Awal</option>
+                                                <option value="Jilid 4 Tengah">Jilid 4 Tengah</option>
+                                                <option value="Juz Amma">Juz Amma</option>
+                                                <option value="Pra Bilqolam">Pra Bilqolam</option>
+                                            </select>
+                                        </div>
 
-                                </div>
-                                <div class="grid grid-cols-3 gap-4">
-                                    <div>
-                                        <label for="inputTajwid"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tajwid</label>
-                                        <input type="number" id="inputTajwid" min="0" max="100"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="0-100">
                                     </div>
-                                    <div>
-                                        <label for="inputFashahah"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fashahah</label>
-                                        <input type="number" id="inputFashahah" min="0" max="100"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="0-100">
+                                    <div class="grid grid-cols-3 gap-4">
+                                        <div>
+                                            <label for="inputTajwid"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tajwid</label>
+                                            <input type="number" id="inputTajwid" min="0" max="100"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                                placeholder="0-100">
+                                        </div>
+                                        <div>
+                                            <label for="inputFashahah"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fashahah</label>
+                                            <input type="number" id="inputFashahah" min="0" max="100"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                                placeholder="0-100">
+                                        </div>
+                                        <div>
+                                            <label for="inputLagu"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Lagu</label>
+                                            <input type="number" id="inputLagu" min="0" max="100"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                                placeholder="0-100">
+                                        </div>
                                     </div>
-                                    <div>
-                                        <label for="inputLagu"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Lagu</label>
-                                        <input type="number" id="inputLagu" min="0" max="100"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="0-100">
-                                    </div>
-                                </div>
                                 </div>
 
                                 <!-- Daurah Fields (Hidden by default, shown for Pasca) -->
@@ -306,6 +309,7 @@
     <script defer src="/__/firebase/init.js?useEmulator=true"></script>
 
     <!-- Scripts -->
+    <script src="js/auth.js"></script>
     <script src="js/sidebar.js"></script>
     <script src="js/header.js"></script>
     <script src="js/dashboard.js"></script>

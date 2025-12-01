@@ -3,6 +3,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const tableBody = document.getElementById('laporanTableBody');
     if (!tableBody) return;
 
+    // Display teacher info
+    const teacher = getCurrentTeacher();
+    const teacherInfoCard = document.getElementById('teacherInfoCard');
+    if (teacher && teacherInfoCard) {
+        teacherInfoCard.innerHTML = `
+            <div class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4">
+                <div class="flex items-center gap-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary to-secondary text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
+                        ${teacher.nama_lengkap ? teacher.nama_lengkap.charAt(0).toUpperCase() : 'G'}
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                            <i class="ph ph-user-circle mr-1"></i>
+                            Anda login sebagai:
+                        </p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">
+                            ${teacher.nama_lengkap || 'Guru'}
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            NIY: ${teacher.niy || '-'} | Menampilkan siswa yang Anda ajar
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     // Filters & Sort UI
     const filterKelas = document.getElementById('filterKelas');
     const filterKelompok = document.getElementById('filterKelompok');
@@ -114,10 +141,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Real-time Listener ---
     db.collection('students').onSnapshot((snapshot) => {
-        studentsData = [];
+        let allStudents = [];
         snapshot.forEach((doc) => {
-            studentsData.push({ id: doc.id, ...doc.data() });
+            allStudents.push({ id: doc.id, ...doc.data() });
         });
+
+        // Get current teacher and filter students
+        const teacher = getCurrentTeacher();
+        if (teacher) {
+            studentsData = filterStudentsByTeacher(allStudents, teacher);
+        } else {
+            studentsData = allStudents;
+        }
 
         populateFilters();
         applyFilters();
@@ -534,21 +569,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 { content: `BILQOLAM ${student.bilqolam_jilid || '-'}`, colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
             ]);
 
-        const bilqolamItems = [
-            { name: 'Tajwid', score: tajwid },
-            { name: 'Fashahah', score: fashahah },
-            { name: 'Lagu', score: lagu }
-        ];
+            const bilqolamItems = [
+                { name: 'Tajwid', score: tajwid },
+                { name: 'Fashahah', score: fashahah },
+                { name: 'Lagu', score: lagu }
+            ];
 
-        bilqolamItems.forEach((item, index) => {
-            tableBody.push([
-                (index + 1) + '.',
-                item.name,
-                { content: item.score, styles: { halign: 'center', valign: 'middle' } },
-                { content: getPredicate(item.score), styles: { halign: 'center', valign: 'middle' } },
-                getDescription(item.name, null, item.score)
-            ]);
-        });
+            bilqolamItems.forEach((item, index) => {
+                tableBody.push([
+                    (index + 1) + '.',
+                    item.name,
+                    { content: item.score, styles: { halign: 'center', valign: 'middle' } },
+                    { content: getPredicate(item.score), styles: { halign: 'center', valign: 'middle' } },
+                    getDescription(item.name, null, item.score)
+                ]);
+            });
         }
 
         // 3. DOA

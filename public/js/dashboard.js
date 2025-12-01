@@ -1,4 +1,29 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Get current teacher
+    const teacher = getCurrentTeacher();
+
+    // Fetch and display student count
+    if (teacher) {
+        const db = firebase.firestore();
+        db.collection('students').get().then((snapshot) => {
+            let allStudents = [];
+            snapshot.forEach((doc) => {
+                allStudents.push({ id: doc.id, ...doc.data() });
+            });
+
+            // Filter students by teacher
+            const teacherStudents = filterStudentsByTeacher(allStudents, teacher);
+
+            // Update total students display
+            const totalStudentsEl = document.getElementById('totalStudents');
+            if (totalStudentsEl) {
+                totalStudentsEl.textContent = teacherStudents.length;
+            }
+        }).catch((error) => {
+            console.error("Error fetching students: ", error);
+        });
+    }
+
     // Register GSAP plugins if needed (not needed for core)
 
     // Initial Animations

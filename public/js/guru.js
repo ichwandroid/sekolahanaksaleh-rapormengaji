@@ -31,6 +31,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemsPerPage = 10;
     let sortOrder = 'asc'; // 'asc' or 'desc'
 
+    // Display teacher info
+    const teacher = getCurrentTeacher();
+    const teacherInfoCard = document.getElementById('teacherInfoCard');
+    if (teacher && teacherInfoCard) {
+        teacherInfoCard.innerHTML = `
+            <div class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 mb-4">
+                <div class="flex items-center gap-4">
+                    <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-br from-primary to-secondary text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
+                        ${teacher.nama_lengkap ? teacher.nama_lengkap.charAt(0).toUpperCase() : 'G'}
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                            <i class="ph ph-user-circle mr-1"></i>
+                            Anda login sebagai:
+                        </p>
+                        <p class="text-lg font-bold text-gray-900 dark:text-white">
+                            ${teacher.nama_lengkap || 'Guru'}
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            NIY: ${teacher.niy || '-'}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     // --- Real-time Listener ---
     db.collection('teachers').onSnapshot((snapshot) => {
         teachersData = [];
