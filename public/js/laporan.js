@@ -527,11 +527,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 2. BILQOLAM
-        const bilqolamLetter = String.fromCharCode(sectionCode++);
-        tableBody.push([
-            { content: bilqolamLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
-            { content: `BILQOLAM Jilid ${student.bilqolam_jilid || '-'}`, colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
-        ]);
+        if (student.status === 'Reguler') {
+            const bilqolamLetter = String.fromCharCode(sectionCode++);
+            tableBody.push([
+                { content: bilqolamLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+                { content: `BILQOLAM ${student.bilqolam_jilid || '-'}`, colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
+            ]);
 
         const bilqolamItems = [
             { name: 'Tajwid', score: tajwid },
@@ -548,6 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 getDescription(item.name, null, item.score)
             ]);
         });
+        }
 
         // 3. DOA
         const doaLetter = String.fromCharCode(sectionCode++);

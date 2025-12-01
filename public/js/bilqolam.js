@@ -305,10 +305,12 @@ document.addEventListener('DOMContentLoaded', () => {
             daurahFields.classList.remove('hidden');
             inputTadarus.value = student.daurah_tadarus || '';
             inputBahasaArab.value = student.daurah_bahasa_arab || '';
+            bilqolamReguler.classList.add('hidden');
         } else {
             daurahFields.classList.add('hidden');
             inputTadarus.value = '';
             inputBahasaArab.value = '';
+            bilqolamReguler.classList.remove('hidden');
         }
 
         toggleModal(true);
