@@ -30,7 +30,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
 
     tl.from("#sidebar", { x: -50, opacity: 0, duration: 0.8 })
-        .from("header", { y: -20, opacity: 0, duration: 0.6 }, "-=0.4")
         .from(".stat-card", { y: 20, opacity: 0, duration: 0.6, stagger: 0.1 }, "-=0.2")
         .from("#main-content-placeholder", { scale: 0.95, opacity: 0, duration: 0.6 }, "-=0.4");
 

@@ -50,6 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${teacher.nama_lengkap || 'Guru'}
                         </p>
                         <p class="text-sm text-gray-600 dark:text-gray-400">
+                            Email: ${teacher.email || '-'}
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
+                            Jabatan: ${teacher.jabatan || '-'}
+                        </p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">
                             NIY: ${teacher.niy || '-'}
                         </p>
                     </div>
@@ -129,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <tr class="teacher-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors opacity-0">
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${data.niy || '-'}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.nama_lengkap || '-'}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.email || '-'}</td>
                     <td class="px-6 py-4">${data.jabatan || '-'}</td>
                     <td class="px-6 py-4">
                         <div class="flex gap-2">
@@ -242,6 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reset form
         document.getElementById('inputNIY').value = '';
         document.getElementById('inputNama').value = '';
+        document.getElementById('inputEmail').value = '';
         document.getElementById('inputJabatan').value = 'Guru PAIBP';
         document.getElementById('modal-title').textContent = 'Tambah Guru Baru';
 
@@ -256,6 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnSaveGuru.addEventListener('click', async () => {
         const niy = document.getElementById('inputNIY').value.trim();
         const nama = document.getElementById('inputNama').value.trim();
+        const email = document.getElementById('inputEmail').value.trim();
         const jabatan = document.getElementById('inputJabatan').value;
         const editId = btnSaveGuru.getAttribute('data-edit-id');
 
@@ -268,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = {
                 niy: niy || '',
                 nama_lengkap: nama,
+                email: email,
                 jabatan,
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             };
@@ -298,6 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         document.getElementById('inputNIY').value = teacher.niy || '';
         document.getElementById('inputNama').value = teacher.nama_lengkap || '';
+        document.getElementById('inputEmail').value = teacher.email || '';
         document.getElementById('inputJabatan').value = teacher.jabatan || 'Guru PAIBP';
 
         document.getElementById('modal-title').textContent = 'Edit Data Guru';
@@ -355,8 +366,8 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCancelCSV.addEventListener('click', () => toggleCSVModal(false));
 
     btnDownloadTemplate.addEventListener('click', () => {
-        const headers = ['NIY', 'Nama Lengkap', 'Jabatan'];
-        const csvContent = headers.join(',') + '\n' + '12345,Contoh Guru,Guru PAIBP';
+        const headers = ['NIY', 'Nama Lengkap', 'Email', 'Jabatan'];
+        const csvContent = headers.join(',') + '\n' + '12345,Contoh Guru,contoh@gmail.com,Guru PAIBP';
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
@@ -401,15 +412,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 // For better robustness, a regex or parser library is recommended
                 const parts = line.split(',');
 
-                if (parts.length >= 2) {
+                if (parts.length >= 3) {
                     const niy = parts[0].trim();
                     const nama = parts[1].trim();
-                    const jabatan = parts.length > 2 ? parts[2].trim() : 'Guru PAIBP'; // Default if missing
+                    const email = parts[2].trim();
+                    const jabatan = parts.length > 3 ? parts[3].trim() : 'Pilih Jabatan'; // Default if missing
 
                     if (niy && nama) {
                         teachers.push({
                             niy,
                             nama_lengkap: nama,
+                            email,
                             jabatan,
                             updated_at: firebase.firestore.FieldValue.serverTimestamp()
                         });

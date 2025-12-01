@@ -32,17 +32,31 @@ function logout() {
     }
 }
 
+// Check if teacher is an admin
+function isAdmin(teacher) {
+    if (!teacher) return false;
+    // Cek berdasarkan role, jabatan, atau NIY spesifik
+    const adminJabatan = ['Admin', 'Kepala Sekolah', 'Operator'];
+    const adminNiy = ['admin', '000000']; // NIY khusus admin
+
+    return (teacher.role === 'admin') ||
+        (adminJabatan.includes(teacher.jabatan)) ||
+        (adminNiy.includes(teacher.niy));
+}
+
 // Filter students by teacher
 function filterStudentsByTeacher(students, teacher) {
     if (!teacher) return students;
 
+    // Jika admin, kembalikan semua data (tidak difilter)
+    if (isAdmin(teacher)) {
+        return students;
+    }
+
     const teacherName = teacher.nama_lengkap;
 
     // Filter students where the teacher is either guru_pai or bilqolam_guru
-    return students.filter(student => {
-        return student.guru_pai === teacherName ||
-            student.bilqolam_guru === teacherName;
-    });
+    return students.filter(student => student.guru_pai === teacherName || student.bilqolam_guru === teacherName);
 }
 
 // Get teacher info display
@@ -64,7 +78,7 @@ function getTeacherInfoHTML(teacher) {
             </div>
             <button 
                 onclick="logout()" 
-                class="flex-shrink-0 p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
+                class="flex-shrink-0 p-2 text-red-800 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors duration-200"
                 title="Keluar"
             >
                 <i class="ph ph-sign-out text-xl"></i>

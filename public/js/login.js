@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const db = firebase.firestore();
     const loginForm = document.getElementById('loginForm');
-    const niyInput = document.getElementById('niy');
+    const emailInput = document.getElementById('email');
     const errorMessage = document.getElementById('errorMessage');
     const errorText = document.getElementById('errorText');
     const loginButton = document.getElementById('loginButton');
@@ -17,10 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const niy = niyInput.value.trim();
+        const email = emailInput.value.trim();
 
-        if (!niy) {
-            showError('NIY tidak boleh kosong');
+        if (!email) {
+            showError('Email tidak boleh kosong');
             return;
         }
 
@@ -29,13 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
         hideError();
 
         try {
-            // Query teacher by NIY
+            // Query teacher by email
             const teacherQuery = await db.collection('teachers')
-                .where('niy', '==', niy)
+                .where('email', '==', email)
                 .get();
 
             if (teacherQuery.empty) {
-                showError('NIY tidak ditemukan. Silakan periksa kembali NIY Anda.');
+                showError('Email tidak ditemukan. Silakan periksa kembali Email Anda.');
                 setLoading(false);
                 return;
             }
@@ -94,19 +94,19 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Auto-focus on NIY input
-    niyInput.focus();
+    // Auto-focus on email input
+    emailInput.focus();
 
     // Add input animation
-    niyInput.addEventListener('focus', () => {
-        gsap.to(niyInput, {
+    emailInput.addEventListener('focus', () => {
+        gsap.to(emailInput, {
             scale: 1.02,
             duration: 0.2
         });
     });
 
-    niyInput.addEventListener('blur', () => {
-        gsap.to(niyInput, {
+    emailInput.addEventListener('blur', () => {
+        gsap.to(emailInput, {
             scale: 1,
             duration: 0.2
         });

@@ -1,5 +1,54 @@
 // Sidebar Component
-const sidebarHTML = `
+function getSidebarHTML() {
+    let teacher = null;
+    try {
+        if (typeof getCurrentTeacher === 'function') {
+            teacher = getCurrentTeacher();
+        }
+    } catch (e) {
+        console.error("Error getting teacher info:", e);
+    }
+
+    // Default: Guru biasa
+    let isAdminUser = false;
+    let isGPQUser = false;
+    let isGPAIUser = false;
+    if (teacher) {
+        const jabatan = teacher.jabatan || '';
+        // const niyVal = teacher.niy || '';
+        isAdminUser = (teacher.role === 'admin') ||
+            (['Admin', 'Kepala Sekolah', 'Operator'].includes(jabatan)) ||
+            (['admin', '000000'].includes(jabatan));
+        isGPQUser = (teacher.role === 'Guru GPQ') ||
+            (['Guru GPQ', '000000'].includes(jabatan));
+        isGPAIUser = (teacher.role === 'Guru PAIBP') ||
+            (['Guru PAIBP', '000000'].includes(jabatan));
+    }
+
+    // Define menu items
+    const menuItems = [
+        { href: 'dashboard.html', page: 'dashboard', icon: 'ph-house', text: 'Home', show: true },
+        { href: 'siswa.html', page: 'siswa', icon: 'ph-student', text: 'Data Siswa', show: true },
+        { href: 'guru.html', page: 'guru', icon: 'ph-chalkboard-teacher', text: 'Data Guru', show: isAdminUser }, // Only show for Admin
+        { href: 'bilqolam.html', page: 'bilqolam', icon: 'ph-book-bookmark', text: 'Bilqolam', show: isAdminUser || isGPQUser },
+        { href: 'doa.html', page: 'doa', icon: 'ph-hands-praying', text: 'Doa Sehari-hari', show: isAdminUser || isGPAIUser },
+        { href: 'tathbiq.html', page: 'tathbiq', icon: 'ph-mosque', text: 'Tathbiq Ibadah', show: isAdminUser || isGPAIUser },
+        { href: 'tahfizh.html', page: 'tahfizh', icon: 'ph-book-open-text', text: "Tahfizh Al-Qur'an", show: true },
+        { href: 'laporan.html', page: 'laporan', icon: 'ph-file-text', text: 'Laporan', show: true }
+    ];
+
+    // Generate menu HTML
+    const navLinks = menuItems.map(item => {
+        if (!item.show) return '';
+        return `
+        <a href="${item.href}" data-page="${item.page}"
+            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
+            <i class="ph ${item.icon} text-xl"></i>
+            <span>${item.text}</span>
+        </a>`;
+    }).join('');
+
+    return `
 <aside id="sidebar"
     class="fixed lg:static inset-y-0 left-0 z-30 w-64 -translate-x-full lg:translate-x-0 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col h-full shadow-lg lg:shadow-none">
 
@@ -20,80 +69,27 @@ const sidebarHTML = `
 
     <!-- Navigation -->
     <nav class="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-        <a href="dashboard.html" data-page="dashboard"
-            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
-            <i class="ph ph-house text-xl"></i>
-            <span>Home</span>
-        </a>
-
-        <a href="siswa.html" data-page="siswa"
-            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
-            <i class="ph ph-student text-xl"></i>
-            <span>Data Siswa</span>
-        </a>
-
-        <a href="guru.html" data-page="guru"
-            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
-            <i class="ph ph-chalkboard-teacher text-xl"></i>
-            <span>Data Guru</span>
-        </a>
-
-        <a href="bilqolam.html" data-page="bilqolam"
-            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
-            <i class="ph ph-book-bookmark text-xl"></i>
-            <span>Bilqolam</span>
-        </a>
-
-        <a href="doa.html" data-page="doa"
-            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
-            <i class="ph ph-hands-praying text-xl"></i>
-            <span>Doa Sehari-hari</span>
-        </a>
-
-        <a href="tathbiq.html" data-page="tathbiq"
-            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
-            <i class="ph ph-mosque text-xl"></i>
-            <span>Tathbiq Ibadah</span>
-        </a>
-
-        <a href="tahfizh.html" data-page="tahfizh"
-            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
-            <i class="ph ph-book-open-text text-xl"></i>
-            <span>Tahfizh Al-Qur'an</span>
-        </a>
-
-        <a href="laporan.html" data-page="laporan"
-            class="nav-link flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
-            <i class="ph ph-file-text text-xl"></i>
-            <span>Laporan</span>
-        </a>
+        ${navLinks}
     </nav>
 
     <!-- Sidebar Footer -->
     <div class="p-4 border-t border-gray-200 dark:border-gray-700 space-y-2">
-
         <!-- Theme Toggle -->
         <button onclick="toggleTheme()"
             class="w-full flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white transition-colors">
             <i id="theme-icon" class="ph ph-moon text-xl"></i>
             <span id="theme-text">Dark Mode</span>
         </button>
-
-        <!-- Logout -->
-        <a href="index.html"
-            class="flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-xl text-red-600 hover:bg-red-50 hover:text-red-700 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300 transition-colors">
-            <i class="ph ph-sign-out text-xl"></i>
-            <span>Logout</span>
-        </a>
     </div>
 </aside>
 `;
+}
 
 // Function to load sidebar
 function loadSidebar(activePage) {
     const sidebarContainer = document.getElementById('sidebar-container');
     if (sidebarContainer) {
-        sidebarContainer.innerHTML = sidebarHTML;
+        sidebarContainer.innerHTML = getSidebarHTML();
 
         // Set active state
         if (activePage) {
