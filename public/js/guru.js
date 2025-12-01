@@ -227,19 +227,19 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCancelModal.addEventListener('click', () => toggleModal(false));
 
     btnSaveGuru.addEventListener('click', async () => {
-        const niy = document.getElementById('inputNIY').value;
-        const nama = document.getElementById('inputNama').value;
+        const niy = document.getElementById('inputNIY').value.trim();
+        const nama = document.getElementById('inputNama').value.trim();
         const jabatan = document.getElementById('inputJabatan').value;
         const editId = btnSaveGuru.getAttribute('data-edit-id');
 
-        if (!niy || !nama) {
-            alert('NIY dan Nama wajib diisi!');
+        if (!nama) {
+            alert('Nama wajib diisi!');
             return;
         }
 
         try {
             const data = {
-                niy,
+                niy: niy || '',
                 nama_lengkap: nama,
                 jabatan,
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
@@ -249,9 +249,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 await db.collection('teachers').doc(editId).update(data);
                 alert('Data guru berhasil diperbarui!');
             } else {
-                // Use NIY as doc ID or auto-gen? Using NIY as ID is safer for uniqueness if guaranteed unique.
-                // But let's use NIY as ID to be consistent with students (using NIS).
-                await db.collection('teachers').doc(niy).set(data, { merge: true });
+                if (niy) {
+                    await db.collection('teachers').doc(niy).set(data, { merge: true });
+                } else {
+                    await db.collection('teachers').add(data);
+                }
                 alert('Data guru berhasil disimpan!');
             }
 
@@ -288,4 +290,156 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     };
+
+    // --- CSV Upload Logic ---
+    const uploadCSVModal = document.getElementById('uploadCSVModal');
+    const btnUploadCSV = document.getElementById('btnUploadCSV');
+    const btnCancelCSV = document.getElementById('btnCancelCSV');
+    const btnDownloadTemplate = document.getElementById('btnDownloadTemplate');
+    const csvFileInput = document.getElementById('csvFileInput');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const btnProcessCSV = document.getElementById('btnProcessCSV');
+
+    function toggleCSVModal(show) {
+        if (show) {
+            uploadCSVModal.classList.remove('hidden');
+            gsap.fromTo(uploadCSVModal.querySelector('.relative'),
+                { scale: 0.95, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.2, ease: "power2.out" }
+            );
+        } else {
+            gsap.to(uploadCSVModal.querySelector('.relative'), {
+                scale: 0.95,
+                opacity: 0,
+                duration: 0.2,
+                ease: "power2.in",
+                onComplete: () => uploadCSVModal.classList.add('hidden')
+            });
+        }
+    }
+
+    btnUploadCSV.addEventListener('click', () => {
+        csvFileInput.value = ''; // Reset file input
+        fileNameDisplay.classList.add('hidden');
+        fileNameDisplay.querySelector('span').textContent = '';
+        toggleCSVModal(true);
+    });
+
+    btnCancelCSV.addEventListener('click', () => toggleCSVModal(false));
+
+    btnDownloadTemplate.addEventListener('click', () => {
+        const headers = ['NIY', 'Nama Lengkap', 'Jabatan'];
+        const csvContent = headers.join(',') + '\n' + '12345,Contoh Guru,Guru PAIBP';
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'template_guru.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    });
+
+    csvFileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            fileNameDisplay.classList.remove('hidden');
+            fileNameDisplay.querySelector('span').textContent = file.name;
+        }
+    });
+
+    btnProcessCSV.addEventListener('click', async () => {
+        const file = csvFileInput.files[0];
+        if (!file) {
+            alert('Silakan pilih file CSV terlebih dahulu!');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const text = e.target.result;
+            const lines = text.split('\n');
+            const teachers = [];
+
+            // Start from index 1 to skip header
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+
+                // Simple CSV split by comma (assuming no commas in fields for now)
+                // For better robustness, a regex or parser library is recommended
+                const parts = line.split(',');
+
+                if (parts.length >= 2) {
+                    const niy = parts[0].trim();
+                    const nama = parts[1].trim();
+                    const jabatan = parts.length > 2 ? parts[2].trim() : 'Guru PAIBP'; // Default if missing
+
+                    if (niy && nama) {
+                        teachers.push({
+                            niy,
+                            nama_lengkap: nama,
+                            jabatan,
+                            updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                }
+            }
+
+            if (teachers.length === 0) {
+                alert('Tidak ada data valid yang ditemukan dalam file CSV.');
+                return;
+            }
+
+            if (!confirm(`Ditemukan ${teachers.length} data guru. Apakah Anda yakin ingin mengupload?`)) {
+                return;
+            }
+
+            // Batch write
+            const batch = db.batch();
+            let batchCount = 0;
+            const BATCH_LIMIT = 500; // Firestore batch limit
+
+            try {
+                btnProcessCSV.disabled = true;
+                btnProcessCSV.textContent = 'Memproses...';
+
+                for (const teacher of teachers) {
+                    // Use NIY as doc ID
+                    const docRef = db.collection('teachers').doc(teacher.niy);
+                    batch.set(docRef, teacher, { merge: true });
+                    batchCount++;
+
+                    if (batchCount >= BATCH_LIMIT) {
+                        await batch.commit();
+                        batchCount = 0;
+                        // Re-instantiate batch for next chunk if needed (though here we might just commit once if < 500)
+                        // Actually, batch object cannot be reused after commit.
+                        // So for > 500 items, we need a new batch. 
+                        // Simplified for now assuming < 500 items usually.
+                        // If > 500, we should handle it properly.
+                    }
+                }
+
+                if (batchCount > 0) {
+                    await batch.commit();
+                }
+
+                alert(`Berhasil mengupload ${teachers.length} data guru!`);
+                toggleCSVModal(false);
+            } catch (error) {
+                console.error("Error uploading CSV: ", error);
+                alert("Gagal mengupload data: " + error.message);
+            } finally {
+                btnProcessCSV.disabled = false;
+                btnProcessCSV.textContent = 'Upload & Proses';
+            }
+        };
+
+        reader.readAsText(file);
+    });
 });

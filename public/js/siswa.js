@@ -386,14 +386,78 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- CSV Upload Logic (Existing) ---
+    // --- CSV Upload Logic ---
+    const uploadCSVModal = document.getElementById('uploadCSVModal');
+    const btnUploadCSV = document.getElementById('btnUploadCSV');
+    const btnCancelCSV = document.getElementById('btnCancelCSV');
+    const btnDownloadTemplate = document.getElementById('btnDownloadTemplate');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const btnProcessCSV = document.getElementById('btnProcessCSV');
+
+    function toggleCSVModal(show) {
+        if (show) {
+            uploadCSVModal.classList.remove('hidden');
+            gsap.fromTo(uploadCSVModal.querySelector('.relative'),
+                { scale: 0.95, opacity: 0 },
+                { scale: 1, opacity: 1, duration: 0.2, ease: "power2.out" }
+            );
+        } else {
+            gsap.to(uploadCSVModal.querySelector('.relative'), {
+                scale: 0.95,
+                opacity: 0,
+                duration: 0.2,
+                ease: "power2.in",
+                onComplete: () => uploadCSVModal.classList.add('hidden')
+            });
+        }
+    }
+
+    btnUploadCSV.addEventListener('click', () => {
+        csvFileInput.value = ''; // Reset file input
+        fileNameDisplay.classList.add('hidden');
+        fileNameDisplay.querySelector('span').textContent = '';
+        toggleCSVModal(true);
+    });
+
+    btnCancelCSV.addEventListener('click', () => toggleCSVModal(false));
+
+    btnDownloadTemplate.addEventListener('click', () => {
+        const headers = ['NIS', 'NISN', 'Nama Lengkap', 'Kelas', 'Kelompok', 'Shift', 'Guru GPQ', 'Guru PAI'];
+        const csvContent = headers.join(',') + '\n' + '12345,0012345678,Contoh Siswa,1A,A,Pagi,Nama Guru GPQ,Nama Guru PAI';
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', 'template_siswa.csv');
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    });
+
     csvFileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
-        if (!file) return;
+        if (file) {
+            fileNameDisplay.classList.remove('hidden');
+            fileNameDisplay.querySelector('span').textContent = file.name;
+        }
+    });
+
+    btnProcessCSV.addEventListener('click', () => {
+        const file = csvFileInput.files[0];
+        if (!file) {
+            alert('Silakan pilih file CSV terlebih dahulu!');
+            return;
+        }
 
         uploadProgress.classList.remove('hidden');
         progressBar.style.width = '0%';
         progressText.textContent = '0%';
+        btnProcessCSV.disabled = true;
+        btnProcessCSV.textContent = 'Memproses...';
 
         Papa.parse(file, {
             header: true,
@@ -429,6 +493,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                     kelas: normalizedRow['kelas'] || '',
                                     kelompok: normalizedRow['kelompok'] || '',
                                     shift: normalizedRow['shift'] || '',
+                                    bilqolam_guru: normalizedRow['guru_gpq'] || '',
+                                    guru_pai: normalizedRow['guru_pai'] || '',
                                     updated_at: firebase.firestore.FieldValue.serverTimestamp()
                                 }, { merge: true });
                             } else {
@@ -446,6 +512,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     setTimeout(() => {
                         alert(`Upload selesai! ${total - errors} data berhasil disimpan.`);
                         uploadProgress.classList.add('hidden');
+                        toggleCSVModal(false);
+                        btnProcessCSV.disabled = false;
+                        btnProcessCSV.textContent = 'Upload & Proses';
                         csvFileInput.value = '';
                     }, 500);
 
@@ -453,12 +522,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     console.error("Error uploading batch: ", error);
                     alert("Terjadi kesalahan saat mengupload data: " + error.message);
                     uploadProgress.classList.add('hidden');
+                    btnProcessCSV.disabled = false;
+                    btnProcessCSV.textContent = 'Upload & Proses';
                 }
             },
             error: (error) => {
                 console.error("CSV Parse Error: ", error);
                 alert("Gagal membaca file CSV.");
                 uploadProgress.classList.add('hidden');
+                btnProcessCSV.disabled = false;
+                btnProcessCSV.textContent = 'Upload & Proses';
             }
         });
     });

@@ -79,6 +79,11 @@
                         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                             <h3 class="text-lg font-bold text-gray-800 dark:text-white">Daftar Guru</h3>
                             <div class="flex gap-2">
+                                <button id="btnUploadCSV"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium flex items-center gap-2">
+                                    <i class="ph ph-upload-simple text-lg"></i>
+                                    <span class="hidden sm:inline">Upload CSV</span>
+                                </button>
                                 <button id="btnAddGuru"
                                     class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-secondary transition-colors text-sm font-medium flex items-center gap-2">
                                     <i class="ph ph-plus text-lg"></i>
@@ -196,10 +201,11 @@
                             <div class="mt-4 space-y-4">
                                 <div>
                                     <label for="inputNIY"
-                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIY</label>
+                                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIY
+                                        (Opsional)</label>
                                     <input type="text" id="inputNIY"
                                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                        placeholder="Nomor Induk Yayasan" required>
+                                        placeholder="Nomor Induk Yayasan">
                                 </div>
                                 <div>
                                     <label for="inputNama"
@@ -226,6 +232,68 @@
                     <button type="button" id="btnSaveGuru"
                         class="inline-flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary sm:ml-3 sm:w-auto">Simpan</button>
                     <button type="button" id="btnCancelModal"
+                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload CSV Modal -->
+    <div id="uploadCSVModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title"
+        role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-gray-900/75 transition-opacity backdrop-blur-sm"></div>
+
+        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <div
+                class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div
+                            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="ph ph-file-csv text-blue-600 dark:text-blue-400 text-xl"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
+                                id="modal-title-csv">Upload Data Guru (CSV)</h3>
+                            <div class="mt-4 space-y-4">
+                                <p class="text-sm text-gray-500 dark:text-gray-400">
+                                    Unggah file CSV berisi data guru. Pastikan format sesuai dengan template.
+                                </p>
+
+                                <div>
+                                    <button id="btnDownloadTemplate" type="button"
+                                        class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 dark:text-blue-400 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors">
+                                        <i class="ph ph-download-simple"></i>
+                                        Download Template CSV
+                                    </button>
+                                </div>
+
+                                <div class="flex items-center justify-center w-full">
+                                    <label for="csvFileInput"
+                                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
+                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
+                                            <i class="ph ph-cloud-arrow-up text-3xl text-gray-500 mb-2"></i>
+                                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span
+                                                    class="font-semibold">Klik untuk upload</span> atau drag and drop
+                                            </p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">CSV only</p>
+                                        </div>
+                                        <input id="csvFileInput" type="file" class="hidden" accept=".csv" />
+                                    </label>
+                                </div>
+                                <div id="fileNameDisplay" class="text-sm text-gray-700 dark:text-gray-300 hidden">
+                                    File terpilih: <span class="font-semibold"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                    <button type="button" id="btnProcessCSV"
+                        class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed">Upload
+                        & Proses</button>
+                    <button type="button" id="btnCancelCSV"
                         class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto">Batal</button>
                 </div>
             </div>
