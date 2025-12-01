@@ -230,10 +230,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4">${data.kelompok || '-'}</td>
                     <td class="px-6 py-4">${data.shift || '-'}</td>
                     <td class="px-6 py-4">
-                        <button class="font-medium text-primary hover:underline mr-3" onclick="viewRapor('${data.id}')">
+                        <button class="font-medium text-primary" onclick="viewRapor('${data.id}')">
                             <i class="ph ph-file-text"></i> Lihat Rapor
                         </button>
-                        <button class="font-medium text-blue-600 hover:underline" onclick="openSaranModal('${data.id}')">
+                        <button class="font-medium text-blue-600" onclick="openSaranModal('${data.id}')">
                             <i class="ph ph-pencil-simple"></i> Edit Saran
                         </button>
                     </td>
