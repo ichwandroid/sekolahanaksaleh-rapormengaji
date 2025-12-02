@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const shift = document.getElementById('inputShift').value;
 
         if (!nis || !nama) {
-            alert('NIS dan Nama wajib diisi!');
+            showCustomAlert('warning', 'Peringatan!', 'NIS dan Nama wajib diisi!');
             return;
         }
 
@@ -413,10 +413,10 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('inputGuruGPQ').value = '';
             document.getElementById('inputGuruPAI').value = '';
 
-            alert('Data siswa berhasil disimpan!');
+            showCustomAlert('success', 'Sukses!', 'Data siswa berhasil disimpan!');
         } catch (error) {
             console.error("Error adding student: ", error);
-            alert("Gagal menyimpan data: " + error.message);
+            showCustomAlert('error', 'Gagal menyimpan data: ' + error.message);
         }
     });
 
@@ -483,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnProcessCSV.addEventListener('click', () => {
         const file = csvFileInput.files[0];
         if (!file) {
-            alert('Silakan pilih file CSV terlebih dahulu!');
+            showCustomAlert('warning', 'Peringatan!', 'Silakan pilih file CSV terlebih dahulu!');
             return;
         }
 
@@ -544,7 +544,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     setTimeout(() => {
-                        alert(`Upload selesai! ${total - errors} data berhasil disimpan.`);
+                        showCustomAlert('success', 'Berhasil!', `Upload selesai! ${total - errors} data berhasil disimpan.`);
                         uploadProgress.classList.add('hidden');
                         toggleCSVModal(false);
                         btnProcessCSV.disabled = false;
@@ -554,7 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 } catch (error) {
                     console.error("Error uploading batch: ", error);
-                    alert("Terjadi kesalahan saat mengupload data: " + error.message);
+                    showCustomAlert('error', 'Gagal menyimpan data: ' + error.message);
                     uploadProgress.classList.add('hidden');
                     btnProcessCSV.disabled = false;
                     btnProcessCSV.textContent = 'Upload & Proses';
@@ -562,7 +562,7 @@ document.addEventListener('DOMContentLoaded', () => {
             },
             error: (error) => {
                 console.error("CSV Parse Error: ", error);
-                alert("Gagal membaca file CSV.");
+                showCustomAlert('error', 'Gagal membaca file CSV.');
                 uploadProgress.classList.add('hidden');
                 btnProcessCSV.disabled = false;
                 btnProcessCSV.textContent = 'Upload & Proses';
@@ -572,13 +572,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Delete Function (Global) ---
     window.deleteStudent = async (id) => {
-        if (confirm('Apakah Anda yakin ingin menghapus data siswa ini?')) {
+        showConfirmAlert('Hapus Data Siswa?', 'Apakah Anda yakin ingin menghapus data siswa ini?', async () => {
             try {
                 await db.collection('students').doc(id).delete();
             } catch (error) {
                 console.error("Error removing document: ", error);
-                alert("Gagal menghapus data: " + error.message);
+                showCustomAlert('error', 'Gagal menghapus data: ' + error.message);
             }
-        }
+        });
     };
 });

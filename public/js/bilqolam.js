@@ -373,10 +373,10 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             await db.collection('students').doc(id).update(updateData);
             toggleModal(false);
-            // No alert needed, realtime listener updates UI
+            showCustomAlert('success', 'Berhasil!', 'Nilai berhasil disimpan!');
         } catch (error) {
             console.error("Error updating grade: ", error);
-            alert("Gagal menyimpan nilai: " + error.message);
+            showCustomAlert('error', 'Gagal!', 'Gagal menyimpan nilai: ' + error.message);
         }
     });
 

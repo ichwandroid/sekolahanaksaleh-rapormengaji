@@ -31,7 +31,7 @@ function getHeaderHTML() {
             <div class="flex items-center justify-between h-16">
                 <!-- Left: Sidebar Toggle & Title -->
                 <div class="flex items-center gap-4">
-                    <button onclick="toggleSidebar()" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 lg:hidden transition-colors">
+                    <button onclick="toggleSidebar()" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700 transition-colors">
                         <i class="ph ph-list text-2xl"></i>
                     </button>
                     <h1 id="page-title" class="text-xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent hidden sm:block">

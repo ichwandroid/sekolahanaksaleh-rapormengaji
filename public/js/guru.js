@@ -50,13 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${teacher.nama_lengkap || 'Guru'}
                         </p>
                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Email: ${teacher.email || '-'}
-                        </p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                            Jabatan: ${teacher.jabatan || '-'}
-                        </p>
-                        <p class="text-sm text-gray-600 dark:text-gray-400">
-                            NIY: ${teacher.niy || '-'}
+                            NIY: ${teacher.niy || '-'} | Menampilkan siswa yang Anda ajar
                         </p>
                     </div>
                 </div>

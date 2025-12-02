@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
             await generatePDF(student);
         } catch (error) {
             console.error('Error generating PDF:', error);
-            alert('Gagal membuat PDF: ' + error.message);
+            showCustomAlert('error', 'Terjadi kesalahan!', 'Gagal membuat PDF: ' + error.message);
         } finally {
             button.innerHTML = originalText;
             button.disabled = false;
@@ -866,7 +866,7 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleSaranModal(false);
         } catch (error) {
             console.error("Error updating saran: ", error);
-            alert("Gagal menyimpan saran: " + error.message);
+            showCustomAlert('error', 'Terjadi kesalahan!', 'Gagal menyimpan saran: ' + error.message);
         }
     });
 

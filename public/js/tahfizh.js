@@ -474,7 +474,7 @@ document.addEventListener('DOMContentLoaded', () => {
             toggleModal(false);
         } catch (error) {
             console.error("Error updating tahfizh: ", error);
-            alert("Gagal menyimpan penilaian: " + error.message);
+            showCustomAlert('error', 'Gagal!', 'Gagal menyimpan penilaian: ' + error.message);
         }
     });
 
@@ -589,20 +589,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     setTimeout(() => {
-                        alert(`Upload selesai!\n${updated} siswa berhasil diperbarui.\n${errors} baris gagal/dilewati.`);
+                        showCustomAlert('success', 'Upload Selesai!', `Upload selesai!\n${updated} siswa berhasil diperbarui.\n${errors} baris gagal/dilewati.`);
                         uploadProgress.classList.add('hidden');
                         csvFileInput.value = '';
                     }, 500);
 
                 } catch (error) {
                     console.error("Error uploading CSV: ", error);
-                    alert("Terjadi kesalahan saat mengupload data: " + error.message);
+                    showCustomAlert('error', 'Terjadi kesalahan!', 'Terjadi kesalahan saat mengupload data: ' + error.message);
                     uploadProgress.classList.add('hidden');
                 }
             },
             error: (error) => {
                 console.error("CSV Parse Error: ", error);
-                alert("Gagal membaca file CSV.");
+                showCustomAlert('error', 'Terjadi kesalahan!', 'Gagal membaca file CSV.');
                 uploadProgress.classList.add('hidden');
             }
         });
