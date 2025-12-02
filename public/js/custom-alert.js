@@ -92,13 +92,13 @@ function showCustomAlert(type = 'success', title = '', message = '', autoClose =
 
     // Icon bounce animation
     gsap.fromTo(alertIconElement,
-        { scale: 0, rotation: -180 },
+        { scale: 0, rotation: 0 },
         {
             scale: 1,
             rotation: 0,
             duration: 0.6,
             delay: 0.2,
-            ease: "elastic.out(1, 0.5)"
+            ease: "power2.out"
         }
     );
 
@@ -158,16 +158,16 @@ function showConfirmAlert(title, message, onConfirm, onCancel = null) {
     );
 
     // Icon shake animation
-    gsap.fromTo(alertIconElement,
-        { x: -10 },
-        {
-            x: 10,
-            duration: 0.1,
-            repeat: 5,
-            yoyo: true,
-            ease: "power1.inOut"
-        }
-    );
+    // gsap.fromTo(alertIconElement,
+    //     { x: -10 },
+    //     {
+    //         x: 10,
+    //         duration: 0.1,
+    //         repeat: 5,
+    //         yoyo: true,
+    //         ease: "power1.inOut"
+    //     }
+    // );
 
     // Add button listeners
     document.getElementById('cancelBtn').addEventListener('click', () => {

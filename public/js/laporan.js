@@ -264,6 +264,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4">${data.kelas || '-'}</td>
                     <td class="px-6 py-4">${data.kelompok || '-'}</td>
                     <td class="px-6 py-4">${data.shift || '-'}</td>
+                    <td class="px-6 py-4 text-center">${data.saran_guru_gpq ? '<i class="ph ph-check-circle text-2xl text-green-500"></i>' : '-'}</td>
+                    <td class="px-6 py-4 text-center">${data.saran_guru_pai ? '<i class="ph ph-check-circle text-2xl text-green-500"></i>' : '-'}</td>
                     <td class="px-6 py-4">
                         <button class="font-medium text-primary" onclick="viewRapor('${data.id}')">
                             <i class="ph ph-file-text"></i> Lihat Rapor

@@ -24,7 +24,6 @@ function getCurrentTeacher() {
 }
 
 // Logout function
-// Logout function
 function logout() {
     // Show confirmation
     if (typeof showConfirmAlert === 'function') {
