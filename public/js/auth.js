@@ -24,11 +24,24 @@ function getCurrentTeacher() {
 }
 
 // Logout function
+// Logout function
 function logout() {
     // Show confirmation
-    if (confirm('Apakah Anda yakin ingin keluar?')) {
-        localStorage.removeItem('currentTeacher');
-        window.location.href = 'login.html';
+    if (typeof showConfirmAlert === 'function') {
+        showConfirmAlert(
+            'Konfirmasi Logout',
+            'Apakah Anda yakin ingin keluar dari aplikasi?',
+            () => {
+                localStorage.removeItem('currentTeacher');
+                window.location.href = 'login.html';
+            }
+        );
+    } else {
+        // Fallback if custom alert is not loaded
+        if (confirm('Apakah Anda yakin ingin keluar?')) {
+            localStorage.removeItem('currentTeacher');
+            window.location.href = 'login.html';
+        }
     }
 }
 
