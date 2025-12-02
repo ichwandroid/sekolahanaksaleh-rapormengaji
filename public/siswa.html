@@ -381,25 +381,8 @@
                     <button type="button" id="btnProcessCSV"
                         class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed">Upload
                         & Proses</button>
-                    id="totalItems">0</span> data
-                    </p>
-                </div>
-                <div>
-                    <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                        <button id="btnPrev"
-                            class="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 dark:ring-gray-600 dark:hover:bg-gray-700">
-                            <span class="sr-only">Previous</span>
-                            <i class="ph ph-caret-left text-lg"></i>
-                        </button>
-                        <span id="pageNumbers" class="flex">
-                            <!-- Page numbers will be injected here -->
-                        </span>
-                        <button id="btnNext"
-                            class="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 dark:ring-gray-600 dark:hover:bg-gray-700">
-                            <span class="sr-only">Next</span>
-                            <i class="ph ph-caret-right text-lg"></i>
-                        </button>
-                    </nav>
+                    <button type="button" id="btnCancelCSV"
+                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto">Batal</button>
                 </div>
             </div>
         </div>
@@ -409,178 +392,7 @@
     </div>
     </div>
 
-    <!-- Add Student Modal -->
-    <div id="addStudentModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title"
-        role="dialog" aria-modal="true">
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-gray-900/75 transition-opacity backdrop-blur-sm"></div>
 
-        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div
-                class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100 dark:border-gray-700">
-                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div
-                            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 sm:mx-0 sm:h-10 sm:w-10">
-                            <i class="ph ph-student text-green-600 dark:text-green-400 text-xl"></i>
-                        </div>
-                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
-                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-                                id="modal-title">Tambah Siswa Baru</h3>
-                            <div class="mt-4 space-y-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="inputNIS"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NIS</label>
-                                        <input type="text" id="inputNIS"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="12345" required>
-                                    </div>
-                                    <div>
-                                        <label for="inputNISN"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">NISN</label>
-                                        <input type="text" id="inputNISN"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="0012345678">
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="inputNama"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
-                                            Lengkap</label>
-                                        <input type="text" id="inputNama"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="Nama Siswa" required>
-                                    </div>
-                                    <div>
-                                        <label for="inputStatus"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Status</label>
-                                        <select id="inputStatus"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-                                            <option value="Reguler">Reguler</option>
-                                            <option value="Pasca">Pasca</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-3 gap-4">
-                                    <div>
-                                        <label for="inputKelas"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kelas</label>
-                                        <input type="text" id="inputKelas"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="1A">
-                                    </div>
-                                    <div>
-                                        <label for="inputKelompok"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kelompok</label>
-                                        <input type="text" id="inputKelompok"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="Kelompok 1">
-                                    </div>
-                                    <div>
-                                        <label for="inputShift"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Shift</label>
-                                        <input type="text" id="inputShift"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                            placeholder="Shift 1">
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="inputGuruPAI"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Guru
-                                            PAIBP</label>
-                                        <select id="inputGuruPAI"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-                                            <option value="">Pilih Guru PAIBP</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="inputGuruGPQ"
-                                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Guru
-                                            GPQ</label>
-                                        <select id="inputGuruGPQ"
-                                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white">
-                                            <option value="">Pilih Guru GPQ</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="button" id="btnSaveStudent"
-                        class="inline-flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-secondary sm:ml-3 sm:w-auto">Simpan</button>
-                    <button type="button" id="btnCancelModal"
-                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto">Batal</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Upload CSV Modal -->
-    <div id="uploadCSVModal" class="fixed inset-0 z-50 hidden overflow-y-auto" aria-labelledby="modal-title"
-        role="dialog" aria-modal="true">
-        <!-- Backdrop -->
-        <div class="fixed inset-0 bg-gray-900/75 transition-opacity backdrop-blur-sm"></div>
-
-        <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <div
-                class="relative transform overflow-hidden rounded-2xl bg-white dark:bg-gray-800 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-gray-100 dark:border-gray-700">
-                <div class="bg-white dark:bg-gray-800 px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div
-                            class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 sm:mx-0 sm:h-10 sm:w-10">
-                            <i class="ph ph-file-csv text-blue-600 dark:text-blue-400 text-xl"></i>
-                        </div>
-                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
-                            <h3 class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-                                id="modal-title-csv">Upload Data Siswa (CSV)</h3>
-                            <div class="mt-4 space-y-4">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    Unggah file CSV berisi data siswa. Pastikan format sesuai dengan template.
-                                </p>
-
-                                <div>
-                                    <button id="btnDownloadTemplate" type="button"
-                                        class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100 dark:text-blue-400 dark:bg-gray-700 dark:hover:bg-gray-600 transition-colors">
-                                        <i class="ph ph-download-simple"></i>
-                                        Download Template CSV
-                                    </button>
-                                </div>
-
-                                <div class="flex items-center justify-center w-full">
-                                    <label for="csvFileInput"
-                                        class="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600">
-                                        <div class="flex flex-col items-center justify-center pt-5 pb-6">
-                                            <i class="ph ph-cloud-arrow-up text-3xl text-gray-500 mb-2"></i>
-                                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span
-                                                    class="font-semibold">Klik untuk upload</span> atau drag and drop
-                                            </p>
-                                            <p class="text-xs text-gray-500 dark:text-gray-400">CSV only</p>
-                                        </div>
-                                        <input id="csvFileInput" type="file" class="hidden" accept=".csv" />
-                                    </label>
-                                </div>
-                                <div id="fileNameDisplay" class="text-sm text-gray-700 dark:text-gray-300 hidden">
-                                    File terpilih: <span class="font-semibold"></span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 dark:bg-gray-700/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                    <button type="button" id="btnProcessCSV"
-                        class="inline-flex w-full justify-center rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 sm:ml-3 sm:w-auto disabled:opacity-50 disabled:cursor-not-allowed">Upload
-                        & Proses</button>
-                    <button type="button" id="btnCancelCSV"
-                        class="mt-3 inline-flex w-full justify-center rounded-md bg-white dark:bg-gray-800 px-3 py-2 text-sm font-semibold text-gray-900 dark:text-gray-300 shadow-sm ring-1 ring-inset ring-gray-300 dark:ring-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 sm:mt-0 sm:w-auto">Batal</button>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Custom Alert Modal -->
     <div id="customAlertModal" class="hidden fixed inset-0 z-50 overflow-y-auto" style="backdrop-filter: blur(4px);">
@@ -603,25 +415,6 @@
         </div>
     </div>
 
-    <!-- Custom Alert Modal -->
-    <div id="customAlertModal" class="hidden fixed inset-0 z-50 overflow-y-auto" style="backdrop-filter: blur(4px);">
-        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50" onclick="closeCustomAlert()"></div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-            <div id="alertBox" class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div id="alertIconContainer" class="flex items-center justify-center pt-8 pb-4">
-                    <div id="alertIcon" class="w-20 h-20 rounded-full flex items-center justify-center">
-                        <i id="alertIconElement" class="text-5xl"></i>
-                    </div>
-                </div>
-                <div class="px-6 pb-6 text-center">
-                    <h3 id="alertTitle" class="text-2xl font-bold text-gray-900 dark:text-white mb-2"></h3>
-                    <p id="alertMessage" class="text-gray-600 dark:text-gray-400 mb-6"></p>
-                    <div id="alertButtons" class="flex gap-3 justify-center"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Firebase SDKs -->
     <script defer src="/__/firebase/10.7.1/firebase-app-compat.js"></script>
