@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const editId = btnSaveGuru.getAttribute('data-edit-id');
 
         if (!nama) {
-            alert('Nama wajib diisi!');
+            showCustomAlert('warning', 'Peringatan!', 'Nama wajib diisi!');
             return;
         }
 
@@ -284,20 +284,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (editId) {
                 await db.collection('teachers').doc(editId).update(data);
-                alert('Data guru berhasil diperbarui!');
+                showCustomAlert('success', 'Berhasil!', 'Data guru berhasil diperbarui!');
             } else {
                 if (niy) {
                     await db.collection('teachers').doc(niy).set(data, { merge: true });
                 } else {
                     await db.collection('teachers').add(data);
                 }
-                alert('Data guru berhasil disimpan!');
+                showCustomAlert('success', 'Berhasil!', 'Data guru berhasil disimpan!');
             }
 
             toggleModal(false);
         } catch (error) {
             console.error("Error saving teacher: ", error);
-            alert("Gagal menyimpan data: " + error.message);
+            showCustomAlert('error', 'Gagal!', 'Gagal menyimpan data: ' + error.message);
         }
     });
 
@@ -319,14 +319,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Delete Function ---
     window.deleteGuru = async (id) => {
-        if (confirm('Apakah Anda yakin ingin menghapus data guru ini?')) {
-            try {
-                await db.collection('teachers').doc(id).delete();
-            } catch (error) {
-                console.error("Error removing document: ", error);
-                alert("Gagal menghapus data: " + error.message);
+        showConfirmAlert(
+            'Hapus Data Guru?',
+            'Apakah Anda yakin ingin menghapus data guru ini? Tindakan ini tidak dapat dibatalkan.',
+            async () => {
+                try {
+                    await db.collection('teachers').doc(id).delete();
+                    showCustomAlert('success', 'Terhapus!', 'Data guru berhasil dihapus.');
+                } catch (error) {
+                    console.error("Error removing document: ", error);
+                    showCustomAlert('error', 'Gagal!', 'Gagal menghapus data: ' + error.message);
+                }
             }
-        }
+        );
     };
 
     // --- CSV Upload Logic ---
@@ -393,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btnProcessCSV.addEventListener('click', async () => {
         const file = csvFileInput.files[0];
         if (!file) {
-            alert('Silakan pilih file CSV terlebih dahulu!');
+            showCustomAlert('warning', 'Peringatan!', 'Silakan pilih file CSV terlebih dahulu!');
             return;
         }
 
@@ -431,53 +436,54 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (teachers.length === 0) {
-                alert('Tidak ada data valid yang ditemukan dalam file CSV.');
+                showCustomAlert('warning', 'Peringatan!', 'Tidak ada data valid yang ditemukan dalam file CSV.');
                 return;
             }
 
-            if (!confirm(`Ditemukan ${teachers.length} data guru. Apakah Anda yakin ingin mengupload?`)) {
-                return;
-            }
+            showConfirmAlert(
+                'Upload Data CSV?',
+                `Ditemukan ${teachers.length} data guru. Apakah Anda yakin ingin mengupload?`,
+                async () => {
 
-            // Batch write
-            const batch = db.batch();
-            let batchCount = 0;
-            const BATCH_LIMIT = 500; // Firestore batch limit
+                    // Batch write
+                    const batch = db.batch();
+                    let batchCount = 0;
+                    const BATCH_LIMIT = 500; // Firestore batch limit
 
-            try {
-                btnProcessCSV.disabled = true;
-                btnProcessCSV.textContent = 'Memproses...';
+                    try {
+                        btnProcessCSV.disabled = true;
+                        btnProcessCSV.textContent = 'Memproses...';
+                        showLoadingAlert('Mengupload Data...', 'Mohon tunggu, sedang memproses file CSV');
 
-                for (const teacher of teachers) {
-                    // Use NIY as doc ID
-                    const docRef = db.collection('teachers').doc(teacher.niy);
-                    batch.set(docRef, teacher, { merge: true });
-                    batchCount++;
+                        for (const teacher of teachers) {
+                            // Use NIY as doc ID
+                            const docRef = db.collection('teachers').doc(teacher.niy);
+                            batch.set(docRef, teacher, { merge: true });
+                            batchCount++;
 
-                    if (batchCount >= BATCH_LIMIT) {
-                        await batch.commit();
-                        batchCount = 0;
-                        // Re-instantiate batch for next chunk if needed (though here we might just commit once if < 500)
-                        // Actually, batch object cannot be reused after commit.
-                        // So for > 500 items, we need a new batch. 
-                        // Simplified for now assuming < 500 items usually.
-                        // If > 500, we should handle it properly.
+                            if (batchCount >= BATCH_LIMIT) {
+                                await batch.commit();
+                                batchCount = 0;
+                            }
+                        }
+
+                        if (batchCount > 0) {
+                            await batch.commit();
+                        }
+
+                        closeCustomAlert();
+                        showCustomAlert('success', 'Berhasil!', `Berhasil mengupload ${teachers.length} data guru!`);
+                        toggleCSVModal(false);
+                    } catch (error) {
+                        console.error("Error uploading CSV: ", error);
+                        closeCustomAlert();
+                        showCustomAlert('error', 'Gagal!', 'Gagal mengupload data: ' + error.message);
+                    } finally {
+                        btnProcessCSV.disabled = false;
+                        btnProcessCSV.textContent = 'Upload & Proses';
                     }
                 }
-
-                if (batchCount > 0) {
-                    await batch.commit();
-                }
-
-                alert(`Berhasil mengupload ${teachers.length} data guru!`);
-                toggleCSVModal(false);
-            } catch (error) {
-                console.error("Error uploading CSV: ", error);
-                alert("Gagal mengupload data: " + error.message);
-            } finally {
-                btnProcessCSV.disabled = false;
-                btnProcessCSV.textContent = 'Upload & Proses';
-            }
+            );
         };
 
         reader.readAsText(file);
