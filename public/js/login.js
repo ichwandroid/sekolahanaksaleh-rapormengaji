@@ -17,11 +17,16 @@ document.addEventListener('DOMContentLoaded', () => {
     loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const email = emailInput.value.trim();
+        let email = emailInput.value.trim();
 
         if (!email) {
             showError('Email tidak boleh kosong');
             return;
+        }
+
+        // Auto-append domain if not present
+        if (!email.includes('@')) {
+            email += '@sekolahanaksaleh.sch.id';
         }
 
         // Show loading state
