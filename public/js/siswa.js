@@ -66,6 +66,44 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     }
 
+    // Hide teacher columns for non-admin users
+    const isAdmin = teacher && (teacher.jabatan === 'Admin' || teacher.jabatan === 'Kepala Sekolah' || teacher.jabatan === 'Operator');
+    if (!isAdmin) {
+        // Hide filter columns
+        const gridFilter = document.getElementById('gridFilter');
+        gridFilter.classList.remove('md:grid-cols-7');
+        gridFilter.classList.add('md:grid-cols-5');
+        const filterGuruGPQ = document.getElementById('filterGuruGPQ');
+        const filterGuruPAI = document.getElementById('filterGuruPAI');
+        if (filterGuruGPQ) filterGuruGPQ.style.display = 'none';
+        if (filterGuruPAI) filterGuruPAI.style.display = 'none';
+
+        // Add style to hide table columns and modal inputs
+        const style = document.createElement('style');
+        style.textContent = `
+            table th:nth-child(8),
+            table td:nth-child(8),
+            table th:nth-child(9),
+            table td:nth-child(9),
+            table th:nth-child(10),
+            table td:nth-child(10) {
+                display: none !important;
+            }
+            /* Hide teacher input fields and their parent container in modal */
+            #inputGuruGPQ, #inputGuruPAI {
+                display: none !important;
+            }
+            label[for="inputGuruGPQ"], label[for="inputGuruPAI"] {
+                display: none !important;
+            }
+            /* Hide the parent div containing both teacher inputs */
+            #inputGuruGPQ:not(:only-child), #inputGuruPAI:not(:only-child) {
+                display: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     // --- Real-time Listener ---
     db.collection('students').onSnapshot((snapshot) => {
         let allStudents = [];
@@ -139,11 +177,12 @@ document.addEventListener('DOMContentLoaded', () => {
         updateSelectOptions(filterKelas, kelasSet, 'Semua Kelas');
         updateSelectOptions(filterKelompok, kelompokSet, 'Semua Kelompok');
         updateSelectOptions(filterShift, shiftSet, 'Semua Shift');
-        updateSelectOptions(filterGuruGPQ, guruGPQSet, 'Semua Guru GPQ');
-        updateSelectOptions(filterGuruPAI, guruPAISet, 'Semua Guru PAI');
+        if (filterGuruGPQ) updateSelectOptions(filterGuruGPQ, guruGPQSet, 'Semua Guru GPQ');
+        if (filterGuruPAI) updateSelectOptions(filterGuruPAI, guruPAISet, 'Semua Guru PAI');
     }
 
     function updateSelectOptions(selectElement, set, defaultText) {
+        if (!selectElement) return; // Skip if element doesn't exist
         const currentValue = selectElement.value;
         selectElement.innerHTML = `<option value="">${defaultText}</option>`;
 
@@ -161,12 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function applyFilters() {
-        const search = searchInput.value.toLowerCase();
-        const kelas = filterKelas.value;
-        const kelompok = filterKelompok.value;
-        const shift = filterShift.value;
-        const guruGPQ = filterGuruGPQ.value;
-        const guruPAI = filterGuruPAI.value;
+        const search = searchInput ? searchInput.value.toLowerCase() : '';
+        const kelas = filterKelas ? filterKelas.value : '';
+        const kelompok = filterKelompok ? filterKelompok.value : '';
+        const shift = filterShift ? filterShift.value : '';
+        const guruGPQ = filterGuruGPQ ? filterGuruGPQ.value : '';
+        const guruPAI = filterGuruPAI ? filterGuruPAI.value : '';
 
         filteredData = studentsData.filter(s => {
             const matchSearch = (s.nama_lengkap && s.nama_lengkap.toLowerCase().includes(search)) ||
@@ -288,18 +327,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Event Listeners ---
-    [filterKelas, filterKelompok, filterShift, filterGuruGPQ, filterGuruPAI, searchInput].forEach(el => {
+    [filterKelas, filterKelompok, filterShift, filterGuruGPQ, filterGuruPAI, searchInput].filter(el => el).forEach(el => {
         el.addEventListener('input', () => {
             currentPage = 1; // Reset to first page on filter change
             applyFilters();
         });
     });
 
-    btnSort.addEventListener('click', () => {
-        sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
-        sortLabel.textContent = sortOrder === 'asc' ? 'Nama A-Z' : 'Nama Z-A';
-        applyFilters();
-    });
+    if (btnSort && sortLabel) {
+        btnSort.addEventListener('click', () => {
+            sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            sortLabel.textContent = sortOrder === 'asc' ? 'Nama A-Z' : 'Nama Z-A';
+            applyFilters();
+        });
+    }
 
     // Pagination Events
     window.changePage = (page) => {
