@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Modal UI
     const btnAddSiswa = document.getElementById('btnAddSiswa');
+    const btnDownloadData = document.getElementById('btnDownloadData');
     const addStudentModal = document.getElementById('addStudentModal');
     const btnCancelModal = document.getElementById('btnCancelModal');
     const btnSaveStudent = document.getElementById('btnSaveStudent');
@@ -81,6 +82,8 @@ document.addEventListener('DOMContentLoaded', () => {
         btnAddSiswa.classList.add('hidden');
         const btnUploadCSV = document.getElementById('btnUploadCSV');
         btnUploadCSV.classList.add('hidden');
+        const btnDownloadData = document.getElementById('btnDownloadData');
+        btnDownloadData.classList.add('hidden');
 
         // Add style to hide table columns and modal inputs
         const style = document.createElement('style');
@@ -268,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             <span>${data.nama_lengkap || '-'}</span>${pdbkBadge}
                         </div>
                     </td>
-                    <td class="px-6 py-4"><span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-purple-900 dark:text-purple-300">${data.status || 'Reguler'}</span></td>
+                    <td class="px-6 py-4"><span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-purple-900 dark:text-purple-300">${data.status || '-'}</span></td>
                     <td class="px-6 py-4">${data.kelas || '-'}</td>
                     <td class="px-6 py-4">${data.kelompok || '-'}</td>
                     <td class="px-6 py-4">${data.shift || '-'}</td>
@@ -527,6 +530,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- Download Data Logic ---
+    if (btnDownloadData) {
+        btnDownloadData.addEventListener('click', () => {
+            if (filteredData.length === 0) {
+                showCustomAlert('warning', 'Peringatan', 'Tidak ada data untuk didownload.');
+                return;
+            }
+
+            // Format data for CSV
+            const dataToExport = filteredData.map(s => ({
+                'NIS': s.nis || '',
+                'NISN': s.nisn || '',
+                'Nama Lengkap': s.nama_lengkap || '',
+                'Status': s.status || 'Reguler',
+                'Kelas': s.kelas || '',
+                'Kelompok': s.kelompok || '',
+                'Shift': s.shift || '',
+                'Guru GPQ': s.bilqolam_guru || '',
+                'Guru PAI': s.guru_pai || '',
+                'PDBK': s.pdbk ? 'Ya' : 'Tidak'
+            }));
+
+            const csv = Papa.unparse(dataToExport);
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', `data_siswa_${new Date().toISOString().slice(0, 10)}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+    }
+
     csvFileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
@@ -579,6 +617,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     nis: String(nis),
                                     nisn: normalizedRow['nisn'] ? String(normalizedRow['nisn']) : '',
                                     nama_lengkap: normalizedRow['nama_lengkap'] || normalizedRow['nama'] || '',
+                                    status: normalizedRow['status'] || 'Reguler',
                                     kelas: normalizedRow['kelas'] || '',
                                     kelompok: normalizedRow['kelompok'] || '',
                                     shift: normalizedRow['shift'] || '',

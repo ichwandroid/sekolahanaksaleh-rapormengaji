@@ -71,6 +71,27 @@ function filterStudentsByTeacher(students, teacher) {
     return students.filter(student => student.guru_pai === teacherName || student.bilqolam_guru === teacherName);
 }
 
+// Filter students by teacher's assigned classes (kelas_diampu)
+function filterStudentsByKelas(students, teacher) {
+    // If teacher has no kelas_diampu, return empty array
+    if (!teacher.kelas_diampu || teacher.kelas_diampu.trim() === '') {
+        return [];
+    }
+
+    // Parse kelas_diampu (format: "1A, 2B, 3C")
+    const assignedKelas = teacher.kelas_diampu
+        .split(',')
+        .map(k => k.trim())
+        .filter(k => k !== '');
+
+    // Filter students whose kelas matches any of the assigned classes
+    return students.filter(student => {
+        if (!student.kelas) return false;
+        return assignedKelas.includes(student.kelas);
+    });
+}
+
+
 // Get teacher info display
 function getTeacherInfoHTML(teacher) {
     if (!teacher) return '';

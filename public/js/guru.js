@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.nama_lengkap || '-'}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.email || '-'}</td>
                     <td class="px-6 py-4">${data.jabatan || '-'}</td>
+                    <td class="px-6 py-4">${data.kelas_diampu || '-'}</td>
                     <td class="px-6 py-4">
                         <div class="flex gap-2">
                             <button class="font-medium text-blue-600 dark:text-blue-500 hover:underline" onclick="editGuru('${data.id}')">Edit</button>
@@ -229,6 +230,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 { scale: 1, opacity: 1, duration: 0.2, ease: "power2.out" }
             );
         } else {
+            // Close kelas dropdown when modal closes
+            const kelasDiampuDropdown = document.getElementById('kelasDiampuDropdown');
+            if (kelasDiampuDropdown) {
+                kelasDiampuDropdown.classList.add('hidden');
+            }
+
             gsap.to(addGuruModal.querySelector('.relative'), {
                 scale: 0.95,
                 opacity: 0,
@@ -239,12 +246,137 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- Multi-Select Kelas Diampu Logic ---
+    const btnKelasDiampuDropdown = document.getElementById('btnKelasDiampuDropdown');
+    const kelasDiampuDropdown = document.getElementById('kelasDiampuDropdown');
+    const kelasDiampuOptions = document.getElementById('kelasDiampuOptions');
+    const selectedKelasBadges = document.getElementById('selectedKelasBadges');
+    const emptyKelasPlaceholder = document.getElementById('emptyKelasPlaceholder');
+    const inputKelasDiampu = document.getElementById('inputKelasDiampu');
+    const selectedCountSpan = document.getElementById('selectedCount');
+    const btnClearAllKelas = document.getElementById('btnClearAllKelas');
+    const btnCloseKelasDiampu = document.getElementById('btnCloseKelasDiampu');
+
+    // Generate kelas options (1A - 6D)
+    const kelasOptions = [];
+    for (let tingkat = 1; tingkat <= 6; tingkat++) {
+        for (let kelas of ['A', 'B', 'C', 'D']) {
+            kelasOptions.push(`${tingkat}${kelas}`);
+        }
+    }
+
+    // Populate kelas options with modern checkbox cards
+    kelasOptions.forEach(kelas => {
+        const label = document.createElement('label');
+        label.className = 'kelas-option relative cursor-pointer';
+        label.innerHTML = `
+            <input type="checkbox" value="${kelas}" class="kelas-checkbox peer sr-only">
+            <div class="flex items-center justify-center h-10 rounded-lg border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-medium text-sm transition-all peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white peer-checked:shadow-lg peer-checked:scale-105 hover:border-primary/50 hover:shadow-md">
+                ${kelas}
+            </div>
+        `;
+        kelasDiampuOptions.appendChild(label);
+    });
+
+    // Toggle dropdown
+    btnKelasDiampuDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+        kelasDiampuDropdown.classList.toggle('hidden');
+    });
+
+    // Close dropdown button
+    btnCloseKelasDiampu.addEventListener('click', () => {
+        kelasDiampuDropdown.classList.add('hidden');
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!btnKelasDiampuDropdown.contains(e.target) && !kelasDiampuDropdown.contains(e.target)) {
+            kelasDiampuDropdown.classList.add('hidden');
+        }
+    });
+
+    // Clear all button
+    btnClearAllKelas.addEventListener('click', () => {
+        document.querySelectorAll('.kelas-checkbox').forEach(cb => cb.checked = false);
+        updateKelasDiampuDisplay();
+    });
+
+    // Update display with badges
+    function updateKelasDiampuDisplay() {
+        const checkboxes = document.querySelectorAll('.kelas-checkbox:checked');
+        const selectedKelas = Array.from(checkboxes).map(cb => cb.value);
+
+        // Update count
+        selectedCountSpan.textContent = selectedKelas.length;
+
+        // Clear badges container
+        selectedKelasBadges.innerHTML = '';
+
+        if (selectedKelas.length === 0) {
+            // Show placeholder
+            const placeholder = document.createElement('span');
+            placeholder.className = 'text-xs text-gray-500 dark:text-gray-400';
+            placeholder.textContent = 'Belum ada kelas dipilih';
+            selectedKelasBadges.appendChild(placeholder);
+        } else {
+            // Show badges
+            selectedKelas.forEach(kelas => {
+                const badge = document.createElement('div');
+                badge.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary text-white text-xs font-medium rounded-full shadow-sm';
+                badge.innerHTML = `
+                    <span>${kelas}</span>
+                    <button type="button" class="remove-kelas hover:bg-white/20 rounded-full p-0.5 transition-colors" data-kelas="${kelas}">
+                        <i class="ph ph-x text-xs"></i>
+                    </button>
+                `;
+                selectedKelasBadges.appendChild(badge);
+            });
+
+            // Add event listeners to remove buttons
+            selectedKelasBadges.querySelectorAll('.remove-kelas').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const kelasToRemove = btn.getAttribute('data-kelas');
+                    const checkbox = document.querySelector(`.kelas-checkbox[value="${kelasToRemove}"]`);
+                    if (checkbox) {
+                        checkbox.checked = false;
+                        updateKelasDiampuDisplay();
+                    }
+                });
+            });
+        }
+
+        // Update hidden input
+        inputKelasDiampu.value = selectedKelas.join(', ');
+    }
+
+    // Listen to checkbox changes
+    kelasDiampuOptions.addEventListener('change', updateKelasDiampuDisplay);
+
+    // Function to set selected kelas from string
+    function setSelectedKelas(kelasString) {
+        // Uncheck all first
+        document.querySelectorAll('.kelas-checkbox').forEach(cb => cb.checked = false);
+
+        if (kelasString) {
+            const kelasList = kelasString.split(',').map(k => k.trim());
+            kelasList.forEach(kelas => {
+                const checkbox = document.querySelector(`.kelas-checkbox[value="${kelas}"]`);
+                if (checkbox) checkbox.checked = true;
+            });
+        }
+
+        updateKelasDiampuDisplay();
+    }
+
     btnAddGuru.addEventListener('click', () => {
         // Reset form
         document.getElementById('inputNIY').value = '';
         document.getElementById('inputNama').value = '';
         document.getElementById('inputEmail').value = '';
         document.getElementById('inputJabatan').value = 'Guru PAIBP';
+        setSelectedKelas(''); // Reset kelas selection
         document.getElementById('modal-title').textContent = 'Tambah Guru Baru';
 
         // Remove any editing ID
@@ -260,6 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const nama = document.getElementById('inputNama').value.trim();
         const email = document.getElementById('inputEmail').value.trim();
         const jabatan = document.getElementById('inputJabatan').value;
+        const kelasDiampu = document.getElementById('inputKelasDiampu').value;
         const editId = btnSaveGuru.getAttribute('data-edit-id');
 
         if (!nama) {
@@ -273,6 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 nama_lengkap: nama,
                 email: email,
                 jabatan,
+                kelas_diampu: kelasDiampu,
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             };
 
@@ -304,6 +438,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('inputNama').value = teacher.nama_lengkap || '';
         document.getElementById('inputEmail').value = teacher.email || '';
         document.getElementById('inputJabatan').value = teacher.jabatan || 'Guru PAIBP';
+        setSelectedKelas(teacher.kelas_diampu || ''); // Set selected kelas
 
         document.getElementById('modal-title').textContent = 'Edit Data Guru';
         btnSaveGuru.setAttribute('data-edit-id', id);

@@ -82,6 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const teacher = getCurrentTeacher();
     const teacherInfoCard = document.getElementById('teacherInfoCard');
     if (teacher && teacherInfoCard) {
+        const kelasInfo = teacher.kelas_diampu
+            ? `Kelas: ${teacher.kelas_diampu}`
+            : 'Belum ada kelas yang diampu';
+
         teacherInfoCard.innerHTML = `
             <div class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border border-emerald-200 dark:border-emerald-800 rounded-xl p-4 mb-4">
                 <div class="flex items-center gap-4">
@@ -97,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             ${teacher.nama_lengkap || 'Guru'}
                         </p>
                         <p class="text-sm text-gray-600 dark:text-gray-400">
-                            NIY: ${teacher.niy || '-'} | Menampilkan siswa yang Anda ajar
+                            NIY: ${teacher.niy || '-'} | ${kelasInfo}
                         </p>
                     </div>
                 </div>
@@ -112,9 +116,9 @@ document.addEventListener('DOMContentLoaded', () => {
             allStudents.push({ id: doc.id, ...doc.data() });
         });
 
-        // Get current teacher and filter students
+        // Get current teacher and filter students by assigned classes
         if (teacher) {
-            studentsData = filterStudentsByTeacher(allStudents, teacher);
+            studentsData = filterStudentsByKelas(allStudents, teacher);
         } else {
             studentsData = allStudents;
         }
