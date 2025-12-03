@@ -347,6 +347,21 @@ document.addEventListener('DOMContentLoaded', () => {
             bilqolamReguler.classList.remove('hidden');
         }
 
+        // Handle PDBK Fields
+        if (student.pdbk === 'true') {
+            bilqolamPdbk.classList.remove('hidden');
+            inputTajwid.value = student.pdbk_tajwid || '';
+            inputFashahah.value = student.pdbk_fashahah || '';
+            inputMenirukan.value = student.pdbk_menirukan || '';
+            bilqolamReguler.classList.add('hidden');
+        } else {
+            bilqolamPdbk.classList.add('hidden');
+            inputTajwid.value = '';
+            inputFashahah.value = '';
+            inputMenirukan.value = '';
+            bilqolamReguler.classList.remove('hidden');
+        }
+
         toggleModal(true);
     };
 

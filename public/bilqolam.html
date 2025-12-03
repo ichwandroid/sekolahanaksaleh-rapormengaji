@@ -204,6 +204,8 @@
                                 id="modal-title">Penilaian Bilqolam: <span id="modalStudentName"></span></h3>
                             <input type="hidden" id="modalStudentId">
                             <div class="mt-4 space-y-4">
+
+                                <!-- Reguler Field -->
                                 <div id="bilqolamReguler">
                                     <div class="grid grid-cols-2 gap-4">
                                         <div>
@@ -283,6 +285,33 @@
                                                 class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Bahasa
                                                 Arab</label>
                                             <input type="number" id="inputBahasaArab" min="0" max="100"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                                placeholder="0-100">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- PDBK Field (Hidden by default, shown when PDBK selected) -->
+                                <div id="bilqolamPdbk" class="hidden">
+                                    <div class="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label for="inputTajwid"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tajwid</label>
+                                            <input type="number" id="inputTajwid" min="0" max="100"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                                placeholder="0-100">
+                                        </div>
+                                        <div>
+                                            <label for="inputFashahah"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fashahah</label>
+                                            <input type="number" id="inputFashahah" min="0" max="100"
+                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                                placeholder="0-100">
+                                        </div>
+                                        <div>
+                                            <label for="inputMenirukan"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Menirukan</label>
+                                            <input type="number" id="inputMenirukan" min="0" max="100"
                                                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
                                                 placeholder="0-100">
                                         </div>
