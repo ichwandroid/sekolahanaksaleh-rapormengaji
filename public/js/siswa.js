@@ -79,6 +79,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (filterGuruPAI) filterGuruPAI.style.display = 'none';
         const btnAddSiswa = document.getElementById('btnAddSiswa');
         btnAddSiswa.classList.add('hidden');
+        const btnUploadCSV = document.getElementById('btnUploadCSV');
+        btnUploadCSV.classList.add('hidden');
 
         // Add style to hide table columns and modal inputs
         const style = document.createElement('style');
@@ -509,8 +511,8 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCancelCSV.addEventListener('click', () => toggleCSVModal(false));
 
     btnDownloadTemplate.addEventListener('click', () => {
-        const headers = ['NIS', 'NISN', 'Nama Lengkap', 'Kelas', 'Kelompok', 'Shift', 'Guru GPQ', 'Guru PAI', 'PDBK'];
-        const csvContent = headers.join(',') + '\n' + '12345,0012345678,Contoh Siswa,1A,A,Pagi,Nama Guru GPQ,Nama Guru PAI,false';
+        const headers = ['NIS', 'NISN', 'Nama Lengkap', 'Status', 'Kelas', 'Kelompok', 'Shift', 'Guru GPQ', 'Guru PAI', 'PDBK'];
+        const csvContent = headers.join(',') + '\n' + '12345,0012345678,Contoh Siswa,Reguler,1A,A,Pagi,Nama Guru GPQ,Nama Guru PAI,false';
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
