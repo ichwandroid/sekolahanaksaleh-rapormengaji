@@ -710,12 +710,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- III. KONVERSI NILAI BILQOLAM ---
+        // --- III. KONVERSI NILAI ---
         yPos = doc.lastAutoTable.finalY + 4;
 
         doc.setFontSize(9);
         doc.setFont(undefined, 'bold');
-        doc.text('III. KONVERSI NILAI BILQOLAM', 14, yPos);
+        doc.text('III. KONVERSI NILAI', 14, yPos);
         yPos += 1;
 
         doc.autoTable({
@@ -724,9 +724,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 ['NILAI', 'KONVERSI', 'KETERANGAN']
             ],
             body: [
-                ['86 - 100', 'B', 'Apabila anak baca benar dan lancar, tidak ada salah sama sekali'],
-                ['71 - 85', 'C', 'Apabila anak baca dan ada kesalahan 3 kali'],
-                ['< 70', 'K', 'Apabila anak baca dan ada kesalahan lebih dari 3 kali']
+                ['86 - 100', 'B', 'Apabila ananda baca benar dan lancar, tidak ada salah sama sekali'],
+                ['71 - 85', 'C', 'Apabila ananda baca dan ada kesalahan 3 kali'],
+                ['< 70', 'K', 'Apabila ananda baca dan ada kesalahan lebih dari 3 kali']
             ],
             theme: 'grid',
             headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', lineWidth: 0.1, lineColor: [0, 0, 0], halign: 'center' },

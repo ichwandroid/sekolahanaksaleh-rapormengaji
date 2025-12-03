@@ -77,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const filterGuruPAI = document.getElementById('filterGuruPAI');
         if (filterGuruGPQ) filterGuruGPQ.style.display = 'none';
         if (filterGuruPAI) filterGuruPAI.style.display = 'none';
+        const btnAddSiswa = document.getElementById('btnAddSiswa');
+        btnAddSiswa.classList.add('hidden');
 
         // Add style to hide table columns and modal inputs
         const style = document.createElement('style');
@@ -84,9 +86,7 @@ document.addEventListener('DOMContentLoaded', () => {
             table th:nth-child(8),
             table td:nth-child(8),
             table th:nth-child(9),
-            table td:nth-child(9),
-            table th:nth-child(10),
-            table td:nth-child(10) {
+            table td:nth-child(9) {
                 display: none !important;
             }
             /* Hide teacher input fields and their parent container in modal */
@@ -254,11 +254,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = '';
         pageData.forEach((data) => {
+            // Create PDBK badge if student has PDBK status
+            const pdbkBadge = data.pdbk ? '<span class="inline-flex items-center justify-center w-2 h-2 ml-2 bg-red-500 rounded-full" title="PDBK - Peserta Didik Berkebutuhan Khusus"></span>' : '';
+
             html += `
                 <tr class="student-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors opacity-0">
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${data.nis || '-'}</td>
                     <td class="px-6 py-4">${data.nisn || '-'}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.nama_lengkap || '-'}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                        <div class="flex items-center">
+                            <span>${data.nama_lengkap || '-'}</span>${pdbkBadge}
+                        </div>
+                    </td>
                     <td class="px-6 py-4"><span class="bg-purple-100 text-purple-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-purple-900 dark:text-purple-300">${data.status || 'Reguler'}</span></td>
                     <td class="px-6 py-4">${data.kelas || '-'}</td>
                     <td class="px-6 py-4">${data.kelompok || '-'}</td>
@@ -388,6 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('inputShift').value = '';
         document.getElementById('inputGuruGPQ').value = '';
         document.getElementById('inputGuruPAI').value = '';
+        document.getElementById('inputPDBK').checked = false;
 
         document.getElementById('modal-title').textContent = 'Tambah Siswa Baru';
         // Enable NIS input for new student
@@ -410,6 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('inputShift').value = student.shift || '';
         document.getElementById('inputGuruGPQ').value = student.bilqolam_guru || '';
         document.getElementById('inputGuruPAI').value = student.guru_pai || '';
+        document.getElementById('inputPDBK').checked = student.pdbk || false;
 
         document.getElementById('modal-title').textContent = 'Edit Data Siswa';
         // Disable NIS input for editing to prevent ID change issues
@@ -428,6 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const kelas = document.getElementById('inputKelas').value;
         const kelompok = document.getElementById('inputKelompok').value;
         const shift = document.getElementById('inputShift').value;
+        const pdbk = document.getElementById('inputPDBK').checked;
 
         if (!nis || !nama) {
             showCustomAlert('warning', 'Peringatan!', 'NIS dan Nama wajib diisi!');
@@ -439,6 +449,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 nis, nisn, nama_lengkap: nama, status, kelas, kelompok, shift,
                 bilqolam_guru: document.getElementById('inputGuruGPQ').value,
                 guru_pai: document.getElementById('inputGuruPAI').value,
+                pdbk: pdbk,
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
 
@@ -453,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('inputShift').value = '';
             document.getElementById('inputGuruGPQ').value = '';
             document.getElementById('inputGuruPAI').value = '';
+            document.getElementById('inputPDBK').checked = false;
 
             showCustomAlert('success', 'Sukses!', 'Data siswa berhasil disimpan!');
         } catch (error) {
@@ -497,8 +509,8 @@ document.addEventListener('DOMContentLoaded', () => {
     btnCancelCSV.addEventListener('click', () => toggleCSVModal(false));
 
     btnDownloadTemplate.addEventListener('click', () => {
-        const headers = ['NIS', 'NISN', 'Nama Lengkap', 'Kelas', 'Kelompok', 'Shift', 'Guru GPQ', 'Guru PAI'];
-        const csvContent = headers.join(',') + '\n' + '12345,0012345678,Contoh Siswa,1A,A,Pagi,Nama Guru GPQ,Nama Guru PAI';
+        const headers = ['NIS', 'NISN', 'Nama Lengkap', 'Kelas', 'Kelompok', 'Shift', 'Guru GPQ', 'Guru PAI', 'PDBK'];
+        const csvContent = headers.join(',') + '\n' + '12345,0012345678,Contoh Siswa,1A,A,Pagi,Nama Guru GPQ,Nama Guru PAI,false';
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
@@ -570,6 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                     shift: normalizedRow['shift'] || '',
                                     bilqolam_guru: normalizedRow['guru_gpq'] || '',
                                     guru_pai: normalizedRow['guru_pai'] || '',
+                                    pdbk: normalizedRow['pdbk'] === 'true' || normalizedRow['pdbk'] === '1' || normalizedRow['pdbk'] === 'TRUE',
                                     updated_at: firebase.firestore.FieldValue.serverTimestamp()
                                 }, { merge: true });
                             } else {
