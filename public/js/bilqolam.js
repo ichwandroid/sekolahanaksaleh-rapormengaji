@@ -40,6 +40,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const inputTadarus = document.getElementById('inputTadarus');
     const inputBahasaArab = document.getElementById('inputBahasaArab');
 
+    // PDBK Inputs
+    const pdbkFields = document.getElementById('pdbkFields');
+    const inputPdbkKriteria1Nama = document.getElementById('inputPDBKKriteria1Nama');
+    const inputPdbkKriteria1Desc = document.getElementById('inputPDBKKriteria1Desc');
+    const inputPdbkKriteria1Nilai = document.getElementById('inputPDBKKriteria1Nilai');
+    const inputPdbkKriteria2Nama = document.getElementById('inputPDBKKriteria2Nama');
+    const inputPdbkKriteria2Desc = document.getElementById('inputPDBKKriteria2Desc');
+    const inputPdbkKriteria2Nilai = document.getElementById('inputPDBKKriteria2Nilai');
+    const inputPdbkKriteria3Nama = document.getElementById('inputPDBKKriteria3Nama');
+    const inputPdbkKriteria3Desc = document.getElementById('inputPDBKKriteria3Desc');
+    const inputPdbkKriteria3Nilai = document.getElementById('inputPDBKKriteria3Nilai');
+
 
     // State
     let studentsData = [];
@@ -183,15 +195,42 @@ document.addEventListener('DOMContentLoaded', () => {
         pageData.forEach((data) => {
             // Bilqolam specific fields
             const jilid = data.bilqolam_jilid || '-';
-            const tajwid = data.bilqolam_tajwid || '-';
-            const fashahah = data.bilqolam_fashahah || '-';
-            const lagu = data.bilqolam_lagu || '-';
 
-            const tajwidScore = parseInt(tajwid) || 0;
-            const fashahahScore = parseInt(fashahah) || 0;
-            const laguScore = parseInt(lagu) || 0;
-            const totalScore = tajwidScore + fashahahScore + laguScore;
-            const percentage = Math.round((totalScore / 300) * 100);
+            // Calculate scores and display values based on student type
+            let totalScore, percentage, col1Display, col2Display, col3Display;
+
+            if (data.pdbk === true) {
+                // PDBK scoring - sum of 3 custom criteria
+                const nilai1 = parseInt(data.pdbk_kriteria1_nilai) || 0;
+                const nilai2 = parseInt(data.pdbk_kriteria2_nilai) || 0;
+                const nilai3 = parseInt(data.pdbk_kriteria3_nilai) || 0;
+                totalScore = nilai1 + nilai2 + nilai3;
+                percentage = Math.round((totalScore / 300) * 100);
+
+                // Display PDBK criteria with names and values
+                const kriteria1Nama = data.pdbk_kriteria1_nama || 'Kriteria 1';
+                const kriteria2Nama = data.pdbk_kriteria2_nama || 'Kriteria 2';
+                const kriteria3Nama = data.pdbk_kriteria3_nama || 'Kriteria 3';
+
+                col1Display = `<div class="text-xs"><span class="font-medium text-gray-700 dark:text-gray-300">${kriteria1Nama}:</span> <span class="text-primary font-semibold">${nilai1}</span></div>`;
+                col2Display = `<div class="text-xs"><span class="font-medium text-gray-700 dark:text-gray-300">${kriteria2Nama}:</span> <span class="text-primary font-semibold">${nilai2}</span></div>`;
+                col3Display = `<div class="text-xs"><span class="font-medium text-gray-700 dark:text-gray-300">${kriteria3Nama}:</span> <span class="text-primary font-semibold">${nilai3}</span></div>`;
+            } else {
+                // Regular scoring - sum of tajwid, fashahah, lagu
+                const tajwid = data.bilqolam_tajwid || '-';
+                const fashahah = data.bilqolam_fashahah || '-';
+                const lagu = data.bilqolam_lagu || '-';
+
+                const tajwidScore = parseInt(tajwid) || 0;
+                const fashahahScore = parseInt(fashahah) || 0;
+                const laguScore = parseInt(lagu) || 0;
+                totalScore = tajwidScore + fashahahScore + laguScore;
+                percentage = Math.round((totalScore / 300) * 100);
+
+                col1Display = tajwid;
+                col2Display = fashahah;
+                col3Display = lagu;
+            }
 
             // Color coding based on percentage
             let badgeColor = 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300';
@@ -205,15 +244,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
+            // Create PDBK badge if student has PDBK status
+            const pdbkBadge = data.pdbk ? '<span class="inline-flex items-center justify-center w-3 h-3 ml-2 bg-red-500 rounded-full" title="PDBK - Peserta Didik Berkebutuhan Khusus"><i class="ph ph-seal-warning"></i></span>' : '';
+
             html += `
                 <tr class="student-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors opacity-0">
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${data.nis || '-'}</td>
                     <td class="px-6 py-4">${data.nisn || '-'}</td>
-                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.nama_lengkap || '-'}</td>
-                    <td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">${jilid}</span></td>
-                    <td class="px-6 py-4">${tajwid}</td>
-                    <td class="px-6 py-4">${fashahah}</td>
-                    <td class="px-6 py-4">${lagu}</td>
+                    <td class="px-6 py-4 font-medium text-gray-900 dark:text-white"><span>${data.nama_lengkap || '-'}</span>${pdbkBadge}</td>
+                    <td class="px-6 py-4"><span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300 text-center">${jilid}</span></td>
+                    <td class="px-6 py-4">${col1Display}</td>
+                    <td class="px-6 py-4">${col2Display}</td>
+                    <td class="px-6 py-4">${col3Display}</td>
                     <td class="px-6 py-4">
                         <span class="${badgeColor} text-xs font-medium px-2.5 py-0.5 rounded">
                             ${percentage}%
@@ -348,19 +390,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // Handle PDBK Fields
-        if (student.pdbk === 'true') {
+        if (student.pdbk === true) {
             bilqolamPdbk.classList.remove('hidden');
-            inputTajwid.value = student.pdbk_tajwid || '';
-            inputFashahah.value = student.pdbk_fashahah || '';
-            inputMenirukan.value = student.pdbk_menirukan || '';
+            inputPDBKKriteria1Nama.value = student.pdbk_kriteria1_nama || '';
+            inputPDBKKriteria1Desc.value = student.pdbk_kriteria1_desc || '';
+            inputPDBKKriteria1Nilai.value = student.pdbk_kriteria1_nilai || '';
+            inputPDBKKriteria2Nama.value = student.pdbk_kriteria2_nama || '';
+            inputPDBKKriteria2Desc.value = student.pdbk_kriteria2_desc || '';
+            inputPDBKKriteria2Nilai.value = student.pdbk_kriteria2_nilai || '';
+            inputPDBKKriteria3Nama.value = student.pdbk_kriteria3_nama || '';
+            inputPDBKKriteria3Desc.value = student.pdbk_kriteria3_desc || '';
+            inputPDBKKriteria3Nilai.value = student.pdbk_kriteria3_nilai || '';
             bilqolamReguler.classList.add('hidden');
         } else {
             bilqolamPdbk.classList.add('hidden');
-            inputTajwid.value = '';
-            inputFashahah.value = '';
-            inputMenirukan.value = '';
-            bilqolamReguler.classList.remove('hidden');
+            // Clear all PDBK fields
+            inputPDBKKriteria1Nama.value = '';
+            inputPDBKKriteria1Desc.value = '';
+            inputPDBKKriteria1Nilai.value = '';
+            inputPDBKKriteria2Nama.value = '';
+            inputPDBKKriteria2Desc.value = '';
+            inputPDBKKriteria2Nilai.value = '';
+            inputPDBKKriteria3Nama.value = '';
+            inputPDBKKriteria3Desc.value = '';
+            inputPDBKKriteria3Nilai.value = '';
         }
+
 
         toggleModal(true);
     };
@@ -381,6 +436,17 @@ document.addEventListener('DOMContentLoaded', () => {
             // Daurah fields (will be saved even if empty/hidden, but that's okay)
             daurah_tadarus: inputTadarus.value,
             daurah_bahasa_arab: inputBahasaArab.value,
+
+            // PDBK fields (will be saved even if empty/hidden, but that's okay)
+            pdbk_kriteria1_nama: inputPDBKKriteria1Nama.value,
+            pdbk_kriteria1_desc: inputPDBKKriteria1Desc.value,
+            pdbk_kriteria1_nilai: inputPDBKKriteria1Nilai.value,
+            pdbk_kriteria2_nama: inputPDBKKriteria2Nama.value,
+            pdbk_kriteria2_desc: inputPDBKKriteria2Desc.value,
+            pdbk_kriteria2_nilai: inputPDBKKriteria2Nilai.value,
+            pdbk_kriteria3_nama: inputPDBKKriteria3Nama.value,
+            pdbk_kriteria3_desc: inputPDBKKriteria3Desc.value,
+            pdbk_kriteria3_nilai: inputPDBKKriteria3Nilai.value,
 
             updated_at: firebase.firestore.FieldValue.serverTimestamp()
         };

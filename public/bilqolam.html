@@ -292,30 +292,124 @@
                                 </div>
 
                                 <!-- PDBK Field (Hidden by default, shown when PDBK selected) -->
-                                <div id="bilqolamPdbk" class="hidden">
-                                    <div class="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label for="inputTajwid"
-                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tajwid</label>
-                                            <input type="number" id="inputTajwid" min="0" max="100"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                                placeholder="0-100">
+                                <!-- PDBK Fields (Hidden by default, shown for PDBK students) -->
+                                <div id="bilqolamPdbk"
+                                    class="hidden space-y-4 border-t border-gray-200 dark:border-gray-700 pt-4 mt-4">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <div
+                                            class="flex items-center justify-center w-8 h-8 bg-red-100 dark:bg-red-900/30 rounded-full">
+                                            <i class="ph ph-heart text-red-600 dark:text-red-400 text-lg"></i>
+                                        </div>
+                                        <h4 class="text-sm font-bold text-gray-900 dark:text-white">Penilaian Khusus
+                                            PDBK</h4>
+                                    </div>
+                                    <p class="text-xs text-gray-600 dark:text-gray-400 mb-3">
+                                        Tentukan 3 kriteria penilaian sesuai kebutuhan siswa. Setiap kriteria memiliki
+                                        nama, deskripsi, dan nilai.
+                                    </p>
+
+                                    <!-- Kriteria 1 -->
+                                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-3">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span
+                                                class="flex items-center justify-center w-6 h-6 bg-primary text-white rounded-full text-xs font-bold">1</span>
+                                            <h5 class="text-sm font-semibold text-gray-900 dark:text-white">Kriteria
+                                                Pertama</h5>
                                         </div>
                                         <div>
-                                            <label for="inputFashahah"
-                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Fashahah</label>
-                                            <input type="number" id="inputFashahah" min="0" max="100"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                                                placeholder="0-100">
+                                            <label for="inputPDBKKriteria1Nama"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
+                                                Kriteria</label>
+                                            <input type="text" id="inputPDBKKriteria1Nama"
+                                                class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                                placeholder="Contoh: Kehadiran, Partisipasi, Kemampuan Membaca, dll">
                                         </div>
                                         <div>
-                                            <label for="inputMenirukan"
-                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Menirukan</label>
-                                            <input type="number" id="inputMenirukan" min="0" max="100"
-                                                class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
+                                            <label for="inputPDBKKriteria1Desc"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Deskripsi
+                                                Kriteria</label>
+                                            <textarea id="inputPDBKKriteria1Desc" rows="2"
+                                                class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                                placeholder="Jelaskan apa yang dinilai dari kriteria ini..."></textarea>
+                                        </div>
+                                        <div>
+                                            <label for="inputPDBKKriteria1Nilai"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nilai
+                                                (0-100)</label>
+                                            <input type="number" id="inputPDBKKriteria1Nilai" min="0" max="100"
+                                                class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
                                                 placeholder="0-100">
                                         </div>
                                     </div>
+
+                                    <!-- Kriteria 2 -->
+                                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-3">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span
+                                                class="flex items-center justify-center w-6 h-6 bg-primary text-white rounded-full text-xs font-bold">2</span>
+                                            <h5 class="text-sm font-semibold text-gray-900 dark:text-white">Kriteria
+                                                Kedua</h5>
+                                        </div>
+                                        <div>
+                                            <label for="inputPDBKKriteria2Nama"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
+                                                Kriteria</label>
+                                            <input type="text" id="inputPDBKKriteria2Nama"
+                                                class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                                placeholder="Contoh: Kehadiran, Partisipasi, Kemampuan Membaca, dll">
+                                        </div>
+                                        <div>
+                                            <label for="inputPDBKKriteria2Desc"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Deskripsi
+                                                Kriteria</label>
+                                            <textarea id="inputPDBKKriteria2Desc" rows="2"
+                                                class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                                placeholder="Jelaskan apa yang dinilai dari kriteria ini..."></textarea>
+                                        </div>
+                                        <div>
+                                            <label for="inputPDBKKriteria2Nilai"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nilai
+                                                (0-100)</label>
+                                            <input type="number" id="inputPDBKKriteria2Nilai" min="0" max="100"
+                                                class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                                placeholder="0-100">
+                                        </div>
+                                    </div>
+
+                                    <!-- Kriteria 3 -->
+                                    <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-3">
+                                        <div class="flex items-center gap-2 mb-2">
+                                            <span
+                                                class="flex items-center justify-center w-6 h-6 bg-primary text-white rounded-full text-xs font-bold">3</span>
+                                            <h5 class="text-sm font-semibold text-gray-900 dark:text-white">Kriteria
+                                                Ketiga</h5>
+                                        </div>
+                                        <div>
+                                            <label for="inputPDBKKriteria3Nama"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama
+                                                Kriteria</label>
+                                            <input type="text" id="inputPDBKKriteria3Nama"
+                                                class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                                placeholder="Contoh: Kehadiran, Partisipasi, Kemampuan Membaca, dll">
+                                        </div>
+                                        <div>
+                                            <label for="inputPDBKKriteria3Desc"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Deskripsi
+                                                Kriteria</label>
+                                            <textarea id="inputPDBKKriteria3Desc" rows="2"
+                                                class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                                placeholder="Jelaskan apa yang dinilai dari kriteria ini..."></textarea>
+                                        </div>
+                                        <div>
+                                            <label for="inputPDBKKriteria3Nilai"
+                                                class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nilai
+                                                (0-100)</label>
+                                            <input type="number" id="inputPDBKKriteria3Nilai" min="0" max="100"
+                                                class="bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-primary focus:border-primary block w-full p-2.5"
+                                                placeholder="0-100">
+                                        </div>
+                                    </div>
+
                                 </div>
 
                             </div>
@@ -338,7 +432,8 @@
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50" onclick="closeCustomAlert()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-            <div id="alertBox" class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div id="alertBox"
+                class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div id="alertIconContainer" class="flex items-center justify-center pt-8 pb-4">
                     <div id="alertIcon" class="w-20 h-20 rounded-full flex items-center justify-center">
                         <i id="alertIconElement" class="text-5xl"></i>

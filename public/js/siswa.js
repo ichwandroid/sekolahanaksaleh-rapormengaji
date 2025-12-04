@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let html = '';
         pageData.forEach((data) => {
             // Create PDBK badge if student has PDBK status
-            const pdbkBadge = data.pdbk ? '<span class="inline-flex items-center justify-center w-2 h-2 ml-2 bg-red-500 rounded-full" title="PDBK - Peserta Didik Berkebutuhan Khusus"></span>' : '';
+            const pdbkBadge = data.pdbk ? '<span class="inline-flex items-center justify-center w-3 h-3 ml-2 bg-red-500 rounded-full" title="PDBK - Peserta Didik Berkebutuhan Khusus"><i class="ph ph-seal-warning"></i></span>' : '';
 
             html += `
                 <tr class="student-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors opacity-0">

@@ -563,8 +563,9 @@ document.addEventListener('DOMContentLoaded', () => {
             ]);
         }
 
-        // 2. BILQOLAM
-        if (student.status === 'Reguler') {
+
+        // 2. BILQOLAM (Only for Regular students, NOT PDBK)
+        if (student.status === 'Reguler' && student.pdbk !== true) {
             const bilqolamLetter = String.fromCharCode(sectionCode++);
             tableBody.push([
                 { content: bilqolamLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
@@ -587,6 +588,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 ]);
             });
         }
+
+        // 3. PDBK (Only for PDBK students)
+        if (student.pdbk === true) {
+            const pdbkLetter = String.fromCharCode(sectionCode++);
+            tableBody.push([
+                { content: pdbkLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+                { content: 'PENILAIAN KHUSUS PDBK', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
+            ]);
+
+            // Kriteria 1
+            const kriteria1Nama = student.pdbk_kriteria1_nama || '-';
+            const kriteria1Nilai = parseInt(student.pdbk_kriteria1_nilai) || 0;
+            const kriteria1Desc = student.pdbk_kriteria1_desc || '-';
+
+            tableBody.push([
+                '1.',
+                kriteria1Nama,
+                { content: kriteria1Nilai, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(kriteria1Nilai), styles: { halign: 'center', valign: 'middle' } },
+                kriteria1Desc
+            ]);
+
+            // Kriteria 2
+            const kriteria2Nama = student.pdbk_kriteria2_nama || '-';
+            const kriteria2Nilai = parseInt(student.pdbk_kriteria2_nilai) || 0;
+            const kriteria2Desc = student.pdbk_kriteria2_desc || '-';
+
+            tableBody.push([
+                '2.',
+                kriteria2Nama,
+                { content: kriteria2Nilai, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(kriteria2Nilai), styles: { halign: 'center', valign: 'middle' } },
+                kriteria2Desc
+            ]);
+
+            // Kriteria 3
+            const kriteria3Nama = student.pdbk_kriteria3_nama || '-';
+            const kriteria3Nilai = parseInt(student.pdbk_kriteria3_nilai) || 0;
+            const kriteria3Desc = student.pdbk_kriteria3_desc || '-';
+
+            tableBody.push([
+                '3.',
+                kriteria3Nama,
+                { content: kriteria3Nilai, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(kriteria3Nilai), styles: { halign: 'center', valign: 'middle' } },
+                kriteria3Desc
+            ]);
+        }
+
 
         // 3. DOA
         const doaLetter = String.fromCharCode(sectionCode++);
