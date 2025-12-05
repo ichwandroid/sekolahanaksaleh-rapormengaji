@@ -744,12 +744,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 [
                     { content: "Guru Pengajar Al-Qur'an", styles: { fontStyle: 'bold' } },
                     { content: catatanGuruQuran }
-                ],
-                // [
-                //     { content: 'Orang Tua / Wali Peserta Didik', styles: { fontStyle: 'bold' } },
-                //     { content: ':' },
-                //     { content: '' }
-                // ]
+                ]
             ],
             theme: 'grid',
             styles: { fontSize: 9, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
@@ -852,6 +847,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Assuming standard space.
         // yPos += 25;
         // doc.text('Naminah, S.Pd', 105, yPos, { align: 'center' }); // Example name if needed
+
+        // footer
+        yPos = doc.lastAutoTable.finalY + 20;
+        doc.setFontSize(9);
+        doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, yPos);
 
 
         // Open PDF in new tab
