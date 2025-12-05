@@ -63,16 +63,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Configuration data (same as in other pages)
     const surahData = {
         "Quraisy": 4, "At-Takatsur": 8, "An-Nashr": 3, "An-Nas": 6,
-        "Al-Ma'Un": 7, "Al-Lahab": 5, "Al-Kautsar": 3, "Al-Kafirun": 6,
+        "Al-Ma'un": 7, "Al-Lahab": 5, "Al-Kautsar": 3, "Al-Kafirun": 6,
         "Al-Ikhlash": 4, "Al-Humazah": 9, "Al-Fil": 5, "Al-Falaq": 5,
         "Al-'Ashr": 3, "At-Tin": 8, "Asy-Syarh": 8, "Al-Qadr": 5,
         "Al-Bayyinah": 8, "Al-'Alaq": 19, "Al-Ghasyiyah": 26, "Al-Fajr": 30,
-        "Al-A'La": 19, "Al-Muthaffifin": 36, "Al-Infithar": 19,
+        "Al-A'la": 19, "Al-Muthaffifin": 36, "Al-Infithar": 19,
         "An-Nazi'at": 46, "An-Naba'": 40, "Yasin-ayat 41 s/d 83": 83
     };
 
     const tahfizhConfig = {
-        '1': ["An-Nas", "Al-Falaq", "Al-Ikhlash", "Al-Lahab", "An-Nashr", "Al-Kafirun", "Al-Kautsar", "Al-Ma'Un", "Quraisy", "Al-Fil", "Al-Humazah", "Al-'Ashr", "At-Takatsur"],
+        '1': ["An-Nas", "Al-Falaq", "Al-Ikhlash", "Al-Lahab", "An-Nashr", "Al-Kafirun", "Al-Kautsar", "Al-Ma'un", "Quraisy", "Al-Fil", "Al-Humazah", "Al-'Ashr", "At-Takatsur"],
         '2': ["Al-Bayyinah", "Al-Qadr", "Al-'Alaq", "At-Tin", "Asy-Syarh"],
         '3': ["Al-Fajr", "Al-Ghasyiyah", "Al-A'la"],
         '4': ["Al-Muthaffifin", "Al-Infithar"],
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "Al-Humazah": { min: 3, mid: 7, max: 9 },
         "Al-Fil": { min: 2, mid: 4, max: 5 },
         "Quraisy": { min: 1, mid: 3, max: 4 },
-        "Al-Ma'Un": { min: 2, mid: 4, max: 7 },
+        "Al-Ma'un": { min: 2, mid: 4, max: 7 },
         "An-Nas": { min: 2, mid: 4, max: 6 },
         "Al-Falaq": { min: 2, mid: 3, max: 5 },
         "Al-Ikhlash": { min: 1, mid: 2, max: 4 },
