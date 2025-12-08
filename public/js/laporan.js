@@ -665,14 +665,21 @@ document.addEventListener('DOMContentLoaded', () => {
             { content: 'DESKRIPSI CAPAIAN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
         ]);
 
+        // Get custom descriptions if available (for PDBK students)
+        const tahfizhDescriptions = student.tahfizh_descriptions || {};
+
         surahList.forEach((surahName, index) => {
             const memorized = tahfizhData[surahName] || 0;
             const max = surahData[surahName] || 0;
+
+            // Use custom description if available, otherwise use automatic description
+            const description = tahfizhDescriptions[surahName] || getDescription('Tahfizh', surahName, memorized);
+
             tableBody.push([
                 (index + 1) + '.',
                 `Q.S ${surahName}`,
                 { content: `${memorized} ayat dari ${max}`, colSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-                getDescription('Tahfizh', surahName, memorized)
+                description
             ]);
         });
 
@@ -720,6 +727,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 2: { cellWidth: 'auto' },
                 3: { cellWidth: 'auto' },
                 4: { cellWidth: 'auto' }
+            },
+            didDrawPage: function (data) {
+                // Footer di setiap halaman
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+
+                // Footer kiri: Info siswa
+                doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, pageHeight - 10);
+
+                // Footer kanan: Nomor halaman
+                const pageNumber = 'Semester Ganjil | Halaman ' + data.pageNumber;
+                doc.text(pageNumber, pageWidth - 14, pageHeight - 10, { align: 'right' });
             }
         });
 
@@ -848,10 +870,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // yPos += 25;
         // doc.text('Naminah, S.Pd', 105, yPos, { align: 'center' }); // Example name if needed
 
-        // footer
-        yPos = doc.lastAutoTable.finalY + 20;
-        doc.setFontSize(9);
-        doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, yPos);
 
 
         // Open PDF in new tab

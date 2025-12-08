@@ -382,31 +382,65 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Get existing tahfizh data
         const tahfizhData = student.tahfizh || {};
+        const tahfizhDescriptions = student.tahfizh_descriptions || {};
+
+        // Check if student is PDBK
+        const isPDBK = student.pdbk === true;
 
         // Generate checklist with verse inputs
         let checklistHtml = '';
+
+        // Add PDBK manual description toggle if student is PDBK
+        if (isPDBK) {
+            checklistHtml += `
+                <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-info text-yellow-600 dark:text-yellow-400"></i>
+                        <span class="text-sm font-medium text-yellow-800 dark:text-yellow-300">Siswa PDBK - Deskripsi Manual Tersedia</span>
+                    </div>
+                    <p class="text-xs text-yellow-700 dark:text-yellow-400 mt-1">Anda dapat mengetik deskripsi capaian secara manual untuk setiap surah.</p>
+                </div>
+            `;
+        }
+
         if (surahList.length === 0) {
-            checklistHtml = '<p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada daftar surat untuk kelas ini.</p>';
+            checklistHtml += '<p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada daftar surat untuk kelas ini.</p>';
         } else {
             surahList.forEach((surah, index) => {
                 const maxVerses = surahData[surah] || 0;
                 const memorized = tahfizhData[surah];
                 const value = (memorized !== undefined && memorized !== null) ? memorized : '';
                 const isChecked = value !== '' && value > 0;
+                const customDesc = tahfizhDescriptions[surah] || '';
 
                 checklistHtml += `
-                    <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                        <input type="checkbox" id="tahfizh_check_${index}" data-index="${index}" ${isChecked ? 'checked' : ''} 
-                            class="w-5 h-5 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 tahfizh-checkbox">
-                        <div class="flex-1">
-                            <label for="tahfizh_check_${index}" class="text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer block">${surah}</label>
-                            <span class="text-xs text-gray-500 dark:text-gray-400">Total: ${maxVerses} Ayat</span>
+                    <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors space-y-2">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="tahfizh_check_${index}" data-index="${index}" ${isChecked ? 'checked' : ''} 
+                                class="w-5 h-5 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 tahfizh-checkbox">
+                            <div class="flex-1">
+                                <label for="tahfizh_check_${index}" class="text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer block">${surah}</label>
+                                <span class="text-xs text-gray-500 dark:text-gray-400">Total: ${maxVerses} Ayat</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="tahfizh_input_${index}" data-surah="${surah}" data-max="${maxVerses}" value="${value}" min="0" max="${maxVerses}"
+                                    class="w-20 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 tahfizh-input">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">/ ${maxVerses}</span>
+                            </div>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <input type="number" id="tahfizh_input_${index}" data-surah="${surah}" data-max="${maxVerses}" value="${value}" min="0" max="${maxVerses}"
-                                class="w-20 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 tahfizh-input">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">/ ${maxVerses}</span>
+                        ${isPDBK ? `
+                        <div class="pl-8">
+                            <label class="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">
+                                <i class="ph ph-pencil-simple"></i> Deskripsi Manual (Opsional):
+                            </label>
+                            <textarea id="tahfizh_desc_${index}" data-surah="${surah}" rows="2" 
+                                placeholder="Kosongkan untuk menggunakan deskripsi otomatis..."
+                                class="w-full text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 tahfizh-description">${customDesc}</textarea>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <i class="ph ph-lightbulb"></i> Tip: Jika dikosongkan, sistem akan menggunakan deskripsi otomatis berdasarkan nilai.
+                            </p>
                         </div>
+                        ` : ''}
                     </div>
                 `;
             });
@@ -470,11 +504,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Collect custom descriptions (for PDBK students)
+        const descTextareas = tahfizhChecklistContainer.querySelectorAll('.tahfizh-description');
+        const tahfizhDescriptions = {};
+
+        descTextareas.forEach(textarea => {
+            const surah = textarea.dataset.surah;
+            const desc = textarea.value.trim();
+
+            if (desc !== '') {
+                tahfizhDescriptions[surah] = desc;
+            }
+        });
+
         try {
-            await db.collection('students').doc(id).update({
+            const updateData = {
                 tahfizh: tahfizhData,
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            };
+
+            // Only add tahfizh_descriptions if there are any custom descriptions
+            if (Object.keys(tahfizhDescriptions).length > 0) {
+                updateData.tahfizh_descriptions = tahfizhDescriptions;
+            }
+
+            await db.collection('students').doc(id).update(updateData);
             toggleModal(false);
         } catch (error) {
             console.error("Error updating tahfizh: ", error);
