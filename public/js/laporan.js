@@ -415,20 +415,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 let quality = '';
 
                 if (threshold) {
-                    if (score >= threshold.max) quality = 'Baik dan';
-                    else if (score >= threshold.min) quality = 'Cukup';
-                    else quality = 'Kurang';
+                    if (score >= threshold.max) quality = 'baik dan';
+                    else if (score >= threshold.min) quality = 'cukup';
+                    else quality = 'kurang';
                 } else {
                     // Fallback if no threshold defined
-                    if (score > 0) quality = 'Baik';
-                    else quality = 'Kurang';
+                    if (score > 0) quality = 'baik';
+                    else quality = 'kurang';
                 }
 
                 return `Ananda ${quality} lancar dalam menghafal Surah ${name}`;
             }
 
             if (category === 'Ibadah') {
-                return `Ananda ${quality} dalam ${name}`;
+                let lancar = '';
+                if (score >= 86) lancar = 'lancar';
+                else if (score >= 71) lancar = 'cukup lancar';
+                else lancar = 'kurang lancar';
+                return `Ananda ${lancar} dalam ${name}`;
             }
 
             return '';
@@ -820,7 +824,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text(': Malang', 40, yPos);
         yPos += 5;
         doc.text('Tanggal', 14, yPos);
-        doc.text(': 20 Desember 2025', 40, yPos);
+        doc.text(': 19 Desember 2025', 40, yPos);
 
         yPos += 5;
 
@@ -938,6 +942,158 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error("Error updating saran: ", error);
             showCustomAlert('error', 'Terjadi kesalahan!', 'Gagal menyimpan saran: ' + error.message);
         }
+    });
+
+    // --- CSV Upload for Saran GPAI ---
+    const csvFileInput = document.getElementById('csvFileInput');
+    const btnUploadCSV = document.getElementById('btnUploadCSV');
+    const btnDownloadTemplate = document.getElementById('btnDownloadTemplate');
+
+    // Trigger file input when button clicked
+    btnUploadCSV.addEventListener('click', () => {
+        csvFileInput.click();
+    });
+
+    // Handle file selection
+    csvFileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.name.endsWith('.csv')) {
+            showCustomAlert('error', 'File Tidak Valid!', 'Silakan upload file dengan format .csv');
+            csvFileInput.value = '';
+            return;
+        }
+
+        // Show loading
+        showLoadingAlert('Memproses CSV...', 'Mohon tunggu, sedang mengupload saran GPAI');
+
+        try {
+            const text = await file.text();
+            const lines = text.split('\n').map(line => line.trim()).filter(line => line);
+
+            if (lines.length < 2) {
+                throw new Error('File CSV kosong atau tidak valid');
+            }
+
+            // Parse header
+            const header = lines[0].split(',').map(h => h.trim());
+            const nisIndex = header.findIndex(h => h.toLowerCase() === 'nis');
+            const saranIndex = header.findIndex(h => h.toLowerCase() === 'saran' || h.toLowerCase() === 'saran_gpai');
+
+            if (nisIndex === -1 || saranIndex === -1) {
+                throw new Error('Format CSV tidak valid. Pastikan ada kolom "NIS" dan "Saran" atau "Saran_GPAI"');
+            }
+
+            // Parse data
+            const updates = [];
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const nis = values[nisIndex];
+                const saran = values[saranIndex];
+
+                if (nis && saran) {
+                    updates.push({ nis, saran });
+                }
+            }
+
+            if (updates.length === 0) {
+                throw new Error('Tidak ada data valid dalam CSV');
+            }
+
+            // Update Firestore
+            let successCount = 0;
+            let failCount = 0;
+            const errors = [];
+
+            for (const update of updates) {
+                try {
+                    // Find student by NIS
+                    const studentSnapshot = await db.collection('students')
+                        .where('nis', '==', update.nis)
+                        .get();
+
+                    if (studentSnapshot.empty) {
+                        failCount++;
+                        errors.push(`NIS ${update.nis} tidak ditemukan`);
+                        continue;
+                    }
+
+                    // Update only saran_guru_pai, don't touch saran_guru_gpq
+                    const studentDoc = studentSnapshot.docs[0];
+                    await db.collection('students').doc(studentDoc.id).update({
+                        saran_guru_pai: update.saran,
+                        updated_at: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    successCount++;
+                } catch (error) {
+                    failCount++;
+                    errors.push(`NIS ${update.nis}: ${error.message}`);
+                }
+            }
+
+            // Show result
+            closeCustomAlert();
+
+            let message = `Berhasil: ${successCount} siswa\nGagal: ${failCount} siswa`;
+            if (errors.length > 0 && errors.length <= 5) {
+                message += '\n\nError:\n' + errors.join('\n');
+            } else if (errors.length > 5) {
+                message += '\n\nError:\n' + errors.slice(0, 5).join('\n') + `\n... dan ${errors.length - 5} error lainnya`;
+            }
+
+            showCustomAlert(
+                successCount > 0 ? 'success' : 'error',
+                'Upload Selesai',
+                message
+            );
+
+        } catch (error) {
+            closeCustomAlert();
+            console.error('Error processing CSV:', error);
+            showCustomAlert('error', 'Terjadi Kesalahan!', error.message);
+        } finally {
+            csvFileInput.value = '';
+        }
+    });
+
+    // Download CSV Template
+    btnDownloadTemplate.addEventListener('click', () => {
+        // Create template with current students
+        let csvContent = 'NIS,Nama,Kelas,Saran_GPAI\n';
+
+        // Add current filtered students to template
+        const sortedStudents = [...filteredData].sort((a, b) => {
+            const kelasA = a.kelas || '';
+            const kelasB = b.kelas || '';
+            return kelasA.localeCompare(kelasB, undefined, { numeric: true });
+        });
+
+        sortedStudents.forEach(student => {
+            const nis = student.nis || '';
+            const nama = (student.nama_lengkap || '').replace(/,/g, ';'); // Replace comma with semicolon
+            const kelas = student.kelas || '';
+            const saranExisting = (student.saran_guru_pai || '').replace(/,/g, ';');
+
+            csvContent += `${nis},${nama},${kelas},${saranExisting}\n`;
+        });
+
+        // Create download link
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+
+        link.setAttribute('href', url);
+        link.setAttribute('download', `template_saran_gpai_${new Date().getTime()}.csv`);
+        link.style.visibility = 'hidden';
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        showCustomAlert('success', 'Template Downloaded!', 'Silakan isi kolom Saran_GPAI dan upload kembali file CSV');
     });
 
 });
