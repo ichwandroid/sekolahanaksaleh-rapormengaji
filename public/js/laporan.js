@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (score >= 86) lancar = 'lancar';
                 else if (score >= 71) lancar = 'cukup lancar';
                 else lancar = 'kurang lancar';
-                return `Ananda ${lancar} dalam ${name}`;
+                return `Ananda ${lancar} dalam menghafal ${name}`;
             }
 
             return '';
