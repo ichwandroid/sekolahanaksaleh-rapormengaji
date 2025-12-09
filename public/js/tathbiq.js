@@ -40,20 +40,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tathbiq Ibadah configuration per class (niat-niat beribadah)
     const tathbiqConfig = {
         '1': [
-            "Niat Wudhu	Do’a",
+            "Niat Wudhu	Do'a",
             "Sesudah Wudhu",
             "Niat-Niat Shalat Fardhu"
         ],
         '2': [
             "Bacaan dan Jawaban Adzan",
-            "Do’a Ba’da Adzan",
+            "Do'a Ba'da Adzan",
             "Bacaan Iqamah",
-            "Dzikir Ba’da Shalat"
+            "Dzikir Ba'da Shalat"
         ],
         '3': [
             "Niat Shalat Tarawih",
             "Niat Shalat Witir",
-            "Dzikir Ba’da Shalat Tarawih & Witir"
+            "Dzikir Ba'da Shalat Tarawih & Witir"
         ],
         '4': [
             "Niat Mandi Wajib"

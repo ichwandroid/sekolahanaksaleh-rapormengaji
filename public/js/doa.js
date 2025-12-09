@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             "Do'a Sesudah Makan"
         ],
         '2': [
-            "Do’a Senandung al-Qur’an",
+            "Do'a Senandung al-Qur'an",
             "Do'a Kaffārotul Majlis",
             "Do'a Masuk Masjid",
             "Do'a Keluar Masjid"
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '4': [
             "Do'a Ketika Sakit",
             "Do'a Menjenguk Orang Sakit",
-            "Do’a Qunut"
+            "Do'a Qunut"
         ],
         '5': [
             "Do'a Mohon Keselamatan",
