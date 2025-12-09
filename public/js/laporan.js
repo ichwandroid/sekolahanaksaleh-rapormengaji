@@ -820,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text(': Malang', 40, yPos);
         yPos += 5;
         doc.text('Tanggal', 14, yPos);
-        doc.text(`: ${dateStr}`, 40, yPos);
+        doc.text(': 20 Desember 2025', 40, yPos);
 
         yPos += 5;
 
