@@ -765,15 +765,15 @@ document.addEventListener('DOMContentLoaded', () => {
             body: [
                 [
                     { content: 'Guru Pendidikan Agama Islam dan Budi Pekerti', styles: { fontStyle: 'bold', cellWidth: 50 } },
-                    { content: catatanGuruPAI, styles: { cellWidth: 'auto' } }
+                    { content: catatanGuruPAI, styles: { cellWidth: 'auto', textAlign: 'justify' } }
                 ],
                 [
                     { content: "Guru Pengajar Al-Qur'an", styles: { fontStyle: 'bold' } },
-                    { content: catatanGuruQuran }
+                    { content: catatanGuruQuran, styles: { cellWidth: 'auto', textAlign: 'justify' } }
                 ]
             ],
             theme: 'grid',
-            styles: { fontSize: 9, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
+            styles: { fontSize: 9, cellPadding: 1.5, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
             columnStyles: {
                 0: { cellWidth: 'auto' },
                 1: { cellWidth: 'auto' },
