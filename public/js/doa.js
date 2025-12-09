@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         ],
         '2': [
             "Do'a Senandung al-Qur'an",
-            "Do'a Kaffārotul Majlis",
+            "Do'a Kaffarotul Majlis",
             "Do'a Masuk Masjid",
             "Do'a Keluar Masjid"
         ],
