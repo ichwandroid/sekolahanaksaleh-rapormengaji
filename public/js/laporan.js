@@ -127,13 +127,13 @@ document.addEventListener('DOMContentLoaded', () => {
         '3': ["Do'a Mohon Kecerdasan Berpikir", "Ayat Kursi"],
         '4': ["Do'a Ketika Sakit", "Do'a Menjenguk Orang Sakit", "Do'a Qunut"],
         '5': ["Do'a Mohon Keselamatan", "Do'a Mohon Diberi Keteguhan Hati", "Shalawat Thibbil Qulub"],
-        '6': ["Do'a Mohon Diberi Rahmat & Hikmah", "Do'a Mohon Petunjuk Kepada Allah"]
+        '6': ["Do'a Mohon Diberi Rahmat dan Hikmah", "Do'a Mohon Petunjuk Kepada Allah"]
     };
 
     const tathbiqConfig = {
         '1': ["Niat Wudhu", "Sesudah Wudhu", "Niat-Niat Shalat Fardhu"],
         '2': ["Bacaan dan Jawaban Adzan", "Do'a Ba'da Adzan", "Bacaan Iqamah", "Dzikir Ba'da Shalat"],
-        '3': ["Niat Shalat Tarawih", "Niat Shalat Witir", "Dzikir Ba'da Shalat Tarawih & Witir"],
+        '3': ["Niat Shalat Tarawih", "Niat Shalat Witir", "Dzikir Ba'da Shalat Tarawih dan Witir"],
         '4': ["Niat Mandi Wajib"],
         '5': ["Niat Tayammum", "Praktik Tayammum", "Niat Shalat Jama' Taqdim", "Niat Shalat Jama' Ta'khir"],
         '6': ["Niat Shalat Hajat", "Do'a Shalat Hajat", "Niat Shalat Tasbih"]
@@ -424,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     else quality = 'kurang';
                 }
 
-                return `Ananda ${quality} lancar dalam menghafal Surah ${name}`;
+                return `Ananda ${quality} lancar dalam menghafalkan Surah ${name}`;
             }
 
             if (category === 'Ibadah') {
@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (score >= 86) lancar = 'lancar';
                 else if (score >= 71) lancar = 'cukup lancar';
                 else lancar = 'kurang lancar';
-                return `Ananda ${lancar} dalam menghafal ${name}`;
+                return `Ananda ${lancar} dalam menghafalkan ${name}`;
             }
 
             return '';
@@ -649,14 +649,21 @@ document.addEventListener('DOMContentLoaded', () => {
             { content: 'TAHFIZH DO\'A SEHARI-HARI', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
         ]);
 
+        // Get custom descriptions if available (for PDBK students)
+        const doaDescriptions = student.doa_descriptions || {};
+
         doaList.forEach((doaName, index) => {
             const score = doaData[doaName] || 0;
+
+            // Use custom description if available, otherwise use automatic description
+            const description = doaDescriptions[doaName] || getDescription('Doa', doaName, score);
+
             tableBody.push([
                 (index + 1) + '.',
                 doaName,
                 { content: score, styles: { halign: 'center', valign: 'middle' } },
                 { content: getPredicate(score), styles: { halign: 'center', valign: 'middle' } },
-                getDescription('Doa', doaName, score)
+                description
             ]);
         });
 
@@ -696,14 +703,21 @@ document.addEventListener('DOMContentLoaded', () => {
             { content: 'DESKRIPSI CAPAIAN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
         ]);
 
+        // Get custom descriptions if available (for PDBK students)
+        const tathbiqDescriptions = student.tathbiq_descriptions || {};
+
         ibadahList.forEach((ibadahName, index) => {
             const score = ibadahData[ibadahName] || 0;
+
+            // Use custom description if available, otherwise use automatic description
+            const description = tathbiqDescriptions[ibadahName] || getDescription('Ibadah', ibadahName, score);
+
             tableBody.push([
                 (index + 1) + '.',
                 ibadahName,
                 { content: score, styles: { halign: 'center', valign: 'middle' } },
                 { content: getPredicate(score), styles: { halign: 'center', valign: 'middle' } },
-                getDescription('Ibadah', ibadahName, score)
+                description
             ]);
         });
 

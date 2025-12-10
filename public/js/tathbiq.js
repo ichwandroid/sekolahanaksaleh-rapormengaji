@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Tathbiq Ibadah configuration per class (niat-niat beribadah)
     const tathbiqConfig = {
         '1': [
-            "Niat Wudhu	Do'a",
+            "Niat Wudhu",
             "Sesudah Wudhu",
             "Niat-Niat Shalat Fardhu"
         ],
@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', () => {
         '3': [
             "Niat Shalat Tarawih",
             "Niat Shalat Witir",
-            "Dzikir Ba'da Shalat Tarawih & Witir"
+            "Dzikir Ba'da Shalat Tarawih dan Witir"
         ],
         '4': [
             "Niat Mandi Wajib"
@@ -369,32 +369,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Get existing tathbiq data
         const tathbiqData = student.tathbiq_ibadah || {};
+        const tathbiqDescriptions = student.tathbiq_descriptions || {};
+
+        // Check if student is PDBK
+        const isPDBK = student.pdbk === true;
 
         // Generate checklist with score inputs
         let checklistHtml = '';
+
+        // Add PDBK manual description toggle if student is PDBK
+        if (isPDBK) {
+            checklistHtml += `
+                <div class="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <i class="ph ph-info text-yellow-600 dark:text-yellow-400"></i>
+                        <span class="text-sm font-medium text-yellow-800 dark:text-yellow-300">Siswa PDBK - Deskripsi Manual Tersedia</span>
+                    </div>
+                    <p class="text-xs text-yellow-700 dark:text-yellow-400 mt-1">Anda dapat mengetik deskripsi capaian secara manual untuk setiap tathbiq.</p>
+                </div>
+            `;
+        }
+
         if (tathbiqList.length === 0) {
-            checklistHtml = '<p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada daftar tathbiq untuk kelas ini.</p>';
+            checklistHtml += '<p class="text-sm text-gray-500 dark:text-gray-400">Tidak ada daftar tathbiq untuk kelas ini.</p>';
         } else {
             tathbiqList.forEach((tathbiq, index) => {
                 const tathbiqScore = tathbiqData[tathbiq];
                 const score = typeof tathbiqScore === 'number' ? tathbiqScore : '';
                 const isChecked = tathbiqScore !== undefined && tathbiqScore !== null && tathbiqScore !== '';
-
-                // Tooltip logic
-                if (score !== '') {
-                    // const numScore = parseInt(score);
-                }
+                const customDesc = tathbiqDescriptions[tathbiq] || '';
 
                 checklistHtml += `
-                    <div class="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                        <input type="checkbox" id="tathbiq_check_${index}" data-index="${index}" ${isChecked ? 'checked' : ''} 
-                            class="w-5 h-5 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 tathbiq-checkbox">
-                        <label for="tathbiq_check_${index}" class="text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer flex-1">${tathbiq}</label>
-                        <div class="flex items-center gap-2">
-                            <input type="number" id="tathbiq_score_${index}" data-tathbiq="${tathbiq}" value="${score}" min="0" max="100" placeholder="0-100"
-                                class="w-20 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 tathbiq-score">
-                            <span class="text-xs text-gray-500 dark:text-gray-400">/ 100</span>
+                    <div class="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors space-y-2">
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="tathbiq_check_${index}" data-index="${index}" ${isChecked ? 'checked' : ''} 
+                                class="w-5 h-5 text-primary bg-gray-100 border-gray-300 rounded focus:ring-primary dark:focus:ring-primary dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 tathbiq-checkbox">
+                            <label for="tathbiq_check_${index}" class="text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer flex-1">${tathbiq}</label>
+                            <div class="flex items-center gap-2">
+                                <input type="number" id="tathbiq_score_${index}" data-tathbiq="${tathbiq}" value="${score}" min="0" max="100" placeholder="0-100"
+                                    class="w-20 text-sm bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 tathbiq-score">
+                                <span class="text-xs text-gray-500 dark:text-gray-400">/ 100</span>
+                            </div>
                         </div>
+                        ${isPDBK ? `
+                        <div class="pl-8">
+                            <label class="text-xs font-medium text-gray-700 dark:text-gray-300 block mb-1">
+                                <i class="ph ph-pencil-simple"></i> Deskripsi Manual (Opsional):
+                            </label>
+                            <textarea id="tathbiq_desc_${index}" data-tathbiq="${tathbiq}" rows="2" 
+                                placeholder="Kosongkan untuk menggunakan deskripsi otomatis..."
+                                class="w-full text-xs bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-primary focus:border-primary p-2 tathbiq-description">${customDesc}</textarea>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <i class="ph ph-lightbulb"></i> Tip: Jika dikosongkan, sistem akan menggunakan deskripsi otomatis berdasarkan nilai.
+                            </p>
+                        </div>
+                        ` : ''}
                     </div>
                 `;
             });
@@ -412,10 +441,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Auto-check if value is entered
                 if (value !== '' && value >= 0 && value <= 100) {
                     checkbox.checked = true;
-
-                    // Update tooltip logic removed
-                } else {
-                    // Tooltip removal logic removed
                 }
             });
         });
@@ -457,11 +482,31 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // Collect custom descriptions (for PDBK students)
+        const descTextareas = tathbiqChecklistContainer.querySelectorAll('.tathbiq-description');
+        const tathbiqDescriptions = {};
+
+        descTextareas.forEach(textarea => {
+            const tathbiqName = textarea.dataset.tathbiq;
+            const desc = textarea.value.trim();
+
+            if (desc !== '') {
+                tathbiqDescriptions[tathbiqName] = desc;
+            }
+        });
+
         try {
-            await db.collection('students').doc(id).update({
+            const updateData = {
                 tathbiq_ibadah: tathbiqData,
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            };
+
+            // Only add tathbiq_descriptions if there are any custom descriptions
+            if (Object.keys(tathbiqDescriptions).length > 0) {
+                updateData.tathbiq_descriptions = tathbiqDescriptions;
+            }
+
+            await db.collection('students').doc(id).update(updateData);
             toggleModal(false);
         } catch (error) {
             console.error("Error updating tathbiq: ", error);
