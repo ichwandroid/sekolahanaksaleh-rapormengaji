@@ -427,6 +427,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 return `Ananda ${quality} lancar dalam menghafalkan Surah ${name}`;
             }
 
+            if (category === 'Daurah') {
+                let lancar = '';
+                if (score >= 86) lancar = 'lancar';
+                else if (score >= 71) lancar = 'cukup lancar';
+                else lancar = 'kurang lancar';
+                return `Ananda ${lancar} dalam melafalkan ${name}`;
+            }
+
             if (category === 'Ibadah') {
                 let lancar = '';
                 if (score >= 86) lancar = 'lancar';
@@ -460,12 +468,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Determine name class
         let nameClass = student.kelas || '-';
         const classMap = {
-            '6D': '6D-Mindi', '6C': '6C-Bintangur', '6B': '6B-Palapi', '6A': '6A-Jati',
-            '5D': '5D-Cemara', '5C': '5C-Beringin', '5B': '5B-Pinus', '5A': '5A-Mersawa',
-            '4D': '4D-Ulin', '4C': '4C-Cendana', '4B': '4B-Damar', '4A': '4A-Meranti',
-            '3D': '3D-Cantigi', '3C': '3C-Eboni', '3B': '3B-Bungur', '3A': '3A-Saga',
-            '2D': '2D-Mahoni', '2C': '2C-Sengon', '2B': '2B-Randu', '2A': '2A-Sungkai',
-            '1D': '1D-Pingku', '1C': '1C-Kenanga', '1B': '1B-Kulim', '1A': '1A-Trembesi'
+            '6D': '6D - Pohon Mindi', '6C': '6C - Pohon Bintangur', '6B': '6B - Pohon Palapi', '6A': '6A - Pohon Jati',
+            '5D': '5D - Pohon Cemara', '5C': '5C - Pohon Beringin', '5B': '5B - Pohon Pinus', '5A': '5A - Pohon Mersawa',
+            '4D': '4D - Pohon Ulin', '4C': '4C - Pohon Cendana', '4B': '4B - Pohon Damar', '4A': '4A - Pohon Meranti',
+            '3D': '3D - Pohon Cantigi', '3C': '3C - Pohon Eboni', '3B': '3B - Pohon Bungur', '3A': '3A - Pohon Saga',
+            '2D': '2D - Pohon Mahoni', '2C': '2C - Pohon Sengon', '2B': '2B - Pohon Randu', '2A': '2A - Pohon Sungkai',
+            '1D': '1D - Pohon Pingku', '1C': '1C - Pohon Kenanga', '1B': '1B - Pohon Kulim', '1A': '1A - Pohon Trembesi'
         };
         if (classMap[student.kelas]) nameClass = classMap[student.kelas];
 
@@ -519,13 +527,17 @@ document.addEventListener('DOMContentLoaded', () => {
         let yPos = 38;
         doc.setFontSize(11);
         doc.setFont(undefined, 'bold');
-        doc.text(`Nama : ${student.nama_lengkap || '-'}`, 25, yPos);
-        doc.text(`Kelas : ${nameClass}`, 135, yPos);
+        doc.text(`Nama`, 15, yPos);
+        doc.text(`: ${student.nama_lengkap || '-'}`, 30, yPos);
+        doc.text(`No. Induk`, 130, yPos);
+        doc.text(`: ${student.nis || '-'}`, 160, yPos);
 
         yPos += 5;
         doc.setFont(undefined, 'bold');
-        doc.text(`Tahun Ajaran : 2025/2026 (Semester 1)`, 25, yPos);
-        doc.text(`No. Induk : ${student.nis || '-'}`, 135, yPos);
+        doc.text(`Kelas`, 15, yPos);
+        doc.text(`: ${nameClass || '-'}`, 30, yPos);
+        doc.text(`Tahun Ajaran`, 130, yPos);
+        doc.text(`: 2025/2026 (Ganjil)`, 160, yPos);
 
         // I. PENCAPAIAN KOMPETENSI
         yPos += 5;
@@ -555,7 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "Tadarus Al-Qur'an",
                 { content: tadarusScore, styles: { halign: 'center', valign: 'middle' } },
                 { content: getPredicate(tadarusScore), styles: { halign: 'center', valign: 'middle' } },
-                getDescription('Ibadah', "Tadarus Al-Qur'an", tadarusScore)
+                getDescription('Daurah', "Tadarus Al-Qur'an", tadarusScore)
             ]);
 
             tableBody.push([
@@ -563,7 +575,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 "Bahasa Arab",
                 { content: bahasaArabScore, styles: { halign: 'center', valign: 'middle' } },
                 { content: getPredicate(bahasaArabScore), styles: { halign: 'center', valign: 'middle' } },
-                getDescription('Ibadah', "Bahasa Arab", bahasaArabScore)
+                getDescription('Daurah', "Bahasa Arab", bahasaArabScore)
             ]);
         }
 
@@ -745,21 +757,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 2: { cellWidth: 'auto' },
                 3: { cellWidth: 'auto' },
                 4: { cellWidth: 'auto' }
-            },
-            didDrawPage: function (data) {
-                // Footer di setiap halaman
-                const pageHeight = doc.internal.pageSize.height;
-                const pageWidth = doc.internal.pageSize.width;
+                // },
+                // didDrawPage: function (data) {
+                //     // Footer di setiap halaman
+                //     const pageHeight = doc.internal.pageSize.height;
+                //     const pageWidth = doc.internal.pageSize.width;
 
-                doc.setFontSize(9);
-                doc.setFont(undefined, 'normal');
+                //     doc.setFontSize(9);
+                //     doc.setFont(undefined, 'normal');
 
-                // Footer kiri: Info siswa
-                doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, pageHeight - 10);
+                //     // Footer kiri: Info siswa
+                //     doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, pageHeight - 10);
 
-                // Footer kanan: Nomor halaman
-                const pageNumber = 'Semester Ganjil | Halaman ' + data.pageNumber;
-                doc.text(pageNumber, pageWidth - 14, pageHeight - 10, { align: 'right' });
+                //     // Footer kanan: Nomor halaman
+                //     const pageNumber = 'Semester Ganjil | Halaman ' + data.pageNumber;
+                //     doc.text(pageNumber, pageWidth - 14, pageHeight - 10, { align: 'right' });
             }
         });
 
@@ -792,11 +804,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 0: { cellWidth: 'auto' },
                 1: { cellWidth: 'auto' },
                 2: { cellWidth: 'auto' }
+            },
+            didDrawPage: function (data) {
+                // Footer di setiap halaman
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+
+                // Footer kiri: Info siswa
+                doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, pageHeight - 10);
+
+                // Footer kanan: Nomor halaman
+                const pageNumber = 'Semester Ganjil | Halaman ' + currentPage;
+                doc.text(pageNumber, pageWidth - 14, pageHeight - 10, { align: 'right' });
             }
         });
 
         // --- III. KONVERSI NILAI ---
         yPos = doc.lastAutoTable.finalY + 4;
+
+        // Untuk kelas 1, pindahkan ke halaman baru
+        if (kelasNum === '1') {
+            doc.addPage();
+            yPos = 20; // Start dari atas halaman baru
+        }
 
         doc.setFontSize(9);
         doc.setFont(undefined, 'bold');
@@ -820,6 +854,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 0: { halign: 'center', cellWidth: 30, fontStyle: 'bold' },
                 1: { halign: 'center', cellWidth: 30, fontStyle: 'bold' },
                 2: { cellWidth: 'auto' }
+            },
+            didDrawPage: function (data) {
+                // Footer di setiap halaman
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+
+                // Footer kiri: Info siswa
+                doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, pageHeight - 10);
+
+                // Footer kanan: Nomor halaman
+                const pageNumber = 'Semester Ganjil | Halaman ' + currentPage;
+                doc.text(pageNumber, pageWidth - 14, pageHeight - 10, { align: 'right' });
             }
         });
 
@@ -838,7 +888,7 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.text(': Malang', 40, yPos);
         yPos += 5;
         doc.text('Tanggal', 14, yPos);
-        doc.text(': 20 Desember 2025', 40, yPos);
+        doc.text(': 19 Desember 2025', 40, yPos);
 
         yPos += 5;
 
