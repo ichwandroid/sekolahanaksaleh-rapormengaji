@@ -468,12 +468,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Determine name class
         let nameClass = student.kelas || '-';
         const classMap = {
-            '6D': '6D - Pohon Mindi', '6C': '6C - Pohon Bintangur', '6B': '6B - Pohon Palapi', '6A': '6A - Pohon Jati',
-            '5D': '5D - Pohon Cemara', '5C': '5C - Pohon Beringin', '5B': '5B - Pohon Pinus', '5A': '5A - Pohon Mersawa',
-            '4D': '4D - Pohon Ulin', '4C': '4C - Pohon Cendana', '4B': '4B - Pohon Damar', '4A': '4A - Pohon Meranti',
-            '3D': '3D - Pohon Cantigi', '3C': '3C - Pohon Eboni', '3B': '3B - Pohon Bungur', '3A': '3A - Pohon Saga',
-            '2D': '2D - Pohon Mahoni', '2C': '2C - Pohon Sengon', '2B': '2B - Pohon Randu', '2A': '2A - Pohon Sungkai',
-            '1D': '1D - Pohon Pingku', '1C': '1C - Pohon Kenanga', '1B': '1B - Pohon Kulim', '1A': '1A - Pohon Trembesi'
+            '6D': 'VI D - Mindi', '6C': 'VI C - Bintangur', '6B': 'VI B - Palapi', '6A': 'VI A - Jati',
+            '5D': 'V D - Cemara', '5C': 'V C - Beringin', '5B': 'V B - Pinus', '5A': 'V A - Mersawa',
+            '4D': 'IV D - Ulin', '4C': 'IV C - Cendana', '4B': 'IV B - Damar', '4A': 'IV A - Meranti',
+            '3D': 'III D - Cantigi', '3C': 'III C - Eboni', '3B': 'III B - Bungur', '3A': 'III A - Saga',
+            '2D': 'II D - Mahoni', '2C': 'II C - Sengon', '2B': 'II B - Randu', '2A': 'II A - Sungkai',
+            '1D': 'I D - Pingku', '1C': 'I C - Kenanga', '1B': 'I B - Kulim', '1A': 'I A - Trembesi'
         };
         if (classMap[student.kelas]) nameClass = classMap[student.kelas];
 
@@ -529,8 +529,8 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFont(undefined, 'bold');
         doc.text(`Nama`, 15, yPos);
         doc.text(`: ${student.nama_lengkap || '-'}`, 30, yPos);
-        doc.text(`No. Induk`, 130, yPos);
-        doc.text(`: ${student.nis || '-'}`, 160, yPos);
+        doc.text(`NISN`, 130, yPos);
+        doc.text(`: ${student.nisn || '-'}`, 160, yPos);
 
         yPos += 5;
         doc.setFont(undefined, 'bold');
@@ -545,10 +545,11 @@ document.addEventListener('DOMContentLoaded', () => {
         doc.setFont(undefined, 'bold');
         doc.text('I. PENCAPAIAN KOMPETENSI', 14, yPos);
 
-        // Table Construction
+        // Table Construction - Page 1
         yPos += 1;
 
-        const tableBody = [];
+        const tableBody1 = []; // Table for page 1 (up to TAHFIZH)
+        const tableBody2 = []; // Table for page 2 (TATHBIQ IBADAH)
         let sectionCode = 65; // ASCII for 'A'
 
         // 1. DAURAH (Only for Pasca)
@@ -557,12 +558,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const bahasaArabScore = parseInt(student.daurah_bahasa_arab) || 0;
             const sectionLetter = String.fromCharCode(sectionCode++);
 
-            tableBody.push([
+            tableBody1.push([
                 { content: sectionLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
                 { content: 'DAURAH', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
             ]);
 
-            tableBody.push([
+            tableBody1.push([
                 '1.',
                 "Tadarus Al-Qur'an",
                 { content: tadarusScore, styles: { halign: 'center', valign: 'middle' } },
@@ -570,7 +571,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 getDescription('Daurah', "Tadarus Al-Qur'an", tadarusScore)
             ]);
 
-            tableBody.push([
+            tableBody1.push([
                 '2.',
                 "Bahasa Arab",
                 { content: bahasaArabScore, styles: { halign: 'center', valign: 'middle' } },
@@ -583,7 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2. BILQOLAM (Only for Regular students, NOT PDBK)
         if (student.status === 'Reguler' && student.pdbk !== true) {
             const bilqolamLetter = String.fromCharCode(sectionCode++);
-            tableBody.push([
+            tableBody1.push([
                 { content: bilqolamLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
                 { content: `BILQOLAM ${student.bilqolam_jilid || '-'}`, colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
             ]);
@@ -595,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             bilqolamItems.forEach((item, index) => {
-                tableBody.push([
+                tableBody1.push([
                     (index + 1) + '.',
                     item.name,
                     { content: item.score, styles: { halign: 'center', valign: 'middle' } },
@@ -608,7 +609,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // 3. PDBK (Only for PDBK students)
         if (student.pdbk === true) {
             const pdbkLetter = String.fromCharCode(sectionCode++);
-            tableBody.push([
+            tableBody1.push([
                 { content: pdbkLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
                 { content: 'PENILAIAN KHUSUS PDBK', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
             ]);
@@ -618,7 +619,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const kriteria1Nilai = parseInt(student.pdbk_kriteria1_nilai) || 0;
             const kriteria1Desc = student.pdbk_kriteria1_desc || '-';
 
-            tableBody.push([
+            tableBody1.push([
                 '1.',
                 kriteria1Nama,
                 { content: kriteria1Nilai, styles: { halign: 'center', valign: 'middle' } },
@@ -631,7 +632,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const kriteria2Nilai = parseInt(student.pdbk_kriteria2_nilai) || 0;
             const kriteria2Desc = student.pdbk_kriteria2_desc || '-';
 
-            tableBody.push([
+            tableBody1.push([
                 '2.',
                 kriteria2Nama,
                 { content: kriteria2Nilai, styles: { halign: 'center', valign: 'middle' } },
@@ -644,7 +645,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const kriteria3Nilai = parseInt(student.pdbk_kriteria3_nilai) || 0;
             const kriteria3Desc = student.pdbk_kriteria3_desc || '-';
 
-            tableBody.push([
+            tableBody1.push([
                 '3.',
                 kriteria3Nama,
                 { content: kriteria3Nilai, styles: { halign: 'center', valign: 'middle' } },
@@ -656,7 +657,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. DOA
         const doaLetter = String.fromCharCode(sectionCode++);
-        tableBody.push([
+        tableBody1.push([
             { content: doaLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: 'TAHFIZH DO\'A SEHARI-HARI', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
         ]);
@@ -670,7 +671,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Use custom description if available, otherwise use automatic description
             const description = doaDescriptions[doaName] || getDescription('Doa', doaName, score);
 
-            tableBody.push([
+            tableBody1.push([
                 (index + 1) + '.',
                 doaName,
                 { content: score, styles: { halign: 'center', valign: 'middle' } },
@@ -681,7 +682,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 4. TAHFIZH
         const tahfizhLetter = String.fromCharCode(sectionCode++);
-        tableBody.push([
+        tableBody1.push([
             { content: tahfizhLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: 'TAHFIZH AL-QUR\'AN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: 'CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } },
@@ -698,7 +699,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Use custom description if available, otherwise use automatic description
             const description = tahfizhDescriptions[surahName] || getDescription('Tahfizh', surahName, memorized);
 
-            tableBody.push([
+            tableBody1.push([
                 (index + 1) + '.',
                 `Q.S ${surahName}`,
                 { content: `${memorized} ayat dari ${max}`, colSpan: 2, styles: { halign: 'center', valign: 'middle' } },
@@ -706,9 +707,63 @@ document.addEventListener('DOMContentLoaded', () => {
             ]);
         });
 
-        // 5. TATHBIQ IBADAH
+        // Draw first table (Page 1)
+        doc.autoTable({
+            startY: yPos,
+            head: [
+                [
+                    { content: 'NO', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 9 } },
+                    { content: 'ASPEK PENILAIAN', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 9 } },
+                    { content: 'CAPAIAN', colSpan: 2, styles: { halign: 'center', fontSize: 9 } },
+                    { content: 'DESKRIPSI CAPAIAN', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 9 } }
+                ],
+                [
+                    { content: 'NUMERIK', styles: { halign: 'center', fontSize: 9 } },
+                    { content: 'PREDIKAT', styles: { halign: 'center', fontSize: 9 } }
+                ]
+            ],
+            body: tableBody1,
+            theme: 'grid',
+            headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', lineWidth: 0.1, lineColor: [0, 0, 0] },
+            styles: { fontSize: 9, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
+            columnStyles: {
+                0: { cellWidth: 'auto', halign: 'center' },
+                1: { cellWidth: 'auto' },
+                2: { cellWidth: 'auto' },
+                3: { cellWidth: 'auto' },
+                4: { cellWidth: 'auto' }
+            },
+            didDrawPage: function (data) {
+                // Footer di setiap halaman
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+
+                // Footer kiri: Info siswa
+                doc.text(nameClass + ' | ' + student.nama_lengkap + ' | ' + student.nisn, 14, pageHeight - 8);
+
+                // Footer kanan: Nomor halaman
+                const pageNumber = 'Halaman : ' + currentPage;
+                doc.text(pageNumber, pageWidth - 14, pageHeight - 8, { align: 'right' });
+            }
+        });
+
+        // // Add new page for TATHBIQ IBADAH
+        // doc.addPage();
+
+        // // Add header on page 2
+        yPos = 20;
+        doc.setFontSize(9);
+        // doc.setFont(undefined, 'bold');
+        // doc.text('I. PENCAPAIAN KOMPETENSI (Lanjutan)', 14, yPos);
+        // yPos += 1;
+
+        // 5. TATHBIQ IBADAH (on page 2)
         const ibadahLetter = String.fromCharCode(sectionCode++);
-        tableBody.push([
+        tableBody2.push([
             { content: ibadahLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: 'TATHBIQ IBADAH', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
             { content: 'CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } },
@@ -724,7 +779,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Use custom description if available, otherwise use automatic description
             const description = tathbiqDescriptions[ibadahName] || getDescription('Ibadah', ibadahName, score);
 
-            tableBody.push([
+            tableBody2.push([
                 (index + 1) + '.',
                 ibadahName,
                 { content: score, styles: { halign: 'center', valign: 'middle' } },
@@ -733,6 +788,7 @@ document.addEventListener('DOMContentLoaded', () => {
             ]);
         });
 
+        // Draw second table (Page 2)
         doc.autoTable({
             startY: yPos,
             head: [
@@ -747,7 +803,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     { content: 'PREDIKAT', styles: { halign: 'center', fontSize: 9 } }
                 ]
             ],
-            body: tableBody,
+            body: tableBody2,
             theme: 'grid',
             headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', lineWidth: 0.1, lineColor: [0, 0, 0] },
             styles: { fontSize: 9, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
@@ -757,21 +813,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 2: { cellWidth: 'auto' },
                 3: { cellWidth: 'auto' },
                 4: { cellWidth: 'auto' }
-                // },
-                // didDrawPage: function (data) {
-                //     // Footer di setiap halaman
-                //     const pageHeight = doc.internal.pageSize.height;
-                //     const pageWidth = doc.internal.pageSize.width;
+            },
+            didDrawPage: function (data) {
+                // Footer di setiap halaman
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
 
-                //     doc.setFontSize(9);
-                //     doc.setFont(undefined, 'normal');
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
 
-                //     // Footer kiri: Info siswa
-                //     doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, pageHeight - 10);
+                // Footer kiri: Info siswa
+                doc.text(nameClass + ' | ' + student.nama_lengkap + ' | ' + student.nisn, 14, pageHeight - 8);
 
-                //     // Footer kanan: Nomor halaman
-                //     const pageNumber = 'Semester Ganjil | Halaman ' + data.pageNumber;
-                //     doc.text(pageNumber, pageWidth - 14, pageHeight - 10, { align: 'right' });
+                // Footer kanan: Nomor halaman
+                const pageNumber = 'Halaman : ' + currentPage;
+                doc.text(pageNumber, pageWidth - 14, pageHeight - 8, { align: 'right' });
             }
         });
 
@@ -804,22 +861,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 0: { cellWidth: 'auto' },
                 1: { cellWidth: 'auto' },
                 2: { cellWidth: 'auto' }
-            },
-            didDrawPage: function (data) {
-                // Footer di setiap halaman
-                const pageHeight = doc.internal.pageSize.height;
-                const pageWidth = doc.internal.pageSize.width;
-                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+                // },
+                // didDrawPage: function (data) {
+                //     // Footer di setiap halaman
+                //     const pageHeight = doc.internal.pageSize.height;
+                //     const pageWidth = doc.internal.pageSize.width;
+                //     const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
 
-                doc.setFontSize(9);
-                doc.setFont(undefined, 'normal');
+                //     doc.setFontSize(9);
+                //     doc.setFont(undefined, 'normal');
 
-                // Footer kiri: Info siswa
-                doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, pageHeight - 10);
+                //     // Footer kiri: Info siswa
+                //     doc.text(nameClass + ' | ' + student.nama_lengkap + ' | ' + student.nisn, 14, pageHeight - 4);
 
-                // Footer kanan: Nomor halaman
-                const pageNumber = 'Semester Ganjil | Halaman ' + currentPage;
-                doc.text(pageNumber, pageWidth - 14, pageHeight - 10, { align: 'right' });
+                //     // Footer kanan: Nomor halaman
+                //     const pageNumber = 'Halaman : ' + currentPage;
+                //     doc.text(pageNumber, pageWidth - 14, pageHeight - 4, { align: 'right' }); // pageHeight - 8
             }
         });
 
@@ -827,10 +884,10 @@ document.addEventListener('DOMContentLoaded', () => {
         yPos = doc.lastAutoTable.finalY + 4;
 
         // Untuk kelas 1, pindahkan ke halaman baru
-        if (kelasNum === '1') {
-            doc.addPage();
-            yPos = 20; // Start dari atas halaman baru
-        }
+        // if (kelasNum === '1') {
+        //     doc.addPage();
+        //     yPos = 20; // Start dari atas halaman baru
+        // }
 
         doc.setFontSize(9);
         doc.setFont(undefined, 'bold');
@@ -852,24 +909,24 @@ document.addEventListener('DOMContentLoaded', () => {
             styles: { fontSize: 9, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
             columnStyles: {
                 0: { halign: 'center', cellWidth: 30, fontStyle: 'bold' },
-                1: { halign: 'center', cellWidth: 30, fontStyle: 'bold' },
+                1: { halign: 'center', cellWidth: 20, fontStyle: 'bold' },
                 2: { cellWidth: 'auto' }
-            },
-            didDrawPage: function (data) {
-                // Footer di setiap halaman
-                const pageHeight = doc.internal.pageSize.height;
-                const pageWidth = doc.internal.pageSize.width;
-                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+                // },
+                // didDrawPage: function (data) {
+                //     // Footer di setiap halaman
+                //     const pageHeight = doc.internal.pageSize.height;
+                //     const pageWidth = doc.internal.pageSize.width;
+                //     const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
 
-                doc.setFontSize(9);
-                doc.setFont(undefined, 'normal');
+                //     doc.setFontSize(9);
+                //     doc.setFont(undefined, 'normal');
 
-                // Footer kiri: Info siswa
-                doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, pageHeight - 10);
+                //     // Footer kiri: Info siswa
+                //     doc.text(nameClass + ' | ' + student.nama_lengkap + ' | ' + student.nisn, 14, pageHeight - 4);
 
-                // Footer kanan: Nomor halaman
-                const pageNumber = 'Semester Ganjil | Halaman ' + currentPage;
-                doc.text(pageNumber, pageWidth - 14, pageHeight - 10, { align: 'right' });
+                //     // Footer kanan: Nomor halaman
+                //     const pageNumber = 'Halaman : ' + currentPage;
+                //     doc.text(pageNumber, pageWidth - 14, pageHeight - 4, { align: 'right' }); // pageHeight - 8
             }
         });
 
@@ -915,16 +972,29 @@ document.addEventListener('DOMContentLoaded', () => {
         const niyGpq = guruGpq ? guruGpq.niy : '...........................';
 
         doc.setFont(undefined, 'bold');
-        doc.text(guruPaiName, leftX, yPos, { align: 'center' });
+        doc.text(guruPaiName, leftX, yPos, { align: 'center', fontStyle: 'underline' });
         doc.text('Andreas Setiyono, S.Pd.Gr., M.Kom', centerX, yPos, { align: 'center' });
         doc.text(guruGpqName, rightX, yPos, { align: 'center' });
+
+        // Add underlines below teacher names
+        doc.setLineWidth(0.3);
+
+        // Calculate text width for each name and draw underline matching the width
+        const guruPaiWidth = doc.getTextWidth(guruPaiName) / 2;
+        doc.line(leftX - guruPaiWidth, yPos + 1, leftX + guruPaiWidth, yPos + 1); // Underline for Guru PAIBP
+
+        const kepalaWidth = doc.getTextWidth('Andreas Setiyono, S.Pd.Gr., M.Kom') / 2;
+        doc.line(centerX - kepalaWidth, yPos + 1, centerX + kepalaWidth, yPos + 1); // Underline for Kepala SD
+
+        const guruGpqWidth = doc.getTextWidth(guruGpqName) / 2;
+        doc.line(rightX - guruGpqWidth, yPos + 1, rightX + guruGpqWidth, yPos + 1); // Underline for Guru Al-Qur'an
 
         yPos += 4;
         doc.setFont(undefined, 'normal');
         doc.setFontSize(9);
-        doc.text('NIY. ' + niyPai, leftX, yPos, { align: 'center' }); // Small caption
-        doc.text('NIY. 0796071420', centerX, yPos, { align: 'center' });
-        doc.text('NIY. ' + niyGpq, rightX, yPos, { align: 'center' });
+        doc.text(niyPai, leftX, yPos, { align: 'center' }); // Small caption
+        doc.text('0796071420', centerX, yPos, { align: 'center' });
+        doc.text(niyGpq, rightX, yPos, { align: 'center' });
 
         // Headmaster
         // yPos += 10;
