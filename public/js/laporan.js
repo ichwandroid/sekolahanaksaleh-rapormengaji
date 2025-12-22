@@ -1160,4 +1160,685 @@ document.addEventListener('DOMContentLoaded', () => {
         showCustomAlert('success', 'Template Downloaded!', 'Silakan isi kolom Saran_GPAI dan upload kembali file CSV');
     });
 
+    // --- Download All PDFs ---
+    const btnDownloadAllPDF = document.getElementById('btnDownloadAllPDF');
+
+    btnDownloadAllPDF.addEventListener('click', async () => {
+        if (filteredData.length === 0) {
+            showCustomAlert('warning', 'Tidak Ada Data', 'Tidak ada siswa yang ditampilkan untuk diunduh.');
+            return;
+        }
+
+        // Confirm with user
+        const confirmed = await showConfirmAlert(
+            'Download Semua PDF?',
+            `Anda akan mengunduh ${filteredData.length} laporan PDF. Proses ini mungkin memakan waktu beberapa menit. Lanjutkan?`
+        );
+
+        if (!confirmed) return;
+
+        // Show loading with progress
+        showLoadingAlert('Memproses PDF...', `Mempersiapkan download untuk ${filteredData.length} siswa...`);
+
+        const originalText = btnDownloadAllPDF.innerHTML;
+        btnDownloadAllPDF.innerHTML = '<i class="ph ph-spinner ph-spin"></i> <span id="loadingText">Memproses</span><span id="loadingDots"></span>';
+        btnDownloadAllPDF.disabled = true;
+
+        // Animate loading dots
+        let dotCount = 0;
+        const loadingInterval = setInterval(() => {
+            const dotsElement = document.getElementById('loadingDots');
+            if (dotsElement) {
+                dotCount = (dotCount + 1) % 4;
+                dotsElement.textContent = '.'.repeat(dotCount);
+            }
+        }, 500);
+
+        // Small delay to ensure loading modal is rendered
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Show progress bar
+        showProgressBar();
+
+        try {
+            // We'll use JSZip to create a zip file containing all PDFs
+            // First, check if JSZip is available
+            if (typeof JSZip === 'undefined') {
+                throw new Error('JSZip library tidak ditemukan. Silakan refresh halaman.');
+            }
+
+            const zip = new JSZip();
+            let successCount = 0;
+            let failCount = 0;
+            const errors = [];
+
+            // Generate PDFs one by one
+            for (let i = 0; i < filteredData.length; i++) {
+                const student = filteredData[i];
+
+                // Update progress - use the new updateLoadingAlert function
+                updateLoadingAlert(
+                    'Memproses PDF...',
+                    `${student.nama_lengkap} (${student.kelas})`
+                );
+
+                // Update progress bar
+                updateProgressBar(i + 1, filteredData.length, `Sedang membuat PDF ${i + 1} dari ${filteredData.length}`);
+
+                // Small delay to allow DOM update
+                await new Promise(resolve => setTimeout(resolve, 50));
+
+                try {
+                    const pdfBlob = await generatePDFBlob(student);
+                    const fileName = `${student.nis}_${student.nama_lengkap}_${student.kelas}.pdf`.replace(/[/\\?%*:|"<>]/g, '-');
+                    zip.file(fileName, pdfBlob);
+                    successCount++;
+                } catch (error) {
+                    console.error(`Error generating PDF for ${student.nama_lengkap}:`, error);
+                    failCount++;
+                    errors.push(`${student.nama_lengkap}: ${error.message}`);
+                }
+
+
+            }
+
+            // Generate ZIP file
+            // Update button text
+            const loadingTextElement = document.getElementById('loadingText');
+            if (loadingTextElement) {
+                loadingTextElement.textContent = 'Mengompres';
+            }
+
+            updateLoadingAlert('Mengompres File...', 'Sedang mengompres semua PDF ke dalam file ZIP...');
+            updateProgressBar(filteredData.length, filteredData.length, 'Mengompres file...');
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            const zipBlob = await zip.generateAsync({
+                type: 'blob',
+                compression: 'DEFLATE',
+                compressionOptions: { level: 6 }
+            });
+
+            // Download ZIP file
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(zipBlob);
+            const timestamp = new Date().toISOString().split('T')[0];
+
+            // Get kelas from filter, or use 'Semua' if no filter selected
+            const kelasFilter = filterKelas.value || 'Semua';
+
+            link.setAttribute('href', url);
+            link.setAttribute('download', `Rapor_Kelas_${kelasFilter}_${timestamp}.zip`);
+            link.style.visibility = 'hidden';
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+
+            // Show result
+            hideProgressBar();
+            closeCustomAlert();
+
+            let message = `Berhasil: ${successCount} PDF\nGagal: ${failCount} PDF`;
+            if (errors.length > 0 && errors.length <= 3) {
+                message += '\n\nError:\n' + errors.join('\n');
+            } else if (errors.length > 3) {
+                message += '\n\nError:\n' + errors.slice(0, 3).join('\n') + `\n... dan ${errors.length - 3} error lainnya`;
+            }
+
+            showCustomAlert(
+                successCount > 0 ? 'success' : 'error',
+                'Download Selesai',
+                message
+            );
+
+        } catch (error) {
+            hideProgressBar();
+            closeCustomAlert();
+            console.error('Error generating PDFs:', error);
+            showCustomAlert('error', 'Terjadi Kesalahan!', error.message);
+        } finally {
+            clearInterval(loadingInterval);
+            btnDownloadAllPDF.innerHTML = originalText;
+            btnDownloadAllPDF.disabled = false;
+        }
+    });
+
+    // Helper function to generate PDF as Blob (modified from generatePDF)
+    async function generatePDFBlob(student) {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        const kelasNum = student.kelas ? student.kelas.match(/\d+/)?.[0] : null;
+
+        // Get current date
+        const today = new Date();
+        const dateStr = today.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+
+        // --- Helpers for Grading & Description ---
+        function getPredicate(score) {
+            if (score >= 86) return 'B';
+            if (score >= 71) return 'C';
+            return 'K';
+        }
+
+        function getDescription(category, name, score) {
+            let quality = '';
+            if (score >= 86) quality = 'mampu'; // or 'mampu'
+            else if (score >= 71) quality = 'cukup mampu'; // or 'mampu'
+            else quality = 'kurang mampu';
+
+            if (category === 'Tajwid') return `Ananda ${quality} memahami tajwid dalam bacaan`;
+            if (category === 'Fashahah') return `Ananda ${quality} melafalkan bacaan dengan jelas`;
+            if (category === 'Lagu') return `Ananda ${quality} memahami nada bacaan`;
+
+            if (category === 'Doa') {
+                let lancar = '';
+                if (score >= 86) lancar = 'lancar';
+                else if (score >= 71) lancar = 'cukup lancar';
+                else lancar = 'kurang lancar';
+                return `Ananda ${lancar} dalam menghafalkan ${name}`;
+            }
+
+            if (category === 'Tahfizh') {
+                const threshold = tahfizhThresholds[name];
+                let quality = '';
+
+                if (threshold) {
+                    if (score >= threshold.max) quality = 'baik dan';
+                    else if (score >= threshold.min) quality = 'cukup';
+                    else quality = 'kurang';
+                } else {
+                    // Fallback if no threshold defined
+                    if (score > 0) quality = 'baik';
+                    else quality = 'kurang';
+                }
+
+                return `Ananda ${quality} lancar dalam menghafalkan Surah ${name}`;
+            }
+
+            if (category === 'Daurah') {
+                let lancar = '';
+                if (score >= 86) lancar = 'lancar';
+                else if (score >= 71) lancar = 'cukup lancar';
+                else lancar = 'kurang lancar';
+                return `Ananda ${lancar} dalam melafalkan ${name}`;
+            }
+
+            if (category === 'Ibadah') {
+                let lancar = '';
+                if (score >= 86) lancar = 'lancar';
+                else if (score >= 71) lancar = 'cukup lancar';
+                else lancar = 'kurang lancar';
+                return `Ananda ${lancar} dalam menghafalkan ${name}`;
+            }
+
+            return '';
+        }
+
+        // --- Data Preparation ---
+
+        // Bilqolam
+        const tajwid = parseInt(student.bilqolam_tajwid) || 0;
+        const fashahah = parseInt(student.bilqolam_fashahah) || 0;
+        const lagu = parseInt(student.bilqolam_lagu) || 0;
+
+        // Doa
+        const doaList = kelasNum && doaConfig[kelasNum] ? doaConfig[kelasNum] : [];
+        const doaData = student.doa_sehari || {};
+
+        // Tahfizh
+        const surahList = kelasNum && tahfizhConfig[kelasNum] ? tahfizhConfig[kelasNum] : [];
+        const tahfizhData = student.tahfizh || {};
+
+        // Ibadah
+        const ibadahList = kelasNum && tathbiqConfig[kelasNum] ? tathbiqConfig[kelasNum] : [];
+        const ibadahData = student.tathbiq_ibadah || {};
+
+        // Determine name class
+        let nameClass = student.kelas || '-';
+        const classMap = {
+            '6D': '6D - Pohon Mindi', '6C': '6C - Pohon Bintangur', '6B': '6B - Pohon Palapi', '6A': '6A - Pohon Jati',
+            '5D': '5D - Pohon Cemara', '5C': '5C - Pohon Beringin', '5B': '5B - Pohon Pinus', '5A': '5A - Pohon Mersawa',
+            '4D': '4D - Pohon Ulin', '4C': '4C - Pohon Cendana', '4B': '4B - Pohon Damar', '4A': '4A - Pohon Meranti',
+            '3D': '3D - Pohon Cantigi', '3C': '3C - Pohon Eboni', '3B': '3B - Pohon Bungur', '3A': '3A - Pohon Saga',
+            '2D': '2D - Pohon Mahoni', '2C': '2C - Pohon Sengon', '2B': '2B - Pohon Randu', '2A': '2A - Pohon Sungkai',
+            '1D': '1D - Pohon Pingku', '1C': '1C - Pohon Kenanga', '1B': '1B - Pohon Kulim', '1A': '1A - Pohon Trembesi'
+        };
+        if (classMap[student.kelas]) nameClass = classMap[student.kelas];
+
+        // --- PDF Generation ---
+
+        // Header
+        const logoPath = '../assets/Logo SD Anak Saleh.png';
+        try {
+            doc.addImage(logoPath, 'PNG', 23, 2, 25, 25);
+        } catch (e) {
+            console.warn("Logo not found or error loading", e);
+        }
+
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
+        doc.text('KEMENKUMHAM RI AHU-0011983.AH.01.04.Tahun 2016', 105, 5, { align: 'center' });
+
+        doc.setFontSize(18);
+        doc.setFont(undefined, 'bold');
+        doc.text('SEKOLAH DASAR ANAK SALEH', 105, 11, { align: 'center' });
+
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'italic');
+        doc.text('Childfriendly Based Creative Islamic School', 105, 14, { align: 'center' });
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text('NPSN: 20539410 | NSS: 102056104008', 105, 18, { align: 'center' });
+
+        doc.setFontSize(8);
+        doc.setFont(undefined, 'normal');
+        doc.text('JL. Arumba No.31 Malang 65143 | Telp. (0341) 487088', 105, 22, { align: 'center' });
+        doc.text('Email: official@sekolahanaksaleh.sch.id | www.sekolahanaksaleh.sch.id', 105, 26, { align: 'center' });
+
+        const logoBilqolam = '../assets/Logo Bilqolam.png';
+        try {
+            doc.addImage(logoBilqolam, 'PNG', 160, 5, 30, 20);
+        } catch (e) {
+            console.warn("Logo Bilqolam not found", e);
+        }
+
+        // Line separator
+        doc.setLineWidth(0.5);
+        doc.line(20, 28, 190, 28);
+
+        doc.setFontSize(13);
+        doc.setFont(undefined, 'bold');
+        doc.text('RELIGIOUS REPORT', 105, 33, { align: 'center' });
+
+        // Student Info
+        let yPos = 38;
+        doc.setFontSize(11);
+        doc.setFont(undefined, 'bold');
+        doc.text(`Nama`, 15, yPos);
+        doc.text(`: ${student.nama_lengkap || '-'}`, 30, yPos);
+        doc.text(`No. Induk`, 130, yPos);
+        doc.text(`: ${student.nis || '-'}`, 160, yPos);
+
+        yPos += 5;
+        doc.setFont(undefined, 'bold');
+        doc.text(`Kelas`, 15, yPos);
+        doc.text(`: ${nameClass || '-'}`, 30, yPos);
+        doc.text(`Tahun Ajaran`, 130, yPos);
+        doc.text(`: 2025/2026 (Ganjil)`, 160, yPos);
+
+        // I. PENCAPAIAN KOMPETENSI
+        yPos += 5;
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.text('I. PENCAPAIAN KOMPETENSI', 14, yPos);
+
+        // Table Construction
+        yPos += 1;
+
+        const tableBody = [];
+        let sectionCode = 65; // ASCII for 'A'
+
+        // 1. DAURAH (Only for Pasca)
+        if (student.status === 'Pasca') {
+            const tadarusScore = parseInt(student.daurah_tadarus) || 0;
+            const bahasaArabScore = parseInt(student.daurah_bahasa_arab) || 0;
+            const sectionLetter = String.fromCharCode(sectionCode++);
+
+            tableBody.push([
+                { content: sectionLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+                { content: 'DAURAH', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
+            ]);
+
+            tableBody.push([
+                '1.',
+                "Tadarus Al-Qur'an",
+                { content: tadarusScore, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(tadarusScore), styles: { halign: 'center', valign: 'middle' } },
+                getDescription('Daurah', "Tadarus Al-Qur'an", tadarusScore)
+            ]);
+
+            tableBody.push([
+                '2.',
+                "Bahasa Arab",
+                { content: bahasaArabScore, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(bahasaArabScore), styles: { halign: 'center', valign: 'middle' } },
+                getDescription('Daurah', "Bahasa Arab", bahasaArabScore)
+            ]);
+        }
+
+
+        // 2. BILQOLAM (Only for Regular students, NOT PDBK)
+        if (student.status === 'Reguler' && student.pdbk !== true) {
+            const bilqolamLetter = String.fromCharCode(sectionCode++);
+            tableBody.push([
+                { content: bilqolamLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+                { content: `BILQOLAM ${student.bilqolam_jilid || '-'}`, colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
+            ]);
+
+            const bilqolamItems = [
+                { name: 'Tajwid', score: tajwid },
+                { name: 'Fashahah', score: fashahah },
+                { name: 'Lagu', score: lagu }
+            ];
+
+            bilqolamItems.forEach((item, index) => {
+                tableBody.push([
+                    (index + 1) + '.',
+                    item.name,
+                    { content: item.score, styles: { halign: 'center', valign: 'middle' } },
+                    { content: getPredicate(item.score), styles: { halign: 'center', valign: 'middle' } },
+                    getDescription(item.name, null, item.score)
+                ]);
+            });
+        }
+
+        // 3. PDBK (Only for PDBK students)
+        if (student.pdbk === true) {
+            const pdbkLetter = String.fromCharCode(sectionCode++);
+            tableBody.push([
+                { content: pdbkLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+                { content: 'PENILAIAN KHUSUS PDBK', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
+            ]);
+
+            // Kriteria 1
+            const kriteria1Nama = student.pdbk_kriteria1_nama || '-';
+            const kriteria1Nilai = parseInt(student.pdbk_kriteria1_nilai) || 0;
+            const kriteria1Desc = student.pdbk_kriteria1_desc || '-';
+
+            tableBody.push([
+                '1.',
+                kriteria1Nama,
+                { content: kriteria1Nilai, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(kriteria1Nilai), styles: { halign: 'center', valign: 'middle' } },
+                kriteria1Desc
+            ]);
+
+            // Kriteria 2
+            const kriteria2Nama = student.pdbk_kriteria2_nama || '-';
+            const kriteria2Nilai = parseInt(student.pdbk_kriteria2_nilai) || 0;
+            const kriteria2Desc = student.pdbk_kriteria2_desc || '-';
+
+            tableBody.push([
+                '2.',
+                kriteria2Nama,
+                { content: kriteria2Nilai, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(kriteria2Nilai), styles: { halign: 'center', valign: 'middle' } },
+                kriteria2Desc
+            ]);
+
+            // Kriteria 3
+            const kriteria3Nama = student.pdbk_kriteria3_nama || '-';
+            const kriteria3Nilai = parseInt(student.pdbk_kriteria3_nilai) || 0;
+            const kriteria3Desc = student.pdbk_kriteria3_desc || '-';
+
+            tableBody.push([
+                '3.',
+                kriteria3Nama,
+                { content: kriteria3Nilai, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(kriteria3Nilai), styles: { halign: 'center', valign: 'middle' } },
+                kriteria3Desc
+            ]);
+        }
+
+
+        // 3. DOA
+        const doaLetter = String.fromCharCode(sectionCode++);
+        tableBody.push([
+            { content: doaLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'TAHFIZH DO\'A SEHARI-HARI', colSpan: 4, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } }
+        ]);
+
+        // Get custom descriptions if available (for PDBK students)
+        const doaDescriptions = student.doa_descriptions || {};
+
+        doaList.forEach((doaName, index) => {
+            const score = doaData[doaName] || 0;
+
+            // Use custom description if available, otherwise use automatic description
+            const description = doaDescriptions[doaName] || getDescription('Doa', doaName, score);
+
+            tableBody.push([
+                (index + 1) + '.',
+                doaName,
+                { content: score, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(score), styles: { halign: 'center', valign: 'middle' } },
+                description
+            ]);
+        });
+
+        // 4. TAHFIZH
+        const tahfizhLetter = String.fromCharCode(sectionCode++);
+        tableBody.push([
+            { content: tahfizhLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'TAHFIZH AL-QUR\'AN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } },
+            { content: 'DESKRIPSI CAPAIAN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
+        ]);
+
+        // Get custom descriptions if available (for PDBK students)
+        const tahfizhDescriptions = student.tahfizh_descriptions || {};
+
+        surahList.forEach((surahName, index) => {
+            const memorized = tahfizhData[surahName] || 0;
+            const max = surahData[surahName] || 0;
+
+            // Use custom description if available, otherwise use automatic description
+            const description = tahfizhDescriptions[surahName] || getDescription('Tahfizh', surahName, memorized);
+
+            tableBody.push([
+                (index + 1) + '.',
+                `Q.S ${surahName}`,
+                { content: `${memorized} ayat dari ${max}`, colSpan: 2, styles: { halign: 'center', valign: 'middle' } },
+                description
+            ]);
+        });
+
+        // 5. TATHBIQ IBADAH
+        const ibadahLetter = String.fromCharCode(sectionCode++);
+        tableBody.push([
+            { content: ibadahLetter, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'TATHBIQ IBADAH', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200] } },
+            { content: 'CAPAIAN', colSpan: 2, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } },
+            { content: 'DESKRIPSI CAPAIAN', colSpan: 1, styles: { fontStyle: 'bold', fillColor: [200, 200, 200], halign: 'center' } }
+        ]);
+
+        // Get custom descriptions if available (for PDBK students)
+        const tathbiqDescriptions = student.tathbiq_descriptions || {};
+
+        ibadahList.forEach((ibadahName, index) => {
+            const score = ibadahData[ibadahName] || 0;
+
+            // Use custom description if available, otherwise use automatic description
+            const description = tathbiqDescriptions[ibadahName] || getDescription('Ibadah', ibadahName, score);
+
+            tableBody.push([
+                (index + 1) + '.',
+                ibadahName,
+                { content: score, styles: { halign: 'center', valign: 'middle' } },
+                { content: getPredicate(score), styles: { halign: 'center', valign: 'middle' } },
+                description
+            ]);
+        });
+
+        doc.autoTable({
+            startY: yPos,
+            head: [
+                [
+                    { content: 'NO', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 9 } },
+                    { content: 'ASPEK PENILAIAN', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 9 } },
+                    { content: 'CAPAIAN', colSpan: 2, styles: { halign: 'center', fontSize: 9 } },
+                    { content: 'DESKRIPSI CAPAIAN', rowSpan: 2, styles: { valign: 'middle', halign: 'center', fontSize: 9 } }
+                ],
+                [
+                    { content: 'NUMERIK', styles: { halign: 'center', fontSize: 9 } },
+                    { content: 'PREDIKAT', styles: { halign: 'center', fontSize: 9 } }
+                ]
+            ],
+            body: tableBody,
+            theme: 'grid',
+            headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', lineWidth: 0.1, lineColor: [0, 0, 0] },
+            styles: { fontSize: 9, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
+            columnStyles: {
+                0: { cellWidth: 'auto', halign: 'center' },
+                1: { cellWidth: 'auto' },
+                2: { cellWidth: 'auto' },
+                3: { cellWidth: 'auto' },
+                4: { cellWidth: 'auto' }
+            }
+        });
+
+        // --- II. CATATAN ---
+        yPos = doc.lastAutoTable.finalY + 4;
+
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.text('II. CATATAN', 14, yPos);
+        yPos += 1;
+
+        const catatanGuruPAI = student.saran_guru_pai || "-";
+        const catatanGuruQuran = student.saran_guru_gpq || "-";
+
+        doc.autoTable({
+            startY: yPos,
+            body: [
+                [
+                    { content: 'Guru Pendidikan Agama Islam dan Budi Pekerti', styles: { fontStyle: 'bold', cellWidth: 50 } },
+                    { content: catatanGuruPAI, styles: { cellWidth: 'auto', textAlign: 'justify' } }
+                ],
+                [
+                    { content: "Guru Pengajar Al-Qur'an", styles: { fontStyle: 'bold' } },
+                    { content: catatanGuruQuran, styles: { cellWidth: 'auto', textAlign: 'justify' } }
+                ]
+            ],
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 1.5, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
+            columnStyles: {
+                0: { cellWidth: 'auto' },
+                1: { cellWidth: 'auto' },
+                2: { cellWidth: 'auto' }
+            },
+            didDrawPage: function (data) {
+                // Footer di setiap halaman
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+
+                // Footer kiri: Info siswa
+                doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, pageHeight - 10);
+
+                // Footer kanan: Nomor halaman
+                const pageNumber = 'Semester Ganjil | Halaman ' + currentPage;
+                doc.text(pageNumber, pageWidth - 14, pageHeight - 10, { align: 'right' });
+            }
+        });
+
+        // --- III. KONVERSI NILAI ---
+        yPos = doc.lastAutoTable.finalY + 4;
+
+        // Untuk kelas 1, pindahkan ke halaman baru
+        if (kelasNum === '1') {
+            doc.addPage();
+            yPos = 20; // Start dari atas halaman baru
+        }
+
+        doc.setFontSize(9);
+        doc.setFont(undefined, 'bold');
+        doc.text('III. KONVERSI NILAI', 14, yPos);
+        yPos += 1;
+
+        doc.autoTable({
+            startY: yPos,
+            head: [
+                ['NILAI', 'KONVERSI', 'KETERANGAN']
+            ],
+            body: [
+                ['86 - 100', 'B', 'Apabila ananda baca benar dan lancar, tidak ada salah sama sekali'],
+                ['71 - 85', 'C', 'Apabila ananda baca dan ada kesalahan 3 kali'],
+                ['< 70', 'K', 'Apabila ananda baca dan ada kesalahan lebih dari 3 kali']
+            ],
+            theme: 'grid',
+            headStyles: { fillColor: [200, 200, 200], textColor: 0, fontStyle: 'bold', lineWidth: 0.1, lineColor: [0, 0, 0], halign: 'center' },
+            styles: { fontSize: 9, cellPadding: 1, lineColor: [0, 0, 0], lineWidth: 0.1, textColor: 0, valign: 'middle' },
+            columnStyles: {
+                0: { halign: 'center', cellWidth: 30, fontStyle: 'bold' },
+                1: { halign: 'center', cellWidth: 30, fontStyle: 'bold' },
+                2: { cellWidth: 'auto' }
+            },
+            didDrawPage: function (data) {
+                // Footer di setiap halaman
+                const pageHeight = doc.internal.pageSize.height;
+                const pageWidth = doc.internal.pageSize.width;
+                const currentPage = doc.internal.getCurrentPageInfo().pageNumber;
+
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+
+                // Footer kiri: Info siswa
+                doc.text(student.nama_lengkap + ' | ' + student.kelas + ' | 2025/2026', 14, pageHeight - 10);
+
+                // Footer kanan: Nomor halaman
+                const pageNumber = 'Semester Ganjil | Halaman ' + currentPage;
+                doc.text(pageNumber, pageWidth - 14, pageHeight - 10, { align: 'right' });
+            }
+        });
+
+        // --- Signatures ---
+        yPos = doc.lastAutoTable.finalY + 4;
+
+        doc.setFontSize(10);
+        doc.setFont(undefined, 'normal');
+        doc.text('Diberikan di', 14, yPos);
+        doc.text(': Malang', 40, yPos);
+        yPos += 5;
+        doc.text('Tanggal', 14, yPos);
+        doc.text(': 19 Desember 2025', 40, yPos);
+
+        yPos += 5;
+
+        // Signature Columns
+        const leftX = 37;
+        const centerX = 100; // Approximate center
+        const rightX = 167;
+
+        doc.text('Guru PAIBP', leftX, yPos, { align: 'center' });
+        doc.text('Kepala SD Anak Saleh', centerX, yPos, { align: 'center' });
+        doc.text("Guru Al-Qur'an", rightX, yPos, { align: 'center' });
+
+        yPos += 25;
+
+        // Names
+        const guruPaiName = student.guru_pai || '...........................';
+        const guruGpqName = student.bilqolam_guru || '...........................';
+
+        const guruPai = teachersData.find(t => t.nama_lengkap === student.guru_pai);
+        const guruGpq = teachersData.find(t => t.nama_lengkap === student.bilqolam_guru);
+
+        const niyPai = guruPai ? guruPai.niy : '...........................';
+        const niyGpq = guruGpq ? guruGpq.niy : '...........................';
+
+        doc.setFont(undefined, 'bold');
+        doc.text(guruPaiName, leftX, yPos, { align: 'center' });
+        doc.text('Andreas Setiyono, S.Pd.Gr., M.Kom', centerX, yPos, { align: 'center' });
+        doc.text(guruGpqName, rightX, yPos, { align: 'center' });
+
+        yPos += 4;
+        doc.setFont(undefined, 'normal');
+        doc.setFontSize(9);
+        doc.text('NIY. ' + niyPai, leftX, yPos, { align: 'center' });
+        doc.text('NIY. 0796071420', centerX, yPos, { align: 'center' });
+        doc.text('NIY. ' + niyGpq, rightX, yPos, { align: 'center' });
+
+        // Return as Blob
+        return doc.output('blob');
+    }
+
+
+
 });

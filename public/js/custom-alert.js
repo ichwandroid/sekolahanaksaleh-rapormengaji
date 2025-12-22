@@ -111,73 +111,63 @@ function showCustomAlert(type = 'success', title = '', message = '', autoClose =
 }
 
 // Show Confirm Alert
-function showConfirmAlert(title, message, onConfirm, onCancel = null) {
-    const modal = document.getElementById('customAlertModal');
-    const alertBox = document.getElementById('alertBox');
-    const alertIcon = document.getElementById('alertIcon');
-    const alertIconElement = document.getElementById('alertIconElement');
-    const alertTitle = document.getElementById('alertTitle');
-    const alertMessage = document.getElementById('alertMessage');
-    const alertButtons = document.getElementById('alertButtons');
+function showConfirmAlert(title, message) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('customAlertModal');
+        const alertBox = document.getElementById('alertBox');
+        const alertIcon = document.getElementById('alertIcon');
+        const alertIconElement = document.getElementById('alertIconElement');
+        const alertTitle = document.getElementById('alertTitle');
+        const alertMessage = document.getElementById('alertMessage');
+        const alertButtons = document.getElementById('alertButtons');
 
-    const config = alertConfig.question;
+        const config = alertConfig.question;
 
-    // Set icon
-    alertIcon.className = `w-20 h-20 rounded-full flex items-center justify-center ${config.iconBg}`;
-    alertIconElement.className = `ph ${config.icon} text-5xl ${config.iconColor}`;
+        // Set icon
+        alertIcon.className = `w-20 h-20 rounded-full flex items-center justify-center ${config.iconBg}`;
+        alertIconElement.className = `ph ${config.icon} text-5xl ${config.iconColor}`;
 
-    // Set content
-    alertTitle.textContent = title;
-    alertMessage.textContent = message;
+        // Set content
+        alertTitle.textContent = title;
+        alertMessage.textContent = message;
 
-    // Set buttons
-    alertButtons.innerHTML = `
-        <button id="cancelBtn"
-                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-            Batal
-        </button>
-        <button id="confirmBtn"
-                class="${config.buttonClass} text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-            Ya, Lanjutkan
-        </button>
-    `;
+        // Set buttons
+        alertButtons.innerHTML = `
+            <button id="cancelBtn"
+                    class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                Batal
+            </button>
+            <button id="confirmBtn"
+                    class="${config.buttonClass} text-white font-semibold py-3 px-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105">
+                Ya, Lanjutkan
+            </button>
+        `;
 
-    // Show modal
-    modal.classList.remove('hidden');
+        // Show modal
+        modal.classList.remove('hidden');
 
-    // GSAP Animation
-    gsap.fromTo(alertBox,
-        { scale: 0.7, opacity: 0, y: -50 },
-        {
-            scale: 1,
-            opacity: 1,
-            y: 0,
-            duration: 0.4,
-            ease: "back.out(1.7)"
-        }
-    );
+        // GSAP Animation
+        gsap.fromTo(alertBox,
+            { scale: 0.7, opacity: 0, y: -50 },
+            {
+                scale: 1,
+                opacity: 1,
+                y: 0,
+                duration: 0.4,
+                ease: "back.out(1.7)"
+            }
+        );
 
-    // Icon shake animation
-    // gsap.fromTo(alertIconElement,
-    //     { x: -10 },
-    //     {
-    //         x: 10,
-    //         duration: 0.1,
-    //         repeat: 5,
-    //         yoyo: true,
-    //         ease: "power1.inOut"
-    //     }
-    // );
+        // Add button listeners
+        document.getElementById('cancelBtn').addEventListener('click', () => {
+            closeCustomAlert();
+            resolve(false);
+        });
 
-    // Add button listeners
-    document.getElementById('cancelBtn').addEventListener('click', () => {
-        closeCustomAlert();
-        if (onCancel) onCancel();
-    });
-
-    document.getElementById('confirmBtn').addEventListener('click', () => {
-        closeCustomAlert();
-        if (onConfirm) onConfirm();
+        document.getElementById('confirmBtn').addEventListener('click', () => {
+            closeCustomAlert();
+            resolve(true);
+        });
     });
 }
 
@@ -225,6 +215,71 @@ function showLoadingAlert(title = 'Memproses...', message = 'Mohon tunggu sebent
         repeat: -1,
         ease: "none"
     });
+}
+
+// Update Loading Alert Message (for progress updates)
+function updateLoadingAlert(title, message) {
+    const alertTitle = document.getElementById('alertTitle');
+    const alertMessage = document.getElementById('alertMessage');
+
+    if (alertTitle && alertMessage) {
+        alertTitle.textContent = title;
+        alertMessage.textContent = message;
+    }
+}
+
+// Show Progress Bar
+function showProgressBar() {
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    if (progressBarContainer) {
+        progressBarContainer.classList.remove('hidden');
+        // Animate entrance
+        gsap.fromTo(progressBarContainer,
+            { opacity: 0, y: -10 },
+            { opacity: 1, y: 0, duration: 0.3, ease: "power2.out" }
+        );
+    }
+}
+
+// Hide Progress Bar
+function hideProgressBar() {
+    const progressBarContainer = document.getElementById('progressBarContainer');
+    if (progressBarContainer) {
+        gsap.to(progressBarContainer,
+            {
+                opacity: 0,
+                y: -10,
+                duration: 0.3,
+                ease: "power2.in",
+                onComplete: () => progressBarContainer.classList.add('hidden')
+            }
+        );
+    }
+}
+
+// Update Progress Bar
+function updateProgressBar(current, total, subtext = '') {
+    const progressBar = document.getElementById('progressBar');
+    const progressText = document.getElementById('progressText');
+    const progressSubtext = document.getElementById('progressSubtext');
+
+    if (progressBar && progressText) {
+        const percentage = Math.round((current / total) * 100);
+
+        // Animate progress bar width
+        gsap.to(progressBar, {
+            width: `${percentage}%`,
+            duration: 0.5,
+            ease: "power2.out"
+        });
+
+        // Update text
+        progressText.textContent = `${percentage}%`;
+
+        if (progressSubtext) {
+            progressSubtext.textContent = subtext;
+        }
+    }
 }
 
 // Close Custom Alert

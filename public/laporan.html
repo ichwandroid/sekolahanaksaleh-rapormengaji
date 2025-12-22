@@ -21,6 +21,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
+    <!-- JSZip for creating ZIP files -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
     <!-- GSAP -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 
@@ -81,17 +84,22 @@
                     <div class="flex flex-col gap-4 mb-6">
                         <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
                             <h3 class="text-lg font-bold text-gray-800 dark:text-white">Laporan Rapor Siswa</h3>
-                            <div class="flex gap-2">
+                            <div class="flex gap-2 flex-wrap">
                                 <input type="file" id="csvFileInput" accept=".csv" class="hidden">
-                                <button id="btnUploadCSV" 
+                                <button id="btnUploadCSV"
                                     class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium">
                                     <i class="ph ph-upload text-lg"></i>
                                     Upload CSV Saran GPAI
                                 </button>
-                                <button id="btnDownloadTemplate" 
+                                <button id="btnDownloadTemplate"
                                     class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium">
                                     <i class="ph ph-download text-lg"></i>
                                     Download Template
+                                </button>
+                                <button id="btnDownloadAllPDF"
+                                    class="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+                                    <i class="ph ph-file-pdf text-lg"></i>
+                                    Download Semua PDF
                                 </button>
                             </div>
                         </div>
@@ -253,7 +261,8 @@
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 transition-opacity bg-gray-900 bg-opacity-50" onclick="closeCustomAlert()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-            <div id="alertBox" class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+            <div id="alertBox"
+                class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
                 <div id="alertIconContainer" class="flex items-center justify-center pt-8 pb-4">
                     <div id="alertIcon" class="w-20 h-20 rounded-full flex items-center justify-center">
                         <i id="alertIconElement" class="text-5xl"></i>
@@ -261,7 +270,20 @@
                 </div>
                 <div class="px-6 pb-6 text-center">
                     <h3 id="alertTitle" class="text-2xl font-bold text-gray-900 dark:text-white mb-2"></h3>
-                    <p id="alertMessage" class="text-gray-600 dark:text-gray-400 mb-6"></p>
+                    <p id="alertMessage" class="text-gray-600 dark:text-gray-400 mb-4"></p>
+
+                    <!-- Progress Bar Container (hidden by default) -->
+                    <div id="progressBarContainer" class="hidden mb-6">
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden shadow-inner">
+                            <div id="progressBar"
+                                class="h-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full transition-all duration-300 ease-out flex items-center justify-center"
+                                style="width: 0%">
+                                <span id="progressText" class="text-xs font-bold text-white drop-shadow-lg"></span>
+                            </div>
+                        </div>
+                        <p id="progressSubtext" class="text-sm text-gray-500 dark:text-gray-400 mt-2"></p>
+                    </div>
+
                     <div id="alertButtons" class="flex gap-3 justify-center"></div>
                 </div>
             </div>
