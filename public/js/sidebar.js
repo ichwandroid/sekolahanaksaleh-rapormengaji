@@ -30,6 +30,7 @@ function getSidebarHTML() {
         { href: 'dashboard.html', page: 'dashboard', icon: 'ph-house', text: 'Home', show: true },
         { href: 'siswa.html', page: 'siswa', icon: 'ph-student', text: 'Data Siswa', show: true },
         { href: 'guru.html', page: 'guru', icon: 'ph-chalkboard-teacher', text: 'Data Guru', show: isAdminUser }, // Only show for Admin
+        { href: 'kurikulum.html', page: 'kurikulum', icon: 'ph-books', text: 'Data Kurikulum', show: isAdminUser }, // Admin Only
         { href: 'bilqolam.html', page: 'bilqolam', icon: 'ph-book-bookmark', text: 'Bilqolam', show: isAdminUser || isGPQUser },
         { href: 'doa.html', page: 'doa', icon: 'ph-hands-praying', text: 'Doa Sehari-hari', show: isAdminUser || isGPAIUser },
         { href: 'tathbiq.html', page: 'tathbiq', icon: 'ph-mosque', text: 'Tathbiq Ibadah', show: isAdminUser || isGPAIUser },
@@ -110,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (path.includes('dashboard')) activePage = 'dashboard';
     else if (path.includes('siswa')) activePage = 'siswa';
     else if (path.includes('guru')) activePage = 'guru';
+    else if (path.includes('kurikulum')) activePage = 'kurikulum';
     else if (path.includes('bilqolam')) activePage = 'bilqolam';
     else if (path.includes('doa')) activePage = 'doa';
     else if (path.includes('tathbiq')) activePage = 'tathbiq';

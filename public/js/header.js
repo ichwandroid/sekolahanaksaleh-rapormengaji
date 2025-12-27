@@ -77,7 +77,8 @@ const pageTitles = {
     'tathbiq': 'Tathbiq Ibadah',
     'tahfizh': "Tahfizh Al-Qur'an",
     'laporan': 'Laporan',
-    'guru': 'Data Guru'
+    'guru': 'Data Guru',
+    'kurikulum': 'Data Kurikulum'
 };
 
 // Function to load header
@@ -117,6 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
     else if (path.includes('tahfizh')) activePage = 'tahfizh';
     else if (path.includes('laporan')) activePage = 'laporan';
     else if (path.includes('guru')) activePage = 'guru';
+    else if (path.includes('kurikulum')) activePage = 'kurikulum';
 
     loadHeader(activePage);
 });

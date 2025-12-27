@@ -666,14 +666,17 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // --- Delete Function (Global) ---
+    // --- Delete Function (Global) ---
     window.deleteStudent = async (id) => {
-        showConfirmAlert('Hapus Data Siswa?', 'Apakah Anda yakin ingin menghapus data siswa ini?', async () => {
+        const confirmed = await showConfirmAlert('Hapus Data Siswa?', 'Apakah Anda yakin ingin menghapus data siswa ini?');
+        if (confirmed) {
             try {
                 await db.collection('students').doc(id).delete();
+                // showCustomAlert('success', 'Terhapus!', 'Data siswa berhasil dihapus.'); // Opsional, listener real-time akan mengupdate UI
             } catch (error) {
                 console.error("Error removing document: ", error);
                 showCustomAlert('error', 'Gagal menghapus data: ' + error.message);
             }
-        });
+        }
     };
 });

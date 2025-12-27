@@ -4,130 +4,135 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (teacher) {
         const db = firebase.firestore();
-        // Student count & Updates
-        db.collection('students').get().then((snapshot) => {
-            let allStudents = [];
-            snapshot.forEach((doc) => {
-                allStudents.push({ id: doc.id, ...doc.data() });
-            });
+        // Check if we are on the dashboard (indicated by the presence of specific elements)
+        const isDashboard = document.getElementById('totalStudents') || document.getElementById('recentUpdatesTableBody');
 
-            // Filter students by teacher
-            const teacherStudents = filterStudentsByTeacher(allStudents, teacher);
-
-            // Update total students display
-            const totalStudentsEl = document.getElementById('totalStudents');
-            if (totalStudentsEl) {
-                totalStudentsEl.textContent = teacherStudents.length;
-            }
-
-            // --- Populate Recent Updates Table ---
-            const recentUpdatesTableBody = document.getElementById('recentUpdatesTableBody');
-            if (recentUpdatesTableBody) {
-                // Sort by updated_at desc (handle missing updated_at by treating as old)
-                const sortedStudents = [...teacherStudents].sort((a, b) => {
-                    const dateA = a.updated_at ? new Date(a.updated_at.toDate()) : new Date(0);
-                    const dateB = b.updated_at ? new Date(b.updated_at.toDate()) : new Date(0);
-                    return dateB - dateA;
+        if (isDashboard) {
+            // Student count & Updates
+            db.collection('students').get().then((snapshot) => {
+                let allStudents = [];
+                snapshot.forEach((doc) => {
+                    allStudents.push({ id: doc.id, ...doc.data() });
                 });
 
-                // Take top 5
-                const recentUpdates = sortedStudents.slice(0, 5);
+                // Filter students by teacher
+                const teacherStudents = filterStudentsByTeacher(allStudents, teacher);
 
-                recentUpdatesTableBody.innerHTML = '';
-                if (recentUpdates.length === 0) {
-                    recentUpdatesTableBody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center">Belum ada data update.</td></tr>';
-                } else {
-                    recentUpdates.forEach(student => {
-                        const date = student.updated_at ? new Date(student.updated_at.toDate()).toLocaleString('id-ID', {
-                            day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                        }) : '-';
-
-                        const row = `
-                            <tr class="studentUpdate bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
-                                <td class="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                                    ${student.nama_lengkap || 'Tanpa Nama'}
-                                </td>
-                                <td class="px-4 py-3">
-                                    ${student.kelas || '-'}
-                                </td>
-                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400">
-                                    ${date}
-                                </td>
-                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400">
-                                    ${student.bilqolam_guru || '-'}
-                                </td>
-                                <td class="px-4 py-3 text-gray-500 dark:text-gray-400">
-                                    ${student.guru_pai || '-'}
-                                </td>
-                            </tr>
-                        `;
-                        recentUpdatesTableBody.innerHTML += row;
-                    });
-
-                    // GSAP
-                    gsap.from('.studentUpdate', {
-                        opacity: 0,
-                        y: 20,
-                        duration: 0.5,
-                        stagger: 0.1,
-                        ease: 'power3.out'
-                    });
+                // Update total students display
+                const totalStudentsEl = document.getElementById('totalStudents');
+                if (totalStudentsEl) {
+                    totalStudentsEl.textContent = teacherStudents.length;
                 }
-            }
 
-            // --- Populate Quick Stats (Reguler vs Pasca) ---
-            const statReguler = document.getElementById('statReguler');
-            const statPasca = document.getElementById('statPasca');
-            const barReguler = document.getElementById('barReguler');
-            const barPasca = document.getElementById('barPasca');
+                // --- Populate Recent Updates Table ---
+                const recentUpdatesTableBody = document.getElementById('recentUpdatesTableBody');
+                if (recentUpdatesTableBody) {
+                    // Sort by updated_at desc (handle missing updated_at by treating as old)
+                    const sortedStudents = [...teacherStudents].sort((a, b) => {
+                        const dateA = a.updated_at ? new Date(a.updated_at.toDate()) : new Date(0);
+                        const dateB = b.updated_at ? new Date(b.updated_at.toDate()) : new Date(0);
+                        return dateB - dateA;
+                    });
 
-            if (statReguler && statPasca) {
-                const regulerCount = teacherStudents.filter(s => s.status === 'Reguler').length;
-                const pascaCount = teacherStudents.filter(s => s.status === 'Pasca').length;
-                const total = teacherStudents.length || 1; // Avoid division by zero
+                    // Take top 5
+                    const recentUpdates = sortedStudents.slice(0, 5);
 
-                statReguler.textContent = regulerCount;
-                statPasca.textContent = pascaCount;
+                    recentUpdatesTableBody.innerHTML = '';
+                    if (recentUpdates.length === 0) {
+                        recentUpdatesTableBody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center">Belum ada data update.</td></tr>';
+                    } else {
+                        recentUpdates.forEach(student => {
+                            const date = student.updated_at ? new Date(student.updated_at.toDate()).toLocaleString('id-ID', {
+                                day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                            }) : '-';
 
-                if (barReguler) barReguler.style.width = `${(regulerCount / total) * 100}%`;
-                if (barPasca) barPasca.style.width = `${(pascaCount / total) * 100}%`;
-            }
+                            const row = `
+                                <tr class="studentUpdate bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors">
+                                    <td class="px-4 py-3 font-medium text-gray-900 dark:text-white whitespace-nowrap">
+                                        ${student.nama_lengkap || 'Tanpa Nama'}
+                                    </td>
+                                    <td class="px-4 py-3">
+                                        ${student.kelas || '-'}
+                                    </td>
+                                    <td class="px-4 py-3 text-gray-500 dark:text-gray-400">
+                                        ${date}
+                                    </td>
+                                    <td class="px-4 py-3 text-gray-500 dark:text-gray-400">
+                                        ${student.bilqolam_guru || '-'}
+                                    </td>
+                                    <td class="px-4 py-3 text-gray-500 dark:text-gray-400">
+                                        ${student.guru_pai || '-'}
+                                    </td>
+                                </tr>
+                            `;
+                            recentUpdatesTableBody.innerHTML += row;
+                        });
 
-        }).catch((error) => {
-            console.error("Error fetching students: ", error);
-            const recentUpdatesTableBody = document.getElementById('recentUpdatesTableBody');
-            if (recentUpdatesTableBody) {
-                recentUpdatesTableBody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-red-500">Gagal memuat data.</td></tr>';
-            }
-        });
+                        // GSAP
+                        gsap.from('.studentUpdate', {
+                            opacity: 0,
+                            y: 20,
+                            duration: 0.5,
+                            stagger: 0.1,
+                            ease: 'power3.out'
+                        });
+                    }
+                }
 
-        // Teacher count
-        db.collection('teachers').get().then((snapshot) => {
-            let allTeachers = [];
-            snapshot.forEach((doc) => {
-                allTeachers.push({ id: doc.id, ...doc.data() });
+                // --- Populate Quick Stats (Reguler vs Pasca) ---
+                const statReguler = document.getElementById('statReguler');
+                const statPasca = document.getElementById('statPasca');
+                const barReguler = document.getElementById('barReguler');
+                const barPasca = document.getElementById('barPasca');
+
+                if (statReguler && statPasca) {
+                    const regulerCount = teacherStudents.filter(s => s.status === 'Reguler').length;
+                    const pascaCount = teacherStudents.filter(s => s.status === 'Pasca').length;
+                    const total = teacherStudents.length || 1; // Avoid division by zero
+
+                    statReguler.textContent = regulerCount;
+                    statPasca.textContent = pascaCount;
+
+                    if (barReguler) barReguler.style.width = `${(regulerCount / total) * 100}%`;
+                    if (barPasca) barPasca.style.width = `${(pascaCount / total) * 100}%`;
+                }
+
+            }).catch((error) => {
+                console.error("Error fetching students: ", error);
+                const recentUpdatesTableBody = document.getElementById('recentUpdatesTableBody');
+                if (recentUpdatesTableBody) {
+                    recentUpdatesTableBody.innerHTML = '<tr><td colspan="3" class="px-4 py-4 text-center text-red-500">Gagal memuat data.</td></tr>';
+                }
             });
+
+            // Teacher count
             const totalTeachersEl = document.getElementById('totalTeachers');
             if (totalTeachersEl) {
-                totalTeachersEl.textContent = allTeachers.length;
+                db.collection('teachers').get().then((snapshot) => {
+                    let allTeachers = [];
+                    snapshot.forEach((doc) => {
+                        allTeachers.push({ id: doc.id, ...doc.data() });
+                    });
+                    totalTeachersEl.textContent = allTeachers.length;
+                }).catch((error) => {
+                    console.error("Error fetching teachers: ", error);
+                });
             }
-        }).catch((error) => {
-            console.error("Error fetching teachers: ", error);
-        });
 
-        // completed student count
-        db.collection('students').where('status', '==', 'completed').get().then((snapshot) => {
-            let completedStudents = [];
-            snapshot.forEach((doc) => {
-                completedStudents.push({ id: doc.id, ...doc.data() });
-            });
+            // completed student count
             const completedStudentsEl = document.getElementById('completedStudents');
             if (completedStudentsEl) {
-                completedStudentsEl.textContent = completedStudents.length;
+                db.collection('students').where('status', '==', 'completed').get().then((snapshot) => {
+                    let completedStudents = [];
+                    snapshot.forEach((doc) => {
+                        completedStudents.push({ id: doc.id, ...doc.data() });
+                    });
+                    completedStudentsEl.textContent = completedStudents.length;
+                }).catch((error) => {
+                    console.error("Error fetching completed students: ", error);
+                });
             }
-        }).catch((error) => {
-            console.error("Error fetching completed students: ", error);
-        });
+        }
 
     }
 

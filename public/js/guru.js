@@ -125,13 +125,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
         let html = '';
         pageData.forEach((data) => {
+            // Process Kelas Badges
+            let kelasDisplayHTML = '-';
+            let kelasList = (data.kelas_diampu || '').split(',').map(k => k.trim()).filter(k => k);
+
+            if (kelasList.length >= 24) {
+                kelasDisplayHTML = '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-800 text-white dark:bg-white dark:text-gray-800 border border-opacity-20 border-current">Semua Kelas</span>';
+            } else if (kelasList.length > 0) {
+                const colors = {
+                    '1': 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',     // Merah
+                    '2': 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300', // Kuning
+                    '3': 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',   // Hijau
+                    '4': 'bg-cyan-100 text-cyan-800 dark:bg-cyan-900/30 dark:text-cyan-300',     // Biru Muda/Cyan
+                    '5': 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',     // Biru
+                    '6': 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' // Ungu
+                };
+
+                const badges = [];
+
+                // Group by levels (Check if Teacher has full level 1A-1D, etc)
+                for (let i = 1; i <= 6; i++) {
+                    const levelStr = i.toString();
+                    const classesInThisLevel = ['A', 'B', 'C', 'D'].map(suffix => levelStr + suffix);
+
+                    const hasAll = classesInThisLevel.every(c => kelasList.includes(c));
+
+                    if (hasAll) {
+                        const colorClass = colors[levelStr] || 'bg-gray-100 text-gray-800';
+                        badges.push(`<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${colorClass} border border-opacity-20 border-current">Kelas ${levelStr}</span>`);
+                        // Remove from active list
+                        kelasList = kelasList.filter(k => !classesInThisLevel.includes(k));
+                    }
+                }
+
+                // Remaining individual classes
+                // Sort remaining to look nice
+                kelasList.sort();
+
+                kelasList.forEach(kelas => {
+                    const levelChar = kelas.charAt(0);
+                    const style = colors[levelChar] || 'bg-gray-100 text-gray-800';
+                    badges.push(`<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${style} border border-opacity-20 border-current">${kelas}</span>`);
+                });
+
+                kelasDisplayHTML = `<div class="flex flex-wrap gap-1.5 max-w-xs">${badges.join('')}</div>`;
+            }
+
             html += `
                 <tr class="teacher-row bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors opacity-0">
                     <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">${data.niy || '-'}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.nama_lengkap || '-'}</td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">${data.email || '-'}</td>
                     <td class="px-6 py-4">${data.jabatan || '-'}</td>
-                    <td class="px-6 py-4">${data.kelas_diampu || '-'}</td>
+                    <td class="px-6 py-4" title="${data.kelas_diampu || '-'}">${kelasDisplayHTML}</td>
                     <td class="px-6 py-4">
                         <div class="flex gap-2">
                             <button class="font-medium text-blue-600 dark:text-blue-500 hover:underline" onclick="editGuru('${data.id}')">Edit</button>
@@ -447,20 +493,22 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // --- Delete Function ---
+    // --- Delete Function ---
     window.deleteGuru = async (id) => {
-        showConfirmAlert(
+        const confirmed = await showConfirmAlert(
             'Hapus Data Guru?',
-            'Apakah Anda yakin ingin menghapus data guru ini? Tindakan ini tidak dapat dibatalkan.',
-            async () => {
-                try {
-                    await db.collection('teachers').doc(id).delete();
-                    showCustomAlert('success', 'Terhapus!', 'Data guru berhasil dihapus.');
-                } catch (error) {
-                    console.error("Error removing document: ", error);
-                    showCustomAlert('error', 'Gagal!', 'Gagal menghapus data: ' + error.message);
-                }
-            }
+            'Apakah Anda yakin ingin menghapus data guru ini? Tindakan ini tidak dapat dibatalkan.'
         );
+
+        if (confirmed) {
+            try {
+                await db.collection('teachers').doc(id).delete();
+                showCustomAlert('success', 'Terhapus!', 'Data guru berhasil dihapus.');
+            } catch (error) {
+                console.error("Error removing document: ", error);
+                showCustomAlert('error', 'Gagal!', 'Gagal menghapus data: ' + error.message);
+            }
+        }
     };
 
     // --- CSV Upload Logic ---
@@ -569,50 +617,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            showConfirmAlert(
+            const confirmed = await showConfirmAlert(
                 'Upload Data CSV?',
-                `Ditemukan ${teachers.length} data guru. Apakah Anda yakin ingin mengupload?`,
-                async () => {
-
-                    // Batch write
-                    const batch = db.batch();
-                    let batchCount = 0;
-                    const BATCH_LIMIT = 500; // Firestore batch limit
-
-                    try {
-                        btnProcessCSV.disabled = true;
-                        btnProcessCSV.textContent = 'Memproses...';
-                        showLoadingAlert('Mengupload Data...', 'Mohon tunggu, sedang memproses file CSV');
-
-                        for (const teacher of teachers) {
-                            // Use NIY as doc ID
-                            const docRef = db.collection('teachers').doc(teacher.niy);
-                            batch.set(docRef, teacher, { merge: true });
-                            batchCount++;
-
-                            if (batchCount >= BATCH_LIMIT) {
-                                await batch.commit();
-                                batchCount = 0;
-                            }
-                        }
-
-                        if (batchCount > 0) {
-                            await batch.commit();
-                        }
-
-                        closeCustomAlert();
-                        showCustomAlert('success', 'Berhasil!', `Berhasil mengupload ${teachers.length} data guru!`);
-                        toggleCSVModal(false);
-                    } catch (error) {
-                        console.error("Error uploading CSV: ", error);
-                        closeCustomAlert();
-                        showCustomAlert('error', 'Gagal!', 'Gagal mengupload data: ' + error.message);
-                    } finally {
-                        btnProcessCSV.disabled = false;
-                        btnProcessCSV.textContent = 'Upload & Proses';
-                    }
-                }
+                `Ditemukan ${teachers.length} data guru. Apakah Anda yakin ingin mengupload?`
             );
+
+            if (confirmed) {
+
+                // Batch write
+                const batch = db.batch();
+                let batchCount = 0;
+                const BATCH_LIMIT = 500; // Firestore batch limit
+
+                try {
+                    btnProcessCSV.disabled = true;
+                    btnProcessCSV.textContent = 'Memproses...';
+                    showLoadingAlert('Mengupload Data...', 'Mohon tunggu, sedang memproses file CSV');
+
+                    for (const teacher of teachers) {
+                        // Use NIY as doc ID
+                        const docRef = db.collection('teachers').doc(teacher.niy);
+                        batch.set(docRef, teacher, { merge: true });
+                        batchCount++;
+
+                        if (batchCount >= BATCH_LIMIT) {
+                            await batch.commit();
+                            batchCount = 0;
+                        }
+                    }
+
+                    if (batchCount > 0) {
+                        await batch.commit();
+                    }
+
+                    closeCustomAlert();
+                    showCustomAlert('success', 'Berhasil!', `Berhasil mengupload ${teachers.length} data guru!`);
+                    toggleCSVModal(false);
+                } catch (error) {
+                    console.error("Error uploading CSV: ", error);
+                    closeCustomAlert();
+                    showCustomAlert('error', 'Gagal!', 'Gagal mengupload data: ' + error.message);
+                } finally {
+                    btnProcessCSV.disabled = false;
+                    btnProcessCSV.textContent = 'Upload & Proses';
+                }
+            }
         };
 
         reader.readAsText(file);
