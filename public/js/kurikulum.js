@@ -141,7 +141,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (data.category === 'Tahfizh') categoryClass = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300';
             else if (data.category === 'Doa') categoryClass = 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
             else if (data.category === 'Tathbiq') categoryClass = 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
-            else if (data.category === 'Hadits') categoryClass = 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300';
 
             // Format Badge Kelas
             let kelasBadges = '';
@@ -179,6 +178,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     </td>
                     <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
                         ${data.target || '-'}
+                    </td>
+                    <td class="px-6 py-4 text-gray-500 dark:text-gray-400">
+                        ${data.semester || '-'}
                     </td>
                     <td class="px-6 py-4 text-right">
                         <div class="flex items-center justify-end gap-2">
@@ -262,7 +264,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     btnAddMateri.addEventListener('click', () => {
         isEditingId = null;
-        modalTitle.innerHTML = '<i class="ph ph-plus-circle text-primary text-xl"></i> Tambah Materi Baru';
+        modalTitle.innerHTML = 'Tambah Materi Baru';
 
         // Reset Form
         inputKategori.value = 'Tahfizh';
@@ -279,6 +281,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const kategori = inputKategori.value;
         const nama = inputNamaMateri.value.trim();
         const target = inputTarget.value.trim();
+        const semester = inputSemester.value;
 
         // Get Checkboxes
         const targetKelas = [];
@@ -301,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
             name: nama,
             targetKelas: targetKelas, // Array of strings ['1', '2']
             target: target, // Optional score/count target
+            semester: semester,
             updated_at: firebase.firestore.FieldValue.serverTimestamp()
         };
 
